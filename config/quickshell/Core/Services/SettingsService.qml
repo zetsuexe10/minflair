@@ -25,8 +25,8 @@ Item {
     property bool clock24h: true
     property bool clockSeconds: false
     property bool clockShowDate: true
-    property string cursorTheme: "Bibata-Modern-Classic"
-    property int cursorSize: Constants.size2Xl
+    property string cursorTheme: "Vimix-cursors"
+    property int cursorSize: 16
     property string barStyle: "convex"
     property bool barIslandMode: barStyle === "island"
     property bool barConvexMode: barStyle === "convex"

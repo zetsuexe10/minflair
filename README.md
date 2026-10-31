@@ -9,7 +9,9 @@ selector, lock screen) with Hyprland dotfiles and an optional Quickshell login s
 - Quickshell 0.3 (not in trixie; the CI builds a `.deb`)
 - Packages: `./tools/check-deps.sh` lists what is missing and changes nothing
 
-Defaults: terminal `foot`, wallpapers `swaybg`, GTK theme `adw-gtk3`.
+Defaults: terminal `foot`, wallpapers `swaybg`, GTK theme `adw-gtk3`, cursor `Vimix-cursors` at size 16
+(not packaged in Debian: `git clone https://github.com/vinceliuice/Vimix-cursors && cd Vimix-cursors && ./install.sh`;
+Adwaita is used until it is installed).
 
 ## Install
 ```bash

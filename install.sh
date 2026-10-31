@@ -42,6 +42,18 @@ for d in quickshell hypr; do
   cp -a "$HERE/config/$d" "$HOME/.config/$d"
   find "$HOME/.config/$d" \( -name '*.sh' -o -name '*.py' \) -exec chmod +x {} +
 done
+# Saved shell settings from an earlier install: move the cursor to Vimix-cursors at size 16.
+prefs="$HOME/.cache/quickshell/settings_prefs.json"
+if [ -f "$prefs" ]; then
+  python3 - "$prefs" <<'PY' || true
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p))
+if "Bibata" in str(d.get("cursorTheme", "")) or d.get("cursorSize") == 24:
+    d["cursorTheme"], d["cursorSize"] = "Vimix-cursors", 16
+    json.dump(d, open(p, "w"))
+PY
+fi
 mkdir -p "$HOME/Pictures/Wallpapers"
 "$HOME/.config/hypr/scripts/minflair-env.sh"
 

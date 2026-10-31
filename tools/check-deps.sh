@@ -68,6 +68,10 @@ for it in "${pkgs[@]}"; do
   else s="MISSING*"; missing+=("$p"); fi
   printf '%-30s %-10s %s\n' "$p" "$s" "$d"
 done
+if ! ls -d ~/.local/share/icons/Vimix* ~/.icons/Vimix* /usr/share/icons/Vimix* >/dev/null 2>&1; then
+  echo; echo "Cursor theme Vimix-cursors not found (not packaged in Debian). Install it:"
+  echo "  git clone https://github.com/vinceliuice/Vimix-cursors && cd Vimix-cursors && ./install.sh"
+fi
 echo; echo "MISSING* = no candidate in your enabled repos (hypr* tools: enable trixie-backports)."
 if [ ${#missing[@]} -gt 0 ]; then
   echo; echo "Install the missing ones:"

@@ -33,15 +33,20 @@ hl.env("ADW_DEBUG_COLOR_SCHEME", dark and "prefer-dark" or "prefer-light")
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 
--- cursor: use Bibata if installed, otherwise Adwaita
+-- cursor: Vimix if installed, otherwise Adwaita
 local cursor = "Adwaita"
-for _, d in ipairs({ home .. "/.local/share/icons", home .. "/.icons", "/usr/share/icons" }) do
-	if exists(d .. "/Bibata-Modern-Classic/index.theme") then
-		cursor = "Bibata-Modern-Classic"
-		break
+local found = false
+for _, name in ipairs({ "Vimix-cursors", "Vimix-white-cursors" }) do
+	for _, d in ipairs({ home .. "/.local/share/icons", home .. "/.icons", "/usr/share/icons" }) do
+		if exists(d .. "/" .. name .. "/index.theme") then
+			cursor = name
+			found = true
+			break
+		end
 	end
+	if found then break end
 end
-hl.env("XCURSOR_SIZE", "24")
-hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XCURSOR_SIZE", "16")
+hl.env("HYPRCURSOR_SIZE", "16")
 hl.env("XCURSOR_THEME", cursor)
 hl.env("HYPRCURSOR_THEME", cursor)

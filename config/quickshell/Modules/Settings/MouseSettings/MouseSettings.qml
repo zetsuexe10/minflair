@@ -188,6 +188,9 @@ AppContainer {
             label: "Cursor Size"
             description: "Size of the mouse cursor in pixels"
             model: [{
+                "text": "16",
+                "value": 16
+            }, {
                 "text": "24",
                 "value": 24
             }, {
