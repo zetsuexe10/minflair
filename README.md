@@ -70,7 +70,7 @@ wallpaper colours after you pick one in the shell. Revert: `sudo systemctl disab
 Media, volume, brightness, mic-mute, touchpad and Caps/Num-lock keys work with an on-screen display.
 
 ## Problems?
-Run `./tools/doctor.sh` inside Hyprland. Widgets open through `/tmp/quickshell_*` sockets that exist only once the
+Lock screen password rejected? It needs only libpam (no python package). Run `./tools/doctor.sh` inside Hyprland. Widgets open through `/tmp/quickshell_*` sockets that exist only once the
 shell has loaded without errors; the doctor prints those errors (`qs log` shows the full log). If `qs` crashes, the
 report is in `~/.cache/quickshell/crashes/`.
 
