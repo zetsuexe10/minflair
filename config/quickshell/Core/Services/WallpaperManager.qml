@@ -10,6 +10,7 @@ QtObject {
 
     property string currentWallpaper: ""
     property string currentWallpaperPath: ""
+    property bool wallpaperRestored: false
     property string transitionType: HyprlandService.wpTransitionType
     property int transitionStep: HyprlandService.wpTransitionStep
     property string transitionPos: HyprlandService.wpTransitionPos
@@ -136,6 +137,10 @@ QtObject {
                 if (name) {
                     root.currentWallpaper = name;
                     root.currentWallpaperPath = name.startsWith("/") ? name : (Quickshell.env("HOME") + "/Pictures/Wallpapers/" + name);
+                    if (!root.wallpaperRestored) {
+                        root.wallpaperRestored = true;
+                        root.reapplyCurrentWallpaper();
+                    }
                 }
             }
         }
