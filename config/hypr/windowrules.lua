@@ -10,7 +10,7 @@ hl.window_rule({ match = { class = "^org.gnome.Loupe$" }, float = true, size = "
 hl.window_rule({ match = { class = "^org.pulseaudio.pavucontrol$" }, float = true, size = "920 450", center = true })
 hl.window_rule({ match = { class = "^blueman-manager$" }, float = true, size = "700 600", center = true })
 hl.window_rule({ match = { class = "^org.gnome.Calculator$" }, float = true, size = "920 450", center = true })
-hl.window_rule({ match = { class = "^kitty-floating$" }, float = true, size = "1000 600", center = true })
+hl.window_rule({ match = { class = "^foot-floating$" }, float = true, size = "1000 600", center = true })
 hl.window_rule({ match = { class = "^xdg-desktop-portal-gtk$" }, float = true, size = "900 600", center = true })
 hl.window_rule({
 	match = { title = "^Open File|Save As|Save File|.*wants to open.*|.*wants to save.*$" },

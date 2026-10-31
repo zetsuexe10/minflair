@@ -132,7 +132,7 @@ Item {
                 return false;
 
             let bin = cmd.split(" ")[0].replace(/^.*\//, '');
-            if (!bin || bin === "kitty" || bin === "sh" || bin === "bash") {
+            if (!bin || bin === "foot" || bin === "sh" || bin === "bash") {
                 let parts = cmd.split(" ");
                 for (let k = 1; k < parts.length; k++) {
                     if (!parts[k].startsWith("-")) {
@@ -275,7 +275,7 @@ Item {
             return x !== "";
         });
         if (isTerminal && parts[0] !== "kitty" && parts[0] !== "alacritty" && parts[0] !== "foot")
-            parts = ["kitty", "-e"].concat(parts);
+            parts = ["foot"].concat(parts);
 
         launcherProc.command = parts;
         launcherProc.running = false;
@@ -295,7 +295,7 @@ Item {
 
         let parts = cmd.trim().split(" ");
         let binary = parts[0];
-        if (binary === "kitty" || binary === "sh" || binary === "bash") {
+        if (binary === "foot" || binary === "sh" || binary === "bash") {
             for (let i = 1; i < parts.length; i++) {
                 if (!parts[i].startsWith("-")) {
                     binary = parts[i];

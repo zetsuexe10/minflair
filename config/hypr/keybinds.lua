@@ -1,5 +1,5 @@
 local mainMod = "SUPER"
-local terminal = "kitty"
+local terminal = "foot"
 local fileManager = "nautilus"
 
 -- ## Applications
@@ -7,7 +7,7 @@ local fileManager = "nautilus"
 -- # Open Terminal
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 -- # Open Floating Terminal
-hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd("kitty --class kitty-floating"))
+hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd("foot --app-id foot-floating"))
 -- # Open File Manager
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 -- # Open Browser
@@ -146,8 +146,6 @@ hl.bind("CTRL + ALT + C", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 
 -- # Toggle Settings
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_settings"))
--- # Toggle Package Manager
-hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_packagemanager"))
 -- # Toggle Keybinds Cheat Sheet
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_keybinds"))
 -- # Toggle Pomodoro

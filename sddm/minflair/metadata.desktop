@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Minflair
+Description=Wallpaper-synced login screen with session picker
+Author=Minflair
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=minflair
+Theme-API=2.0
+QTVersion=6

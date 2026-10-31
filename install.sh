@@ -2,6 +2,7 @@
 # Minflair (Quickshell + Hyprland) for Debian 13. Run as your normal user.
 #   ./install.sh            full: apt packages + configs      (zip from CI, has debs/)
 #   ./install.sh --no-apt   configs only (you already installed the packages)
+#   add --no-sddm to keep your current login manager
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ "$(id -u)" -ne 0 ] || { echo "Run as your normal user, not root." >&2; exit 1; }
@@ -14,7 +15,7 @@ if [ "${1:-}" != "--no-apt" ] && ls "$HERE"/debs/quickshell_*.deb >/dev/null 2>&
     power-profiles-daemon upower pipewire pipewire-pulse wireplumber playerctl brightnessctl \
     wl-clipboard cliphist grim slurp wf-recorder tesseract-ocr tesseract-ocr-eng cava swaybg \
     libnotify-bin xdg-utils papirus-icon-theme fonts-noto-color-emoji fonts-noto-core qt6ct \
-    kitty nautilus gnome-keyring xdg-desktop-portal-gtk qt6-wayland
+    foot nautilus gnome-keyring xdg-desktop-portal-gtk qt6-wayland
   sudo apt-get install -y -t trixie-backports hyprland hypridle hyprlock hyprpicker hyprsunset \
     hyprpolkitagent xdg-desktop-portal-hyprland \
     || echo "!! hypr* packages: enable trixie-backports and install them manually"
@@ -34,6 +35,12 @@ for d in quickshell hypr; do
 done
 mkdir -p "$HOME/Pictures/Wallpapers"
 "$HOME/.config/hypr/scripts/minflair-env.sh"
+
+# SDDM is the default login screen (session picker: hyprland / labwc / openbox ...)
+if [[ " $* " != *" --no-sddm "* ]]; then
+  echo "==> Setting up the SDDM login screen"
+  "$HERE/tools/install-sddm.sh" -y || echo "!! SDDM setup failed; retry with tools/install-sddm.sh"
+fi
 
 cat <<MSG
 

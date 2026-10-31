@@ -91,6 +91,25 @@ def apply(home, colors):
         except OSError:
             pass
 
+        # QML palette for the Minflair SDDM theme (loaded via file:// by the greeter)
+        qml_file = os.path.join(sddm_dir, "colors.qml")
+        qml = (
+            "import QtQuick\nQtObject {\n"
+            f'    property color bg: "{theme_data["opaqueBg"]}"\n'
+            f'    property color fg: "{theme_data["fg"]}"\n'
+            f'    property color muted: "{theme_data["muted"]}"\n'
+            f'    property color accent: "{theme_data["accent"]}"\n'
+            f'    property color panel: "{_argb(theme_data["opaqueBg"], 0.78)}"\n'
+            f'    property string font: "{theme_data["font"]}"\n'
+            "}\n"
+        )
+        with open(qml_file, "w") as f:
+            f.write(qml)
+        try:
+            os.chmod(qml_file, 0o666)
+        except OSError:
+            pass
+
         # Sync wallpaper
         qs_wall_file = os.path.join(home, ".cache", "quickshell", "current_wallpaper")
         if os.path.exists(qs_wall_file):

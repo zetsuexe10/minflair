@@ -12,7 +12,7 @@ items=(
  "xdg-desktop-portal-hyprland|xdg-desktop-portal-hyprland|screen share / screenshots portal"
  "swaybg|swaybg|wallpaper"
  "qs|quickshell|the shell"
- "kitty|kitty|terminal (Super+Return)"
+ "foot|foot|terminal (Super+Return)"
  "nautilus|nautilus|file manager (Super+E)"
  "cliphist|cliphist|clipboard history"
  "wl-paste|wl-clipboard|clipboard"

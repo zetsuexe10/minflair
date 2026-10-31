@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import Quickshell.Widgets
 import qs.Core
 import qs.Core.Components
 import qs.Core.Services
@@ -46,41 +47,21 @@ Item {
                 Layout.preferredHeight: root.artSize
                 Layout.alignment: Qt.AlignHCenter
 
-                Image {
-                    id: artImage
-
-                    anchors.fill: parent
-                    source: MprisService.activePlayer ? (MprisService.activePlayer.trackArtUrl || "") : ""
-                    fillMode: Image.PreserveAspectCrop
-                    mipmap: true
-                    asynchronous: true
-                    visible: false
-                }
-
-                Rectangle {
-                    id: artMask
-
+                // ClippingRectangle rounds the cover without a hidden mask source.
+                ClippingRectangle {
                     anchors.fill: parent
                     radius: Constants.sizeLg
-                    antialiasing: true
-                    visible: false
-                }
-
-                MultiEffect {
-                    anchors.fill: parent
-                    source: artImage
-                    maskEnabled: true
-                    // Keep a real 0..1 alpha ramp so the antialiased rounded
-                    // corners are not promoted to fully opaque.
-                    maskThresholdMin: 0.5
-                    maskSpreadAtMin: 1
+                    color: "transparent"
                     visible: artImage.status === Image.Ready && MprisService.activePlayer !== null
 
-                    maskSource: ShaderEffectSource {
-                        visible: false
-                        hideSource: true
-                        smooth: true
-                        sourceItem: artMask
+                    Image {
+                        id: artImage
+
+                        anchors.fill: parent
+                        source: MprisService.activePlayer ? (MprisService.activePlayer.trackArtUrl || "") : ""
+                        fillMode: Image.PreserveAspectCrop
+                        mipmap: true
+                        asynchronous: true
                     }
 
                 }

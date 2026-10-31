@@ -194,7 +194,7 @@ Item {
                 out.push({
                     "type": "run",
                     "name": term,
-                    "subtitle": "Run in kitty",
+                    "subtitle": "Run in foot",
                     "command": term
                 });
 
@@ -259,7 +259,7 @@ Item {
 
         let command = String(exec).trim();
         if (terminal)
-            command = "kitty -e " + command;
+            command = "foot " + command;
 
         closeLauncher();
         launchShell(command);
@@ -320,7 +320,7 @@ Item {
             openUrl(item.url);
         } else if (item.type === "run") {
             closeLauncher();
-            launchShell("kitty --hold -e sh -c " + shellQuote(item.command));
+            launchShell("foot --hold sh -c " + shellQuote(item.command));
         } else {
             launchApp(item.exec, item.terminal);
         }
