@@ -9,6 +9,7 @@ import qs.Core.Windows
 import qs.Modules.Bar
 import qs.Modules.Bar.Styles.Convex
 import qs.Modules.Bar.Styles.Gaming
+import qs.Modules.Bar.Styles.Side
 
 ShellRoot {
     id: root
@@ -55,6 +56,35 @@ ShellRoot {
         }
 
         target: "osd"
+    }
+
+    function announceBarStyle() {
+        const name = SettingsService.barStyleNames[SettingsService.barStyle] || SettingsService.barStyle;
+        OsdService.displayMessage("Bar style", name, "bar", true);
+        return SettingsService.barStyle;
+    }
+
+    IpcHandler {
+        function cycle(): string {
+            SettingsService.cycleBarStyle(1);
+            return root.announceBarStyle();
+        }
+
+        function prev(): string {
+            SettingsService.cycleBarStyle(-1);
+            return root.announceBarStyle();
+        }
+
+        function set(style: string): string {
+            SettingsService.setBarStyle(style);
+            return root.announceBarStyle();
+        }
+
+        function get(): string {
+            return SettingsService.barStyle;
+        }
+
+        target: "bar"
     }
 
     NotificationService {
@@ -138,6 +168,17 @@ ShellRoot {
 
         notificationService: globalNotificationService
         visible: SettingsService.settingsLoaded
+    }
+
+    SideBarWindow {
+        id: sideBarSurface
+
+        notificationService: globalNotificationService
+    }
+
+    SideOverlay {
+        notificationService: globalNotificationService
+        barWidth: sideBarSurface.barWidth
     }
 
     GamingOverlay {

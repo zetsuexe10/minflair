@@ -16,13 +16,16 @@ AppContainer {
 
         SettingSegmented {
             label: "Style"
-            description: "Choose between Convex or Island"
+            description: "Convex or Island (top bar), or Side (vertical bar on the left). Super+Alt+B cycles the styles."
             model: [{
                 "text": "Convex",
                 "value": "convex"
             }, {
                 "text": "Island",
                 "value": "island"
+            }, {
+                "text": "Side",
+                "value": "side"
             }]
             currentValue: SettingsService.barStyle
             onActivated: (value) => {

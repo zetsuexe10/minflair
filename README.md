@@ -86,6 +86,17 @@ Log: `/var/tmp/minflair-greeter/greeter.log`. The layout and icons are adapted f
 | `Super+G` / `Super+Tab` / `Super+Shift+G` | group / cycle group / lock group |
 | `Super+Shift+M` | exit Hyprland |
 
+| Bar style | |
+| :-- | :-- |
+| `Super+Alt+B` / `Super+Alt+Shift+B` | next / previous bar style |
+| `Super+Alt+1` / `2` / `3` | Convex / Island / Side bar |
+
+Shell command behind them: `qs ipc call bar cycle|prev|get|set <convex|island|side>`. The style is also in Settings > Bar.
+
+The **Side** style is a floating vertical bar on the left: launcher, workspaces, focused window title, tray, status
+(network, Bluetooth, volume, keyboard layout, lock keys, notifications), clock and power. It has no battery indicator.
+Widgets (control center, calendar, dashboard, ...) and notification toasts open next to it.
+
 | Navigation | |
 | :-- | :-- |
 | `Super+Arrows` | focus |

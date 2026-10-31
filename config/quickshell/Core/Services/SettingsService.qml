@@ -28,6 +28,12 @@ Item {
     property string cursorTheme: "Vimix-cursors"
     property int cursorSize: 16
     property string barStyle: "convex"
+    readonly property var barStyles: ["convex", "island", "side"]
+    readonly property var barStyleNames: ({
+        "convex": "Convex",
+        "island": "Island",
+        "side": "Side"
+    })
     property bool barIslandMode: barStyle === "island"
     property bool barConvexMode: barStyle === "convex"
     property string islandRightMode: "auto"
@@ -45,6 +51,21 @@ Item {
         if (!settingsLoaded && !isSettingsLoading)
             settingsLoader.running = true;
 
+    }
+
+    function setBarStyle(style) {
+        if (barStyles.indexOf(style) !== -1)
+            barStyle = style;
+
+        return barStyle;
+    }
+
+    function cycleBarStyle(step) {
+        let i = barStyles.indexOf(barStyle);
+        if (i < 0)
+            i = 0;
+
+        return setBarStyle(barStyles[(i + step + barStyles.length) % barStyles.length]);
     }
 
     function applyCursor(theme, size) {
@@ -404,8 +425,8 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                         applyCursor(settingsService.cursorTheme, settingsService.cursorSize);
                         applyFont(settingsService.fontFamily, Math.round(11 * settingsService.fontScale));
                         if (prefs.barStyle !== undefined) {
-                            if (prefs.barStyle === "island")
-                                settingsService.barStyle = "island";
+                            if (settingsService.barStyles.indexOf(prefs.barStyle) !== -1)
+                                settingsService.barStyle = prefs.barStyle;
                             else
                                 settingsService.barStyle = "convex";
                         }

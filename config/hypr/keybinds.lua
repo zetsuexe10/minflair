@@ -151,6 +151,19 @@ hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell
 -- # Toggle Pomodoro
 hl.bind("CTRL + ALT + T", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_pomodoro"))
 
+-- ## Bar Style
+
+-- # Next Bar Style
+hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd("qs ipc call bar cycle"))
+-- # Previous Bar Style
+hl.bind(mainMod .. " + ALT + SHIFT + B", hl.dsp.exec_cmd("qs ipc call bar prev"))
+-- # Convex Bar
+hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd("qs ipc call bar set convex"))
+-- # Island Bar
+hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd("qs ipc call bar set island"))
+-- # Side Bar
+hl.bind(mainMod .. " + ALT + 3", hl.dsp.exec_cmd("qs ipc call bar set side"))
+
 -- ## Window Groups
 
 -- # Create / Dissolve Group

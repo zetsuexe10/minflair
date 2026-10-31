@@ -15,8 +15,9 @@ Item {
     readonly property bool isBarOverlayHandled: AppState.isBarOverlayWidget(widgetId)
     readonly property bool isIslandHandled: !DisplayProfileService.gameModeActive && SettingsService.barIslandMode && isBarOverlayHandled
     readonly property bool isConvexHandled: !DisplayProfileService.gameModeActive && SettingsService.barConvexMode && isBarOverlayHandled
+    readonly property bool isSideHandled: !DisplayProfileService.gameModeActive && SettingsService.barStyle === "side" && isBarOverlayHandled
     readonly property bool isGamingHandled: DisplayProfileService.gameModeActive && isBarOverlayHandled
-    readonly property bool shouldLoadWindow: enabled && !isIslandHandled && !isConvexHandled && !isGamingHandled
+    readonly property bool shouldLoadWindow: enabled && !isIslandHandled && !isConvexHandled && !isSideHandled && !isGamingHandled
     readonly property bool _isActive: shouldLoadWindow && (exclusive ? AppState.isWidgetOpen(widgetId) : _isInternalActive)
     property bool _isClosing: false
     property bool _pendingOpen: false
