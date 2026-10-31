@@ -8,12 +8,20 @@ Requires Hyprland >= 0.55 (Lua config, from trixie-backports) and Quickshell (no
 
 ## Install
 ```bash
-./check-deps.sh            # what is missing on your machine (changes nothing)
+./tools/check-deps.sh      # what is missing on your machine (changes nothing)
 ./install.sh --no-apt      # configs only, packages already installed
 ./install.sh               # CI zip only: also installs the Quickshell .deb and all packages
 ```
 Then log out and start Hyprland. Put wallpapers in `~/Pictures/Wallpapers`; `Super+K` lists the keybinds.
 Backups of your old `~/.config/quickshell` and `~/.config/hypr` are kept as `.bak.<date>`.
+
+## Login screen (optional)
+`./tools/install-sddm.sh` switches greetd -> SDDM with the Minflair theme (follows your wallpaper). Takes effect on
+next boot; revert with `sudo systemctl disable sddm; sudo systemctl enable --force greetd`.
+
+## Something not showing (launcher, widgets)?
+Inside Hyprland run `./tools/doctor.sh`. Widgets open through sockets `/tmp/quickshell_*` that only exist once the
+shell has loaded without errors; the doctor prints the errors. Launcher is `Super+A`, control center `Ctrl+Alt+S`.
 
 ## Theme isolation
 Minflair never edits `~/.config/gtk-*`, `~/.config/qt*ct` or gsettings. The wallpaper-driven GTK (adw-gtk3) and
@@ -24,7 +32,7 @@ Uninstall: `./uninstall.sh`, then delete `~/.minflair`.
 ## Differences from the Arch version
 - apt/dpkg instead of pacman/yay; Package Manager window removed.
 - Wallpapers via swaybg (no transitions). Only GTK, Qt and Hyprland colours are generated.
-- Lock screen is Quickshell's (`Super+L`, hypridle); hyprlock is not used.
+- Window rounding default is 12 (was 32). Lock screen is Quickshell's (`Super+L`, hypridle); hyprlock is not used.
 
 ## Build
 `.github/workflows/debian-trixie.yml` builds Quickshell on trixie, makes the `.deb`, smoke-tests the config and

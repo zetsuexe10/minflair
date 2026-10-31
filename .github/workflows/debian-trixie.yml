@@ -40,7 +40,7 @@ jobs:
       - name: Lint config scripts
         run: |
           python3 -m py_compile $(find config/quickshell -name '*.py')
-          shellcheck -S error $(find config ci install.sh uninstall.sh check-deps.sh -name '*.sh')
+          shellcheck -S error $(find config ci tools install.sh uninstall.sh -name '*.sh')
 
       - name: Build Quickshell
         run: |
