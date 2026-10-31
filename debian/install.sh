@@ -27,4 +27,4 @@ find "$dest" \( -name '*.sh' -o -name '*.py' \) -exec chmod +x {} +
 
 echo
 echo "Done. Start it inside a Wayland session with:  qs"
-echo "Logs: qs log     Optional: install 'awww' for animated wallpaper transitions (swaybg is used otherwise)."
+echo "Logs: qs log    "
