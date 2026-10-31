@@ -57,6 +57,9 @@ $muted_alpha = {hypr_color(muted, "aa")}
         f2.write(hypr_content)
     with open(os.path.join(hypr_dir, "colors.conf"), "w") as f2:
         f2.write(hypr_conf_content)
-    subprocess.run(
-        ["hyprctl", "reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-    )
+    try:
+        subprocess.run(
+            ["hyprctl", "reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+        )
+    except FileNotFoundError:
+        pass

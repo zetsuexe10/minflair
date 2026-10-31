@@ -50,23 +50,26 @@ def apply(home, colors):
     qt_colors_str = ", ".join(qt_colors)
     qt_conf_content = f"[ColorScheme]\nactive_colors={qt_colors_str}\ninactive_colors={qt_colors_str}\ndisabled_colors={qt_colors_str}\n"
 
+    from minflair_paths import XDG
+
     for qtct in ["qt5ct", "qt6ct"]:
-        qt_dir = os.path.join(home, ".config", qtct, "colors")
+        base = os.path.join(XDG, qtct)
+        qt_dir = os.path.join(base, "colors")
         os.makedirs(qt_dir, exist_ok=True)
         scheme_path = os.path.join(qt_dir, "quickshell.conf")
         with open(scheme_path, "w") as f2:
             f2.write(qt_conf_content)
 
-        qtct_conf = os.path.join(home, ".config", qtct, f"{qtct}.conf")
+        qtct_conf = os.path.join(base, f"{qtct}.conf")
+        config = configparser.ConfigParser()
+        config.optionxform = str
         if os.path.exists(qtct_conf):
-            config = configparser.ConfigParser()
-            config.optionxform = str
             config.read(qtct_conf)
-            if "Appearance" not in config:
-                config["Appearance"] = {}
-            config["Appearance"]["color_scheme_path"] = scheme_path
-            config["Appearance"]["custom_palette"] = "true"
-            icon_theme = "Papirus-Dark" if is_dark else "Papirus-Light"
-            config["Appearance"]["icon_theme"] = icon_theme
-            with open(qtct_conf, "w") as configfile:
-                config.write(configfile)
+        if "Appearance" not in config:
+            config["Appearance"] = {}
+        config["Appearance"]["color_scheme_path"] = scheme_path
+        config["Appearance"]["custom_palette"] = "true"
+        config["Appearance"].setdefault("style", "Fusion")
+        config["Appearance"]["icon_theme"] = "Papirus-Dark" if is_dark else "Papirus-Light"
+        with open(qtct_conf, "w") as configfile:
+            config.write(configfile)

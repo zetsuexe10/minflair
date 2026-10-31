@@ -7,18 +7,7 @@ import json
 import os
 
 from color_utils import blend_hex, get_brightness, resolve_color, sanitize_color
-from theme_appliers import (
-    btop,
-    gtk,
-    hyprland,
-    kitty,
-    lazygit,
-    nvim,
-    obsidian,
-    qt,
-    sddm,
-    starship,
-)
+from theme_appliers import gtk, hyprland, qt
 
 
 def main():
@@ -90,16 +79,9 @@ def main():
         "is_dark": is_dark,
     }
 
-    kitty.apply(home, colors)
     gtk.apply(home, colors)
-    nvim.apply(home, colors)
-    hyprland.apply(home, colors)
-    starship.apply(home, colors)
     qt.apply(home, colors)
-    btop.apply(home, colors)
-    lazygit.apply(home, colors)
-    obsidian.apply(home, colors)
-    sddm.apply(home, colors)
+    hyprland.apply(home, colors)
 
 
 if __name__ == "__main__":

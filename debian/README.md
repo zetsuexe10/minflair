@@ -1,18 +1,21 @@
-# Minflair Quickshell - Debian 13 (trixie) port
+# Minflair - Debian 13 (trixie): Quickshell + Hyprland
 
-Quickshell shell config only (bar styles Convex / Island / Gaming, control center, launcher, notifications, ...).
-Hyprland dotfiles are not part of this bundle yet.
+Needs Hyprland >= 0.55 (Lua config; trixie-backports) and Quickshell (built by CI).
 
 ```bash
-unzip minflair-quickshell-trixie.zip && cd minflair-quickshell-trixie
-./install.sh
-qs            # inside a Wayland session (Hyprland, sway, ...)
+./install.sh            # full (CI zip): apt packages + configs
+./install.sh --no-apt   # configs only, if the packages are already installed
 ```
+Then log out and start Hyprland: `qs`, polkit agent, clipboard, idle lock all autostart.
 
-What changed vs. the Arch version
-- Quickshell is not packaged in trixie: CI builds it and ships it as `debs/quickshell_*.deb`.
-- Updates card and system info use apt/dpkg instead of pacman/yay.
-- Package Manager window removed (it was a pacman/AUR frontend).
-- Wallpapers: `Scripts/system/awww-compat.sh` uses `swaybg`.
-- Needs a compositor with layer-shell. The `qs ipc` calls used by the keybinds work the same.
-- Fonts: the UI uses "Geist"; install it manually if you want the original look (Qt falls back otherwise).
+## Theme isolation
+Minflair never edits ~/.config/gtk-*, ~/.config/qt*ct or gsettings. Its GTK (adw-gtk3 + wallpaper colours) and
+Qt (qt6ct) theme is written to `~/.minflair/xdg`. The Hyprland session sets `XDG_CONFIG_HOME=~/.minflair/xdg`,
+an overlay that symlinks every other entry back to `~/.config`, so only apps started from the Minflair session
+see the theme. Light/dark switches reach apps started after the change; restart Hyprland for the GTK_THEME env.
+To remove everything: delete `~/.minflair` and `~/.config/hypr`.
+
+## Differences from the Arch version
+- Updates card / system info use apt/dpkg; Package Manager window removed.
+- Wallpapers via swaybg (no transitions). Only GTK, Qt and Hyprland colours are generated (no kitty/nvim/sddm...).
+- hyprlock isn't used: Super+L and hypridle call the Quickshell lock screen.

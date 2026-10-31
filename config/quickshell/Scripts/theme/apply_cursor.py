@@ -17,23 +17,17 @@ def main():
     size = sys.argv[2]
     home = Path.home()
 
-    # 1. Update GTK globally via gsettings
-    subprocess.run(
-        ["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", theme_name],
-        capture_output=True,
-    )
-    subprocess.run(
-        ["gsettings", "set", "org.gnome.desktop.interface", "cursor-size", size],
-        capture_output=True,
-    )
-
-    # 2. Update ~/.icons/default/index.theme
-    icons_dir = home / ".icons" / "default"
-    icons_dir.mkdir(parents=True, exist_ok=True)
-    index_theme_path = icons_dir / "index.theme"
-
-    content = f"[Icon Theme]\nInherits={theme_name}\n"
-    index_theme_path.write_text(content, encoding="utf-8")
+    # 1. Remember the cursor for the Minflair GTK settings (no gsettings, no ~/.icons)
+    from minflair_paths import ROOT, STATE
+    import json
+    st = {}
+    try:
+        st = json.loads(Path(STATE).read_text())
+    except Exception:
+        pass
+    st["cursor"] = theme_name
+    Path(ROOT).mkdir(parents=True, exist_ok=True)
+    Path(STATE).write_text(json.dumps(st, indent=2))
 
     # 3. Update ~/.config/hypr/envs.lua for persistence across reboots
     envs_lua = home / ".config" / "hypr" / "envs.lua"
