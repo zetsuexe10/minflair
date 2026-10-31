@@ -28,6 +28,10 @@ Item {
         color: root.panel
         border.color: popup.visible ? root.accent : "transparent"
         border.width: 1
+        scale: pickerMouse.pressed ? 0.98 : 1
+
+        Behavior on border.color { ColorAnimation { duration: 150 } }
+        Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
@@ -50,6 +54,7 @@ Item {
             font.pixelSize: 14
         }
         MouseArea {
+            id: pickerMouse
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: popup.visible ? popup.close() : popup.open()
@@ -63,6 +68,16 @@ Item {
         width: Math.max(root.width, 220)
         padding: 6
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        enter: Transition {
+            ParallelAnimation {
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 160; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "scale"; from: 0.96; to: 1; duration: 160; easing.type: Easing.OutCubic }
+            }
+        }
+        exit: Transition {
+            NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 110 }
+        }
 
         background: Rectangle {
             radius: 12
@@ -88,6 +103,7 @@ Item {
                 radius: 8
                 color: index === root.currentIndex ? Qt.rgba(root.accent.r, root.accent.g, root.accent.b, 0.25)
                                                     : (hover.hovered ? Qt.rgba(1, 1, 1, 0.08) : "transparent")
+                Behavior on color { ColorAnimation { duration: 110 } }
 
                 Text {
                     anchors.verticalCenter: parent.verticalCenter

@@ -29,16 +29,37 @@ Rectangle {
     }
 
     property bool failed: false
+    property bool busy: false
+    property real appear: 0      // 0 -> 1 on start (drives fade/slide-in)
+    property real shakeX: 0
+
+    opacity: 0
+    Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
+    NumberAnimation on appear { id: appearAnim; from: 0; to: 1; duration: 800; easing.type: Easing.OutCubic; running: false }
+    SequentialAnimation {
+        id: shake
+        NumberAnimation { target: root; property: "shakeX"; to: -14; duration: 55 }
+        NumberAnimation { target: root; property: "shakeX"; to: 14; duration: 90 }
+        NumberAnimation { target: root; property: "shakeX"; to: -9; duration: 80 }
+        NumberAnimation { target: root; property: "shakeX"; to: 5; duration: 70 }
+        NumberAnimation { target: root; property: "shakeX"; to: 0; duration: 60 }
+    }
 
     function doLogin() {
-        if (pass.text === "" || users.count === 0) return;
+        if (root.busy || pass.text === "" || users.count === 0) return;
         root.failed = false;
+        root.busy = true;
         sddm.login(userPicker.currentText, pass.text, sessionPicker.currentIndex);
     }
 
     Connections {
         target: sddm
+        function onLoginSucceeded() {
+            root.opacity = 0;
+        }
         function onLoginFailed() {
+            root.busy = false;
+            shake.restart();
             root.failed = true;
             pass.text = "";
             pass.forceActiveFocus();
@@ -52,6 +73,8 @@ Rectangle {
         source: "file:///var/tmp/sddm-theme/wallpaper.png"
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
+        opacity: status === Image.Ready ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 600 } }
     }
     // blurred copy on top; if the renderer has no effect support the plain image stays visible
     MultiEffect {
@@ -73,7 +96,8 @@ Rectangle {
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: parent.height * 0.12
+        anchors.topMargin: parent.height * 0.12 - (1 - root.appear) * 20
+        opacity: root.appear
         spacing: 4
 
         Text {
@@ -106,7 +130,9 @@ Rectangle {
     Rectangle {
         id: card
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: parent.height * 0.12
+        anchors.verticalCenterOffset: parent.height * 0.12 + (1 - root.appear) * 40
+        opacity: root.appear
+        transform: Translate { x: root.shakeX }
         width: 360
         height: col.implicitHeight + 48
         radius: 24
@@ -146,6 +172,7 @@ Rectangle {
                 id: pass
                 Layout.fillWidth: true
                 Layout.preferredHeight: 42
+                enabled: !root.busy
                 echoMode: TextInput.Password
                 placeholderText: "Password"
                 placeholderTextColor: pal.muted
@@ -159,13 +186,17 @@ Rectangle {
                     color: Qt.rgba(1, 1, 1, 0.07)
                     border.color: root.failed ? "#e5534b" : (pass.activeFocus ? pal.accent : "transparent")
                     border.width: 1
+                    Behavior on border.color { ColorAnimation { duration: 160 } }
                 }
                 onAccepted: root.doLogin()
             }
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                visible: root.failed
+                opacity: root.failed ? 1 : 0
+                Layout.preferredHeight: root.failed ? 18 : 0
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on Layout.preferredHeight { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
                 text: "Login failed, try again"
                 color: "#e5534b"
                 font.family: pal.font
@@ -175,7 +206,10 @@ Rectangle {
             Button {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 42
-                text: "Log in"
+                text: root.busy ? "Signing in..." : "Log in"
+                enabled: !root.busy
+                scale: down ? 0.98 : 1
+                Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
                 onClicked: root.doLogin()
                 contentItem: Text {
                     text: parent.text
@@ -189,7 +223,8 @@ Rectangle {
                 background: Rectangle {
                     radius: 12
                     color: pal.accent
-                    opacity: parent.down ? 0.8 : 1
+                    opacity: parent.down || root.busy ? 0.7 : (parent.hovered ? 0.92 : 1)
+                    Behavior on opacity { NumberAnimation { duration: 120 } }
                 }
             }
         }
@@ -229,6 +264,9 @@ Rectangle {
                 height: 38
                 radius: 12
                 color: pal.panel
+                scale: powerHover.hovered ? 1.05 : 1
+                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                HoverHandler { id: powerHover; cursorShape: Qt.PointingHandCursor }
                 Text {
                     id: lbl
                     anchors.centerIn: parent
@@ -245,5 +283,9 @@ Rectangle {
     // hidden helper so we can read the user count
     ListView { id: users; visible: false; model: userModel }
 
-    Component.onCompleted: pass.forceActiveFocus()
+    Component.onCompleted: {
+        pass.forceActiveFocus();
+        root.opacity = 1;
+        appearAnim.start();
+    }
 }
