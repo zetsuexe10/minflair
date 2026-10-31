@@ -2,7 +2,7 @@
 # Minflair (Quickshell + Hyprland) for Debian 13. Run as your normal user.
 #   ./install.sh            full: apt packages + configs      (zip from CI, has debs/)
 #   ./install.sh --no-apt   configs only (you already installed the packages)
-#   add --no-sddm to keep your current login manager
+#   login screen is separate: sudo tools/install-greeter.sh
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ "$(id -u)" -ne 0 ] || { echo "Run as your normal user, not root." >&2; exit 1; }
@@ -36,17 +36,12 @@ done
 mkdir -p "$HOME/Pictures/Wallpapers"
 "$HOME/.config/hypr/scripts/minflair-env.sh"
 
-# SDDM is the default login screen (session picker: hyprland / labwc / openbox ...)
-if [[ " $* " != *" --no-sddm "* ]]; then
-  echo "==> Setting up the SDDM login screen"
-  "$HERE/tools/install-sddm.sh" -y || echo "!! SDDM setup failed; retry with tools/install-sddm.sh"
-fi
-
 cat <<MSG
 
 Done.
  - Log out, pick/start Hyprland, and everything (qs, themes) starts by itself.
  - Theme output lives in ~/.minflair; your ~/.config/gtk-*, qt*ct and gsettings are untouched.
  - Put wallpapers in ~/Pictures/Wallpapers. Keybinds: Super+K shows all of them.
+ - Login screen (optional): sudo tools/install-greeter.sh
  - Logs: qs log
 MSG

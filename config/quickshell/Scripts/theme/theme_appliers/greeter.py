@@ -17,7 +17,7 @@ except ImportError:
 def _argb(rgb, alpha):
     """Build a QML #AARRGGBB color from an #RRGGBB color and an opacity (0-1).
 
-    SDDM's QML theme composites its surfaces over the blurred wallpaper, so the
+    The greeter composites its surfaces over the blurred wallpaper, so the
     derived overlays must keep their alpha instead of being flattened onto the
     background (which is what apply_theme.py does for text-only appliers).
     """
@@ -32,11 +32,11 @@ def _argb(rgb, alpha):
 
 
 def apply(home, colors):
-    sddm_dir = "/var/tmp/sddm-theme"
+    greeter_dir = "/var/tmp/minflair-greeter"
     try:
-        os.makedirs(sddm_dir, mode=0o777, exist_ok=True)
+        os.makedirs(greeter_dir, mode=0o777, exist_ok=True)
         try:
-            os.chmod(sddm_dir, 0o777)
+            os.chmod(greeter_dir, 0o777)
         except OSError:
             pass
 
@@ -83,7 +83,7 @@ def apply(home, colors):
             "isDark": is_dark,
         }
 
-        colors_file = os.path.join(sddm_dir, "colorscheme.json")
+        colors_file = os.path.join(greeter_dir, "colorscheme.json")
         with open(colors_file, "w") as f:
             json.dump(theme_data, f, indent=2)
         try:
@@ -91,8 +91,8 @@ def apply(home, colors):
         except OSError:
             pass
 
-        # QML palette for the Minflair SDDM theme (loaded via file:// by the greeter)
-        qml_file = os.path.join(sddm_dir, "colors.qml")
+        # QML palette for the Minflair greeter (loaded via file:// by the greeter)
+        qml_file = os.path.join(greeter_dir, "colors.qml")
         qml = (
             "import QtQuick\nQtObject {\n"
             f'    property color bg: "{theme_data["opaqueBg"]}"\n'
@@ -123,7 +123,7 @@ def apply(home, colors):
                     src_wall = os.path.join(home, "Pictures", "Wallpapers", wall_name)
 
                 if os.path.exists(src_wall):
-                    dest_wall_png = os.path.join(sddm_dir, "wallpaper.png")
+                    dest_wall_png = os.path.join(greeter_dir, "wallpaper.png")
                     # Safely obtain static image via prepare_image (cached single-frame extraction, no memory spikes)
                     static_wall, _ = prepare_image(src_wall)
                     if os.path.exists(static_wall):
@@ -135,7 +135,7 @@ def apply(home, colors):
                         except OSError:
                             pass
 
-                    name_file = os.path.join(sddm_dir, "current_wallpaper")
+                    name_file = os.path.join(greeter_dir, "current_wallpaper")
                     with open(name_file, "w") as f:
                         f.write(wall_name)
                     try:
@@ -143,4 +143,4 @@ def apply(home, colors):
                     except OSError:
                         pass
     except Exception as e:
-        print(f"Error applying SDDM theme colors: {e}")
+        print(f"Error applying greeter theme colors: {e}")

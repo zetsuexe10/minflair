@@ -84,7 +84,7 @@ QtObject {
         // The wallpaper name is passed as a positional argument and written with
         // printf, so quotes, newlines or shell metacharacters in a file name can
         // never break the command or inject code.
-        wallpaperSaveProc.command = ["sh", "-c", "mkdir -p \"$HOME/.cache/quickshell\" /var/tmp/sddm-theme && printf '%s' \"$1\" > \"$HOME/.cache/quickshell/current_wallpaper\" && printf '%s' \"$1\" > /var/tmp/sddm-theme/current_wallpaper 2>/dev/null; python3 \"$2\" 2>/dev/null || true", "minflair-wallpaper", wallName, Quickshell.shellDir + "/Scripts/theme/apply_theme.py"];
+        wallpaperSaveProc.command = ["sh", "-c", "mkdir -p \"$HOME/.cache/quickshell\" /var/tmp/minflair-greeter && printf '%s' \"$1\" > \"$HOME/.cache/quickshell/current_wallpaper\" && printf '%s' \"$1\" > /var/tmp/minflair-greeter/current_wallpaper 2>/dev/null; python3 \"$2\" 2>/dev/null || true", "minflair-wallpaper", wallName, Quickshell.shellDir + "/Scripts/theme/apply_theme.py"];
         wallpaperSaveProc.startDetached();
     }
 

@@ -1,25 +1,26 @@
 # Minflair for Debian 13 (trixie)
 
 Quickshell desktop shell (Convex / Island / Gaming bar styles, launcher, control center, notifications, music,
-clipboard, wallpaper selector, lock screen, ...), Hyprland dotfiles and an SDDM login screen with a session picker.
+clipboard, wallpaper selector, lock screen, ...), Hyprland dotfiles and a Quickshell login screen (greetd) with a session picker.
 Ported from [t4lentles5/minflair](https://github.com/t4lentles5/minflair) (GPL-3.0).
 
 Needs Hyprland >= 0.55 (Lua config, from trixie-backports) and Quickshell (not in trixie: built by CI).
-Default terminal: **foot**. Default login screen: **SDDM** (greetd is disabled, not removed).
+Default terminal: **foot**. Login screen: Quickshell greeter on greetd + cage (optional).
 
 ## Install
 ```bash
 ./tools/check-deps.sh      # what is missing on your machine (changes nothing)
-./install.sh --no-apt      # configs + SDDM, packages already installed
+./install.sh --no-apt      # configs only, packages already installed
 ./install.sh               # CI zip only: also installs the Quickshell .deb and all packages
 ```
-Flags: `--no-apt` skip packages, `--no-sddm` keep your current login manager. Old `~/.config/quickshell` and
+Flag: `--no-apt` skips packages. Old `~/.config/quickshell` and
 `~/.config/hypr` are kept as `.bak.<date>`. Put wallpapers in `~/Pictures/Wallpapers`, then log out and pick a session.
 
 ## Login screen
-SDDM with the Minflair theme: blurred wallpaper, clock, user, password, **session picker** (Hyprland, labwc, Openbox,
-or anything installed in `/usr/share/wayland-sessions` or `xsessions`) and suspend/reboot/shut down. It follows your
-wallpaper colours after you pick one in the shell. Revert: `sudo systemctl disable sddm; sudo systemctl enable --force greetd`.
+Optional: `sudo tools/install-greeter.sh` installs a Quickshell greeter that runs under greetd + cage (same blurred wallpaper,
+clock, user, password, **session picker** with real names: Hyprland, labwc, Openbox, FlickOS, ...). It uses your
+wallpaper colours after you pick one in the shell. If it fails to start, the stock gtkgreet screen is used instead.
+Revert: `sudo tools/install-greeter.sh --revert`. Coming back from SDDM: `sudo systemctl disable sddm; sudo systemctl enable --force greetd`.
 
 ## Keybinds (`Super+K` shows them in the shell)
 `Super` = mod key.
@@ -81,7 +82,7 @@ links back to `~/.config`). Only apps started from the Minflair session see it. 
 
 ## Differences from the Arch version
 - apt/dpkg instead of pacman/yay; Package Manager window removed. foot instead of kitty.
-- Wallpapers via swaybg (no transitions). Only GTK, Qt, Hyprland and SDDM colours are generated.
+- Wallpapers via swaybg (no transitions). Only GTK, Qt, Hyprland and greeter colours are generated.
 - Window rounding default 12 (was 32). Lock screen is Quickshell's; hyprlock is not used.
 
 ## Build

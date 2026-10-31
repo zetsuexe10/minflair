@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Effects
 import QtQuick.Layouts
 
-// Minflair SDDM theme: blurred wallpaper (synced by the shell), clock, user, password,
+// Minflair login screen (UI only; shell.qml talks to greetd): blurred wallpaper (synced by the shell), clock, user, password,
 // session picker (every installed Wayland/X11 session) and power buttons.
 Rectangle {
     id: root
@@ -12,10 +12,10 @@ Rectangle {
     height: 1080
     color: pal.bg
 
-    // Colours written by the shell to /var/tmp/sddm-theme/colors.qml; defaults used until then.
+    // Colours written by the shell to /var/tmp/minflair-greeter/colors.qml; defaults used until then.
     Loader {
         id: palLoader
-        source: "file:///var/tmp/sddm-theme/colors.qml"
+        source: "file:///var/tmp/minflair-greeter/colors.qml"
     }
     QtObject {
         id: pal
@@ -30,6 +30,20 @@ Rectangle {
 
     property bool failed: false
     property bool busy: false
+    property string errorText: "Login failed, try again"
+    property alias userModel: userPicker.model
+    property alias sessionModel: sessionPicker.model
+    property alias sessionIndex: sessionPicker.currentIndex
+    readonly property string currentUser: userPicker.currentText
+    readonly property string currentSession: sessionPicker.currentText
+    signal loginRequested(string user, string password, int sessionIndex)
+    signal powerRequested(string action)
+
+    function fail(msg) {
+        busy = false; failed = true;
+        if (msg) errorText = msg;
+        shake.restart(); pass.text = ""; pass.forceActiveFocus();
+    }
     property real appear: 0      // 0 -> 1 on start (drives fade/slide-in)
     property real shakeX: 0
 
@@ -46,31 +60,17 @@ Rectangle {
     }
 
     function doLogin() {
-        if (root.busy || pass.text === "" || users.count === 0) return;
+        if (root.busy || pass.text === "" || userPicker.currentText === "") return;
         root.failed = false;
         root.busy = true;
-        sddm.login(userPicker.currentText, pass.text, sessionPicker.currentIndex);
-    }
-
-    Connections {
-        target: sddm
-        function onLoginSucceeded() {
-            root.opacity = 0;
-        }
-        function onLoginFailed() {
-            root.busy = false;
-            shake.restart();
-            root.failed = true;
-            pass.text = "";
-            pass.forceActiveFocus();
-        }
+        root.loginRequested(userPicker.currentText, pass.text, sessionPicker.currentIndex);
     }
 
     // ---- background
     Image {
         id: wall
         anchors.fill: parent
-        source: "file:///var/tmp/sddm-theme/wallpaper.png"
+        source: "file:///var/tmp/minflair-greeter/wallpaper.png"
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
         opacity: status === Image.Ready ? 1 : 0
@@ -162,9 +162,7 @@ Rectangle {
             Picker {
                 id: userPicker
                 Layout.fillWidth: true
-                model: userModel
                 textRole: "name"
-                currentIndex: userModel.lastIndex
                 fg: pal.fg; panel: Qt.rgba(1, 1, 1, 0.07); accent: pal.accent; fontFamily: pal.font
             }
 
@@ -197,7 +195,7 @@ Rectangle {
                 Layout.preferredHeight: root.failed ? 18 : 0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
                 Behavior on Layout.preferredHeight { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                text: "Login failed, try again"
+                text: root.errorText
                 color: "#e5534b"
                 font.family: pal.font
                 font.pixelSize: 13
@@ -239,9 +237,7 @@ Rectangle {
         width: 280
         openUp: true
         label: "Session"
-        model: sessionModel
         textRole: "name"
-        currentIndex: sessionModel.lastIndex
         fg: pal.fg; panel: pal.panel; accent: pal.accent; fontFamily: pal.font
     }
 
@@ -253,9 +249,9 @@ Rectangle {
 
         Repeater {
             model: [
-                { label: "Suspend", ok: sddm.canSuspend, act: function() { sddm.suspend(); } },
-                { label: "Reboot", ok: sddm.canReboot, act: function() { sddm.reboot(); } },
-                { label: "Shut down", ok: sddm.canPowerOff, act: function() { sddm.powerOff(); } }
+                { label: "Suspend", ok: true, act: function() { root.powerRequested("suspend"); } },
+                { label: "Reboot", ok: true, act: function() { root.powerRequested("reboot"); } },
+                { label: "Shut down", ok: true, act: function() { root.powerRequested("poweroff"); } }
             ]
             delegate: Rectangle {
                 required property var modelData
@@ -279,9 +275,6 @@ Rectangle {
             }
         }
     }
-
-    // hidden helper so we can read the user count
-    ListView { id: users; visible: false; model: userModel }
 
     Component.onCompleted: {
         pass.forceActiveFocus();

@@ -7,7 +7,7 @@ import json
 import os
 
 from color_utils import blend_hex, get_brightness, resolve_color, sanitize_color
-from theme_appliers import gtk, hyprland, qt, sddm
+from theme_appliers import greeter, gtk, hyprland, qt
 
 
 def main():
@@ -82,7 +82,7 @@ def main():
     gtk.apply(home, colors)
     qt.apply(home, colors)
     hyprland.apply(home, colors)
-    sddm.apply(home, colors)
+    greeter.apply(home, colors)
 
 
 if __name__ == "__main__":
