@@ -17,11 +17,6 @@ QtObject {
         "widgetId": "minflair_keybinds",
         "keywords": ["keybinds", "keybindings", "shortcuts", "atajos", "teclas"]
     }, {
-        "name": "Package Manager",
-        "subtitle": "Minflair",
-        "widgetId": "packagemanager",
-        "keywords": ["package", "packages", "paquetes", "pacman", "yay", "install", "instalar"]
-    }, {
         "name": "Pomodoro",
         "subtitle": "Minflair",
         "widgetId": "pomodoro",

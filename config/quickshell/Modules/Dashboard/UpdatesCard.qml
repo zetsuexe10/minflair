@@ -17,8 +17,7 @@ Card {
     readonly property bool isUpdating: UpdateService.isSystemUpdating
 
     function runUpdate() {
-        SettingsService.packageManagerMode = "update";
-        AppState.openWidget("packagemanager");
+        Quickshell.execDetached(["x-terminal-emulator", "-e", "sh", "-c", "sudo apt update && sudo apt full-upgrade; echo; echo Done. Press Enter.; read _"]);
     }
 
     contentPadding: Constants.sizeMd
@@ -144,7 +143,7 @@ Card {
 
                             let total = (parseInt(root.pacmanUpdates) || 0) + (parseInt(root.aurUpdates) || 0);
                             if (total > 0)
-                                return "Pacman: " + root.pacmanUpdates + " | AUR: " + root.aurUpdates;
+                                return "APT: " + root.pacmanUpdates;
 
                             return "All packages are currently up to date";
                         }

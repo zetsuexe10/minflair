@@ -48,7 +48,7 @@ QtObject {
         wallpaperApplyProc.running = false;
         let rMode = HyprlandService.wpResizeMode || "crop";
         let gravity = HyprlandService.wpCropGravity || "center";
-        let cmd = ["awww", "img", rawPath, "--resize", rMode];
+        let cmd = [Quickshell.shellDir + "/Scripts/system/awww-compat.sh", "img", rawPath, "--resize", rMode];
         if (rMode === "crop")
             cmd.push("--crop-gravity", gravity);
 
@@ -61,7 +61,7 @@ QtObject {
         wallpaperApplyProc.running = false;
         let rMode = HyprlandService.wpResizeMode || "crop";
         let gravity = HyprlandService.wpCropGravity || "center";
-        let cmd = ["awww", "img", rawPath, "--resize", rMode];
+        let cmd = [Quickshell.shellDir + "/Scripts/system/awww-compat.sh", "img", rawPath, "--resize", rMode];
         if (rMode === "crop")
             cmd.push("--crop-gravity", gravity);
 

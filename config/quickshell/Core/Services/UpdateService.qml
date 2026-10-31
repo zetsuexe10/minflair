@@ -43,7 +43,7 @@ Item {
     Process {
         id: pacmanProc
 
-        command: ["sh", "-c", "checkupdates | wc -l || echo 0"]
+        command: ["sh", "-c", "apt list --upgradable 2>/dev/null | grep -c upgradable || true"]
 
         stdout: SplitParser {
             onRead: (data) => {
@@ -56,7 +56,7 @@ Item {
     Process {
         id: aurProc
 
-        command: ["sh", "-c", "yay -Qua | wc -l || echo 0"]
+        command: ["sh", "-c", "echo 0"]
 
         stdout: SplitParser {
             onRead: (data) => {
@@ -69,7 +69,7 @@ Item {
     Process {
         id: checkLockProc
 
-        command: ["test", "-f", "/var/lib/pacman/db.lck"]
+        command: ["sh", "-c", "pgrep -x 'apt|apt-get|dpkg|aptitude' >/dev/null"]
         onExited: (code) => {
             updateService.isSystemUpdating = (code === 0);
         }

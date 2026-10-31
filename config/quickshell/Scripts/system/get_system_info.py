@@ -359,24 +359,18 @@ def get_system_specs():
     data["wm"] = "Hyprland (Wayland)"
 
     # Installed Packages Count
-    n_pacman = 0
-    n_aur = 0
+    n_dpkg = 0
     try:
-        n_pacman = int(
-            subprocess.check_output("pacman -Qn 2>/dev/null | wc -l", shell=True)
-            .decode()
-            .strip()
-        )
-        n_aur = int(
-            subprocess.check_output("pacman -Qm 2>/dev/null | wc -l", shell=True)
+        n_dpkg = int(
+            subprocess.check_output(
+                "dpkg-query -f '.\n' -W 2>/dev/null | wc -l", shell=True
+            )
             .decode()
             .strip()
         )
     except Exception:
         pass
-    data["packages"] = (
-        f"{n_pacman} (pacman), {n_aur} (aur)" if n_aur > 0 else f"{n_pacman} (pacman)"
-    )
+    data["packages"] = f"{n_dpkg} (dpkg)"
 
     # Displays
     data["display"] = get_displays()

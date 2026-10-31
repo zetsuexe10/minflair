@@ -4,7 +4,6 @@ import qs.Modules.Clipboard
 import qs.Modules.KeybindsCheatSheet
 import qs.Modules.Launcher
 import qs.Modules.LockScreen
-import qs.Modules.PackageManager
 import qs.Modules.Pomodoro
 import qs.Modules.Settings
 import qs.Modules.WallpaperSelector
@@ -98,18 +97,6 @@ Item {
 
         sourceComponent: Component {
             Settings {
-            }
-
-        }
-
-    }
-
-    WidgetLoader {
-        widgetId: "packagemanager"
-        exclusive: false
-
-        sourceComponent: Component {
-            PackageManager {
             }
 
         }
