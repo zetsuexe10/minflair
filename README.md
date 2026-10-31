@@ -18,8 +18,9 @@ Flag: `--no-apt` skips packages. Old `~/.config/quickshell` and
 
 ## Login screen
 Optional: `sudo tools/install-greeter.sh` installs a Quickshell greeter that runs under greetd + cage (same blurred wallpaper,
-clock, user, password, **session picker** with real names: Hyprland, labwc, Openbox, FlickOS, ...). It uses your
+header, clock, pill user/password fields, **session picker** with real names: Hyprland, labwc, Openbox, FlickOS, ...). It uses your
 wallpaper colours after you pick one in the shell. If it fails to start, the stock gtkgreet screen is used instead.
+Layout and icons are adapted from the Archcraft SDDM theme (GPLv3, credit in `greeter/Assets/NOTICE`). Debug log: `/var/tmp/minflair-greeter/greeter.log`.
 Revert: `sudo tools/install-greeter.sh --revert`. Coming back from SDDM: `sudo systemctl disable sddm; sudo systemctl enable --force greetd`.
 
 ## Keybinds (`Super+K` shows them in the shell)

@@ -16,6 +16,11 @@ export XDG_CACHE_HOME=/tmp/greeter-cache XDG_STATE_HOME=/tmp/greeter-state XDG_D
 export QT_QPA_PLATFORM=wayland QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-}"
 mkdir -p "$XDG_CACHE_HOME" "$XDG_STATE_HOME" "$XDG_DATA_HOME"
 
+# Log for debugging (read it with: cat /var/tmp/minflair-greeter/greeter.log)
+LOG=/var/tmp/minflair-greeter/greeter.log
+[ -w "$(dirname "$LOG")" ] && exec 2>>"$LOG"
+echo "=== greeter start $(date) ===" >&2
+
 QS="$(command -v quickshell || command -v qs)"
 if [ -n "$QS" ] && [ -f /usr/share/minflair/greeter/shell.qml ]; then
     start=$(date +%s)

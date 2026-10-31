@@ -3,8 +3,9 @@ import QtQuick.Controls.Basic
 import QtQuick.Effects
 import QtQuick.Layouts
 
-// Minflair login screen (UI only; shell.qml talks to greetd): blurred wallpaper (synced by the shell), clock, user, password,
-// session picker (every installed Wayland/X11 session) and power buttons.
+// Minflair login screen, layout adapted from the Archcraft SDDM theme (GPLv3, see Assets/NOTICE):
+// header, big clock, pill-shaped user/password fields, pill login button, session link, power icons.
+// UI only; shell.qml talks to greetd. Colours come from the shell's palette file.
 Rectangle {
     id: root
 
@@ -12,22 +13,22 @@ Rectangle {
     height: 1080
     color: pal.bg
 
-    // Colours written by the shell to /var/tmp/minflair-greeter/colors.qml; defaults used until then.
-    Loader {
-        id: palLoader
-        source: "file:///var/tmp/minflair-greeter/colors.qml"
-    }
+    // ---- palette (written by the shell to /var/tmp/minflair-greeter/colors.qml)
+    Loader { id: palLoader; source: "file:///var/tmp/minflair-greeter/colors.qml" }
     QtObject {
         id: pal
         readonly property bool ok: palLoader.status === Loader.Ready && palLoader.item !== null
-        readonly property color bg: ok ? palLoader.item.bg : "#0c0b08"
-        readonly property color fg: ok ? palLoader.item.fg : "#ece8dc"
-        readonly property color muted: ok ? palLoader.item.muted : "#8c8a84"
-        readonly property color accent: ok ? palLoader.item.accent : "#ccb565"
-        readonly property color panel: ok ? palLoader.item.panel : "#d9161410"
+        readonly property color bg: ok ? palLoader.item.bg : "#1e2128"
+        readonly property color fg: ok ? palLoader.item.fg : "#d8d8d8"
+        readonly property color muted: ok ? palLoader.item.muted : "#abb2bf"
+        readonly property color accent: ok ? palLoader.item.accent : "#5294e2"
+        readonly property color panel: ok ? palLoader.item.panel : "#d91e2128"
         readonly property string font: ok ? palLoader.item.font : "Geist"
     }
+    readonly property color line: Qt.rgba(pal.fg.r, pal.fg.g, pal.fg.b, 0.28)
+    readonly property real u: Math.max(0.7, Math.min(width / 1920, height / 1080))   // UI scale
 
+    // ---- interface to shell.qml
     property bool failed: false
     property bool busy: false
     property string errorText: "Login failed, try again"
@@ -44,9 +45,14 @@ Rectangle {
         if (msg) errorText = msg;
         shake.restart(); pass.text = ""; pass.forceActiveFocus();
     }
-    property real appear: 0      // 0 -> 1 on start (drives fade/slide-in)
-    property real shakeX: 0
+    function doLogin() {
+        if (busy || pass.text === "" || userPicker.currentText === "") return;
+        failed = false; busy = true;
+        loginRequested(userPicker.currentText, pass.text, sessionPicker.currentIndex);
+    }
 
+    property real appear: 0
+    property real shakeX: 0
     opacity: 0
     Behavior on opacity { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
     NumberAnimation on appear { id: appearAnim; from: 0; to: 1; duration: 800; easing.type: Easing.OutCubic; running: false }
@@ -59,14 +65,7 @@ Rectangle {
         NumberAnimation { target: root; property: "shakeX"; to: 0; duration: 60 }
     }
 
-    function doLogin() {
-        if (root.busy || pass.text === "" || userPicker.currentText === "") return;
-        root.failed = false;
-        root.busy = true;
-        root.loginRequested(userPicker.currentText, pass.text, sessionPicker.currentIndex);
-    }
-
-    // ---- background
+    // ---- background: wallpaper (blurred, dimmed) over the flat palette colour
     Image {
         id: wall
         anchors.fill: parent
@@ -76,202 +75,208 @@ Rectangle {
         opacity: status === Image.Ready ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 600 } }
     }
-    // blurred copy on top; if the renderer has no effect support the plain image stays visible
     MultiEffect {
         anchors.fill: parent
         source: wall
         visible: wall.status === Image.Ready
         blurEnabled: true
-        blur: 0.7
-        blurMax: 48
+        blur: 0.6
+        blurMax: 40
     }
     Rectangle {
         anchors.fill: parent
-        color: "black"
-        opacity: 0.35
-        visible: wall.status === Image.Ready
+        color: pal.bg
+        opacity: wall.status === Image.Ready ? 0.45 : 0
     }
 
-    // ---- clock
-    Column {
+    // ---- centred column
+    ColumnLayout {
+        id: col
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: parent.height * 0.12 - (1 - root.appear) * 20
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -root.height * 0.04 + (1 - root.appear) * 30
         opacity: root.appear
-        spacing: 4
+        spacing: 0
+        transform: Translate { x: root.shakeX }
 
         Text {
-            id: clock
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
+            text: "Welcome!"
             color: pal.fg
             font.family: pal.font
-            font.pixelSize: 96
+            font.pixelSize: 34 * root.u
+        }
+        Text {
+            id: clock
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 6 * root.u
+            color: pal.fg
+            font.family: pal.font
+            font.pixelSize: 110 * root.u
             font.weight: Font.DemiBold
-            text: Qt.formatTime(new Date(), "hh:mm")
+            text: Qt.formatTime(new Date(), "HH:mm")
         }
         Text {
             id: date
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             color: pal.muted
             font.family: pal.font
-            font.pixelSize: 20
-            text: Qt.formatDate(new Date(), "dddd, d MMMM")
+            font.pixelSize: 22 * root.u
+            text: Qt.formatDate(new Date(), "dddd, MMMM d")
         }
         Timer {
             interval: 1000; running: true; repeat: true
             onTriggered: {
-                clock.text = Qt.formatTime(new Date(), "hh:mm");
-                date.text = Qt.formatDate(new Date(), "dddd, d MMMM");
+                clock.text = Qt.formatTime(new Date(), "HH:mm");
+                date.text = Qt.formatDate(new Date(), "dddd, MMMM d");
             }
         }
-    }
 
-    // ---- login card
-    Rectangle {
-        id: card
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset: parent.height * 0.12 + (1 - root.appear) * 40
-        opacity: root.appear
-        transform: Translate { x: root.shakeX }
-        width: 360
-        height: col.implicitHeight + 48
-        radius: 24
-        color: pal.panel
-        border.color: Qt.rgba(1, 1, 1, 0.08)
+        Item { Layout.preferredHeight: 56 * root.u }
 
-        ColumnLayout {
-            id: col
-            anchors.fill: parent
-            anchors.margins: 24
-            spacing: 14
-
-            Rectangle {
-                Layout.alignment: Qt.AlignHCenter
-                width: 76; height: 76; radius: 38
-                color: pal.accent
-                Text {
-                    anchors.centerIn: parent
-                    text: userPicker.currentText.length > 0 ? userPicker.currentText.charAt(0).toUpperCase() : "?"
-                    color: pal.bg
-                    font.family: pal.font
-                    font.pixelSize: 34
-                    font.weight: Font.Bold
-                }
-            }
-
+        // user
+        Item {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 400 * root.u
+            Layout.preferredHeight: 44 * root.u
             Picker {
                 id: userPicker
-                Layout.fillWidth: true
+                anchors.fill: parent
+                radius: height / 2
+                centered: true
                 textRole: "name"
-                fg: pal.fg; panel: Qt.rgba(1, 1, 1, 0.07); accent: pal.accent; fontFamily: pal.font
+                fg: pal.fg; panel: "transparent"; accent: pal.accent; fontFamily: pal.font
             }
+            Icon { source: "Assets/User.svg"; lit: userPicker.hovered
+                   anchors.left: parent.left; anchors.leftMargin: 16; anchors.verticalCenter: parent.verticalCenter }
+        }
 
-            TextField {
-                id: pass
-                Layout.fillWidth: true
-                Layout.preferredHeight: 42
-                enabled: !root.busy
-                echoMode: TextInput.Password
-                placeholderText: "Password"
-                placeholderTextColor: pal.muted
-                color: pal.fg
-                font.family: pal.font
-                font.pixelSize: 15
-                leftPadding: 14
-                focus: true
-                background: Rectangle {
-                    radius: 12
-                    color: Qt.rgba(1, 1, 1, 0.07)
-                    border.color: root.failed ? "#e5534b" : (pass.activeFocus ? pal.accent : "transparent")
-                    border.width: 1
-                    Behavior on border.color { ColorAnimation { duration: 160 } }
-                }
-                onAccepted: root.doLogin()
+        // password
+        TextField {
+            id: pass
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 14 * root.u
+            Layout.preferredWidth: 400 * root.u
+            Layout.preferredHeight: 44 * root.u
+            enabled: !root.busy
+            echoMode: showPass.shown ? TextInput.Normal : TextInput.Password
+            horizontalAlignment: TextInput.AlignHCenter
+            color: pal.fg
+            font.family: pal.font
+            font.pixelSize: 16 * root.u
+            leftPadding: 44; rightPadding: 44
+            focus: true
+            background: Rectangle {
+                radius: height / 2
+                color: "transparent"
+                border.width: 2
+                border.color: root.failed ? "#e06b74" : (pass.activeFocus ? pal.accent : root.line)
+                Behavior on border.color { ColorAnimation { duration: 160 } }
             }
+            onAccepted: root.doLogin()
+            onTextEdited: root.failed = false
 
             Text {
-                Layout.alignment: Qt.AlignHCenter
-                opacity: root.failed ? 1 : 0
-                Layout.preferredHeight: root.failed ? 18 : 0
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-                Behavior on Layout.preferredHeight { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                text: root.errorText
-                color: "#e5534b"
-                font.family: pal.font
-                font.pixelSize: 13
+                anchors.centerIn: parent
+                visible: pass.text === ""
+                text: "Password"
+                color: pal.muted
+                font: pass.font
             }
 
-            Button {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 42
-                text: root.busy ? "Signing in..." : "Log in"
-                enabled: !root.busy
-                scale: down ? 0.98 : 1
-                Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
-                onClicked: root.doLogin()
-                contentItem: Text {
-                    text: parent.text
-                    color: pal.bg
-                    font.family: pal.font
-                    font.pixelSize: 15
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                background: Rectangle {
-                    radius: 12
-                    color: pal.accent
-                    opacity: parent.down || root.busy ? 0.7 : (parent.hovered ? 0.92 : 1)
-                    Behavior on opacity { NumberAnimation { duration: 120 } }
-                }
+            Icon {
+                id: showPass
+                property bool shown: false
+                source: shown ? "Assets/Password2.svg" : "Assets/Password.svg"
+                lit: passTap.hovered || pass.activeFocus
+                anchors.left: parent.left; anchors.leftMargin: 16; anchors.verticalCenter: parent.verticalCenter
+                HoverHandler { id: passTap; cursorShape: Qt.PointingHandCursor }
+                TapHandler { onTapped: showPass.shown = !showPass.shown }
+            }
+        }
+
+        // error line
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredHeight: 28 * root.u
+            verticalAlignment: Text.AlignVCenter
+            opacity: root.failed ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 200 } }
+            text: root.errorText
+            color: "#e06b74"
+            font.family: pal.font
+            font.italic: true
+            font.pixelSize: 13 * root.u
+        }
+
+        // login button
+        Button {
+            id: loginBtn
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 400 * root.u
+            Layout.preferredHeight: 44 * root.u
+            enabled: !root.busy
+            scale: down ? 0.98 : 1
+            Behavior on scale { NumberAnimation { duration: 90; easing.type: Easing.OutQuad } }
+            onClicked: root.doLogin()
+            contentItem: Text {
+                text: root.busy ? "Signing in..." : "Login"
+                color: pal.bg
+                font.family: pal.font
+                font.pixelSize: 16 * root.u
+                font.weight: Font.DemiBold
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+            background: Rectangle {
+                radius: height / 2
+                color: pal.accent
+                opacity: loginBtn.down || root.busy ? 0.7 : (loginBtn.hovered ? 0.9 : 1)
+                Behavior on opacity { NumberAnimation { duration: 120 } }
             }
         }
     }
 
-    // ---- session picker (bottom left) + power (bottom right)
-    Picker {
-        id: sessionPicker
-        anchors.left: parent.left
+    // ---- bottom: session link + power icons
+    ColumnLayout {
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.margins: 28
-        width: 280
-        openUp: true
-        label: "Session"
-        textRole: "name"
-        fg: pal.fg; panel: pal.panel; accent: pal.accent; fontFamily: pal.font
-    }
+        anchors.bottomMargin: 30 * root.u
+        opacity: root.appear
+        spacing: 14 * root.u
 
-    Row {
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: 28
-        spacing: 10
+        Picker {
+            id: sessionPicker
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 420 * root.u
+            Layout.preferredHeight: 34 * root.u
+            bare: true
+            centered: true
+            openUp: true
+            label: "Session"
+            textRole: "name"
+            fg: pal.muted; panel: pal.panel; accent: pal.accent; fontFamily: pal.font
+        }
 
-        Repeater {
-            model: [
-                { label: "Suspend", ok: true, act: function() { root.powerRequested("suspend"); } },
-                { label: "Reboot", ok: true, act: function() { root.powerRequested("reboot"); } },
-                { label: "Shut down", ok: true, act: function() { root.powerRequested("poweroff"); } }
-            ]
-            delegate: Rectangle {
-                required property var modelData
-                visible: modelData.ok
-                width: lbl.implicitWidth + 28
-                height: 38
-                radius: 12
-                color: pal.panel
-                scale: powerHover.hovered ? 1.05 : 1
-                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
-                HoverHandler { id: powerHover; cursorShape: Qt.PointingHandCursor }
-                Text {
-                    id: lbl
-                    anchors.centerIn: parent
-                    text: parent.modelData.label
-                    color: pal.fg
-                    font.family: pal.font
-                    font.pixelSize: 14
+        Row {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 26 * root.u
+            Repeater {
+                model: [
+                    { icon: "Assets/Suspend.svg", act: "suspend" },
+                    { icon: "Assets/Reboot.svg", act: "reboot" },
+                    { icon: "Assets/Shutdown.svg", act: "poweroff" }
+                ]
+                delegate: Item {
+                    required property var modelData
+                    width: 32 * root.u; height: 32 * root.u
+                    scale: ph.hovered ? 1.15 : 1
+                    Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                    Icon { anchors.fill: parent; size: parent.width; source: parent.modelData.icon
+                           lit: ph.hovered }
+                    HoverHandler { id: ph; cursorShape: Qt.PointingHandCursor }
+                    TapHandler { onTapped: root.powerRequested(parent.modelData.act) }
                 }
-                TapHandler { onTapped: parent.modelData.act() }
             }
         }
     }

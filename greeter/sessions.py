@@ -46,8 +46,8 @@ def desktop_entries(directory, wrap):
         parts = [p for p in shlex.split(exe) if not p.startswith("%")]
         if not parts:
             continue
-        cmd = " ".join(shlex.quote(p) for p in parts)
-        out.append({"name": name + (" (X11)" if wrap else ""), "exec": ("startx " + cmd) if wrap else cmd})
+        argv = (["startx"] + parts) if wrap else parts
+        out.append({"name": name + (" (X11)" if wrap else ""), "exec": shlex.join(argv), "argv": argv})
     return out
 
 
@@ -70,7 +70,7 @@ def main():
 
     sessions = []
     if os.path.exists("/usr/bin/flickos-session"):
-        sessions.append({"name": "FlickOS", "exec": "flickos-session"})
+        sessions.append({"name": "FlickOS", "exec": "flickos-session", "argv": ["flickos-session"]})
     sessions += desktop_entries("/usr/share/wayland-sessions", False)
     sessions += desktop_entries("/usr/share/xsessions", True)
     seen, uniq = set(), []
@@ -79,7 +79,7 @@ def main():
             seen.add(s["exec"])
             uniq.append(s)
     if not uniq:
-        uniq = [{"name": "Shell", "exec": "bash -l"}]
+        uniq = [{"name": "Shell", "exec": "bash -l", "argv": ["bash", "-l"]}]
 
     default = 0
     names = [s["name"] for s in uniq]

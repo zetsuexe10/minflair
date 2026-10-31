@@ -14,6 +14,10 @@ Item {
     property color accent: "#88aaff"
     property string fontFamily: "sans-serif"
     property bool openUp: false
+    property real radius: 12
+    property bool centered: false
+    readonly property bool hovered: pickerHover.hovered
+    property bool bare: false   // text only, no pill (used for the session link)
     readonly property string currentText: {
         if (!list.currentItem) return "";
         return list.currentItem.itemText;
@@ -24,10 +28,11 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 12
-        color: root.panel
-        border.color: popup.visible ? root.accent : "transparent"
-        border.width: 1
+        radius: root.radius
+        color: root.bare ? "transparent" : root.panel
+        border.color: root.bare ? "transparent" : (popup.visible || pickerHover.hovered ? root.accent : Qt.rgba(1, 1, 1, 0.28))
+        border.width: root.bare ? 0 : 2
+        HoverHandler { id: pickerHover }
         scale: pickerMouse.pressed ? 0.98 : 1
 
         Behavior on border.color { ColorAnimation { duration: 150 } }
@@ -36,8 +41,10 @@ Item {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.leftMargin: 14
-            anchors.right: arrow.left
+            anchors.leftMargin: root.centered ? (root.bare ? 8 : 40) : 14
+            anchors.right: root.centered ? parent.right : arrow.left
+            anchors.rightMargin: root.centered ? (root.bare ? 8 : 40) : 0
+            horizontalAlignment: root.centered ? Text.AlignHCenter : Text.AlignLeft
             text: (root.label !== "" ? root.label + ": " : "") + root.currentText
             color: root.fg
             font.family: root.fontFamily
@@ -49,6 +56,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 12
+            visible: !root.bare
             text: root.openUp ? "▴" : "▾"
             color: root.fg
             font.pixelSize: 14

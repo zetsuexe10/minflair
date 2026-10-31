@@ -8,7 +8,7 @@ ShellRoot {
     id: shell
 
     property string pendingPassword: ""
-    property var sessionExecs: []
+    property var sessionArgv: []
 
     ListModel { id: users }
     ListModel { id: sessions }
@@ -22,7 +22,7 @@ ShellRoot {
                 try {
                     const d = JSON.parse(text);
                     d.users.forEach(u => users.append({ name: u }));
-                    shell.sessionExecs = d.sessions.map(s => s.exec);
+                    shell.sessionArgv = d.sessions.map(s => s.argv);
                     d.sessions.forEach(s => sessions.append({ name: s.name }));
                     ui.sessionIndex = d.default;
                 } catch (e) {
@@ -56,8 +56,10 @@ ShellRoot {
             shell.pendingPassword = "";
             saver.args = [ui.currentUser, ui.currentSession];
             saver.running = true;
-            const cmd = shell.sessionExecs[ui.sessionIndex] || "";
-            Greetd.launch(["sh", "-c", "exec " + cmd], [], true);
+            const argv = shell.sessionArgv[ui.sessionIndex];
+            console.log("launching session:", JSON.stringify(argv));
+            if (!argv) { ui.fail("No session selected"); return; }
+            Greetd.launch(argv, [], true);
         }
     }
 
