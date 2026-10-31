@@ -18,7 +18,11 @@ mkdir -p "$XDG_CACHE_HOME" "$XDG_STATE_HOME" "$XDG_DATA_HOME"
 
 QS="$(command -v quickshell || command -v qs)"
 if [ -n "$QS" ] && [ -f /usr/share/minflair/greeter/shell.qml ]; then
-    cage -d -s -- "$QS" -p /usr/share/minflair/greeter && exit 0
+    start=$(date +%s)
+    cage -d -s -- "$QS" -p /usr/share/minflair/greeter
+    # If it ran for a while the user logged in: exit 0 so greetd starts the session
+    # (cage's own exit code is not reliable). Only a quick failure falls back.
+    [ $(( $(date +%s) - start )) -ge 4 ] && exit 0
 fi
 
 # Fallback: the stock FlickOS gtkgreet screen.
