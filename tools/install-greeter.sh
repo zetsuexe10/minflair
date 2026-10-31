@@ -35,13 +35,12 @@ echo "$(command -v greetd)" > /etc/X11/default-display-manager 2>/dev/null || tr
 
 install -d "$DEST"
 cp -a "$HERE/greeter/." "$DEST/"
-rm -f "$DEST/greeter-wrapper.sh"
 install -d -m 777 /var/tmp/minflair-greeter
 
 if [[ -f "$WRAP" && ! -f "$WRAP.orig" ]]; then
   cp -a "$WRAP" "$WRAP.orig"
 fi
-install -D -m 755 "$HERE/greeter/greeter-wrapper.sh" "$WRAP"
+install -D -m 755 "$HERE/tools/greeter-launch.sh" "$WRAP"
 
 echo "Done. Open Quickshell once in your session so the palette and wallpaper are"
 echo "written to /var/tmp/minflair-greeter, then reboot (or: sudo systemctl restart greetd)."

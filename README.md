@@ -1,27 +1,52 @@
 # Minflair for Debian 13 (trixie)
 
-Quickshell desktop shell (Convex / Island / Gaming bar styles, launcher, control center, notifications, music,
-clipboard, wallpaper selector, lock screen, ...), Hyprland dotfiles and a Quickshell login screen (greetd) with a session picker.
-Ported from [t4lentles5/minflair](https://github.com/t4lentles5/minflair) (GPL-3.0).
+Quickshell desktop shell (bar styles, launcher, control center, notifications, music, clipboard, wallpaper
+selector, lock screen) with Hyprland dotfiles and an optional Quickshell login screen. Ported from
+[t4lentles5/minflair](https://github.com/t4lentles5/minflair) (GPL-3.0).
 
-Needs Hyprland >= 0.55 (Lua config, from trixie-backports) and Quickshell (not in trixie: built by CI).
-Default terminal: **foot**. Login screen: Quickshell greeter on greetd + cage (optional).
+## Requirements
+- Hyprland 0.55+ (Lua config; `trixie-backports`)
+- Quickshell 0.3 (not in trixie; the CI builds a `.deb`)
+- Packages: `./tools/check-deps.sh` lists what is missing and changes nothing
+
+Defaults: terminal `foot`, wallpapers `swaybg`, GTK theme `adw-gtk3`.
 
 ## Install
 ```bash
-./tools/check-deps.sh      # what is missing on your machine (changes nothing)
-./install.sh --no-apt      # configs only, packages already installed
-./install.sh               # CI zip only: also installs the Quickshell .deb and all packages
+./install.sh --no-apt              # configs only (packages already installed)
+./install.sh --no-apt --greeter    # same, plus the login screen
+./install.sh                       # CI zip only: also installs the .deb and all packages
 ```
-Flag: `--no-apt` skips packages. Old `~/.config/quickshell` and
-`~/.config/hypr` are kept as `.bak.<date>`. Put wallpapers in `~/Pictures/Wallpapers`, then log out and pick a session.
+Existing `~/.config/quickshell` and `~/.config/hypr` are moved to `.bak.<date>`.
+Put wallpapers in `~/Pictures/Wallpapers`, then log in to a Hyprland session.
+
+## Layout
+| Path | Purpose |
+| :-- | :-- |
+| `config/quickshell/` | the shell, installed to `~/.config/quickshell` |
+| `config/hypr/` | Hyprland config and helper scripts, installed to `~/.config/hypr` |
+| `greeter/` | login screen (QML, `sessions.py`, `components/`, `assets/`) |
+| `install.sh`, `uninstall.sh` | install / remove the user configs |
+| `tools/check-deps.sh` | report missing packages |
+| `tools/doctor.sh` | diagnose a shell that does not load or crashes |
+| `tools/install-greeter.sh` | install or revert the login screen (root) |
+| `tools/greeter-launch.sh` | greetd entry point (cage + Quickshell, gtkgreet fallback) |
+| `ci/`, `.github/` | Quickshell `.deb` build, smoke test, release zip |
 
 ## Login screen
-Optional: `sudo tools/install-greeter.sh` installs a Quickshell greeter that runs under greetd + cage (same blurred wallpaper,
-header, clock, pill user/password fields, **session picker** with real names: Hyprland, labwc, Openbox, FlickOS, ...). It uses your
-wallpaper colours after you pick one in the shell. If it fails to start, the stock gtkgreet screen is used instead.
-Layout and icons are adapted from the Archcraft SDDM theme (GPLv3, credit in `greeter/Assets/NOTICE`). Debug log: `/var/tmp/minflair-greeter/greeter.log`.
-Revert: `sudo tools/install-greeter.sh --revert`. Coming back from SDDM: `sudo systemctl disable sddm; sudo systemctl enable --force greetd`.
+A Quickshell greeter that runs on greetd inside cage. It shows the user, password and a session picker with
+readable names (Hyprland, Hyprland (uwsm), labwc, Openbox, FlickOS, ...), read from `/usr/share/wayland-sessions`
+and `/usr/share/xsessions`. Colours and the blurred wallpaper follow the shell: choosing a wallpaper
+(`Ctrl+Alt+W`) regenerates them.
+
+```bash
+sudo tools/install-greeter.sh            # install (disables SDDM, enables greetd)
+sudo tools/install-greeter.sh --revert   # restore the original greeter
+sudo systemctl restart greetd            # apply without rebooting (ends the graphical session)
+```
+If the greeter fails within a few seconds of starting, the stock gtkgreet screen is used instead.
+Log: `/var/tmp/minflair-greeter/greeter.log`. The layout and icons are adapted from the Archcraft SDDM theme
+(GPLv3, see `greeter/assets/NOTICE`).
 
 ## Keybinds (`Super+K` shows them in the shell)
 `Super` = mod key.
@@ -71,21 +96,24 @@ Revert: `sudo tools/install-greeter.sh --revert`. Coming back from SDDM: `sudo s
 
 Media, volume, brightness, mic-mute, touchpad and Caps/Num-lock keys work with an on-screen display.
 
-## Problems?
-Lock screen password rejected? It needs only libpam (no python package). Run `./tools/doctor.sh` inside Hyprland. Widgets open through `/tmp/quickshell_*` sockets that exist only once the
-shell has loaded without errors; the doctor prints those errors (`qs log` shows the full log). If `qs` crashes, the
-report is in `~/.cache/quickshell/crashes/`.
+## Troubleshooting
+- Shell or a widget does not load, or `qs` crashes: run `./tools/doctor.sh` inside Hyprland and send the output.
+  Widgets open through `/tmp/quickshell_*` sockets, which exist only after the shell loaded without errors.
+  Crash reports are in `~/.cache/quickshell/crashes/`; the full log is `qs log`.
+- Login screen: read `/var/tmp/minflair-greeter/greeter.log` and `sudo journalctl -b -u greetd`.
+- Lock screen rejects the password: it authenticates through libpam; no extra Python package is needed.
 
 ## Theme isolation
-Minflair never edits `~/.config/gtk-*`, `~/.config/qt*ct` or gsettings. The wallpaper-driven GTK (adw-gtk3) and
-Qt (qt6ct) theme goes to `~/.minflair/xdg`, used as `XDG_CONFIG_HOME` by the Hyprland session (every other entry
-links back to `~/.config`). Only apps started from the Minflair session see it. Uninstall: `./uninstall.sh`, delete `~/.minflair`.
+Minflair never edits `~/.config/gtk-*`, `~/.config/qt*ct` or gsettings. The generated GTK (adw-gtk3) and Qt (qt6ct)
+theme is written to `~/.minflair/xdg`, which the Hyprland session uses as `XDG_CONFIG_HOME` (every other entry
+links back to `~/.config`). Only apps started from that session see it. To remove: `./uninstall.sh`, then delete `~/.minflair`.
 
 ## Differences from the Arch version
-- apt/dpkg instead of pacman/yay; Package Manager window removed. foot instead of kitty.
-- Wallpapers via swaybg (no transitions). Only GTK, Qt, Hyprland and greeter colours are generated.
-- Window rounding default 12 (was 32). Lock screen is Quickshell's; hyprlock is not used.
+- apt/dpkg instead of pacman/yay; no Package Manager window; foot instead of kitty.
+- swaybg instead of awww (no wallpaper transitions).
+- Window rounding 12 (was 32); the lock screen is Quickshell's, hyprlock is not used.
+- Only GTK, Qt, Hyprland and greeter colours are generated.
 
 ## Build
-`.github/workflows/debian-trixie.yml` builds Quickshell on trixie, makes the `.deb`, smoke-tests the config and
-publishes `minflair-quickshell-trixie.zip` (artifact; release asset on `v*` tags).
+`.github/workflows/debian-trixie.yml` builds Quickshell on trixie, packages the `.deb`, smoke-tests the config and
+publishes `minflair-quickshell-trixie.zip` (workflow artifact; release asset on `v*` tags).

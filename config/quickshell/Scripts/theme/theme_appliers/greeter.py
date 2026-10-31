@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import shutil
 import sys
 
@@ -29,6 +30,21 @@ def _argb(rgb, alpha):
     s = s[-6:]
     a = max(0, min(255, int(round(alpha * 255))))
     return f"#{a:02x}{s}"
+
+
+def _bake_wallpaper(src, dest, bg):
+    """Blur + dim the wallpaper once, so the greeter only has to show a plain JPEG."""
+    tool = shutil.which("magick") or shutil.which("convert")
+    tmp = dest + ".tmp.jpg"
+    try:
+        if not tool:
+            raise FileNotFoundError("imagemagick")
+        cmd = [tool, src + "[0]", "-resize", "1920x1080^", "-gravity", "center", "-extent", "1920x1080",
+               "-blur", "0x14", "-fill", bg, "-colorize", "35%", "-quality", "88", tmp]
+        subprocess.run(cmd, check=True, timeout=60, capture_output=True)
+        os.replace(tmp, dest)
+    except Exception:
+        shutil.copyfile(src, dest)
 
 
 def apply(home, colors):
@@ -100,6 +116,7 @@ def apply(home, colors):
             f'    property color muted: "{theme_data["muted"]}"\n'
             f'    property color accent: "{theme_data["accent"]}"\n'
             f'    property color panel: "{_argb(theme_data["opaqueBg"], 0.78)}"\n'
+            f'    property color opaquePanel: "{theme_data["opaqueBg"]}"\n'
             f'    property string font: "{theme_data["font"]}"\n'
             "}\n"
         )
@@ -123,17 +140,13 @@ def apply(home, colors):
                     src_wall = os.path.join(home, "Pictures", "Wallpapers", wall_name)
 
                 if os.path.exists(src_wall):
-                    dest_wall_png = os.path.join(greeter_dir, "wallpaper.png")
-                    # Safely obtain static image via prepare_image (cached single-frame extraction, no memory spikes)
-                    static_wall, _ = prepare_image(src_wall)
-                    if os.path.exists(static_wall):
-                        shutil.copyfile(static_wall, dest_wall_png)
-
-                    if os.path.exists(dest_wall_png):
-                        try:
-                            os.chmod(dest_wall_png, 0o666)
-                        except OSError:
-                            pass
+                    dest_wall = os.path.join(greeter_dir, "wallpaper.jpg")
+                    static_wall, _ = prepare_image(src_wall)   # single frame, cached
+                    _bake_wallpaper(static_wall, dest_wall, theme_data["opaqueBg"])
+                    try:
+                        os.chmod(dest_wall, 0o666)
+                    except OSError:
+                        pass
 
                     name_file = os.path.join(greeter_dir, "current_wallpaper")
                     with open(name_file, "w") as f:

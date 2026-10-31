@@ -10,9 +10,6 @@ ShellRoot {
     property string pendingPassword: ""
     property var sessionArgv: []
 
-    ListModel { id: users }
-    ListModel { id: sessions }
-
     Process {
         id: lister
         command: ["python3", Quickshell.shellPath("sessions.py")]
@@ -21,9 +18,9 @@ ShellRoot {
             onStreamFinished: {
                 try {
                     const d = JSON.parse(text);
-                    d.users.forEach(u => users.append({ name: u }));
                     shell.sessionArgv = d.sessions.map(s => s.argv);
-                    d.sessions.forEach(s => sessions.append({ name: s.name }));
+                    ui.users = d.users;
+                    ui.sessions = d.sessions.map(s => s.name);
                     ui.sessionIndex = d.default;
                 } catch (e) {
                     console.warn("sessions.py output unreadable:", e);
@@ -69,8 +66,6 @@ ShellRoot {
         Greeter {
             id: ui
             anchors.fill: parent
-            userModel: users
-            sessionModel: sessions
             onLoginRequested: (user, password, sessionIndex) => {
                 shell.pendingPassword = password;
                 if (Greetd.state !== GreetdState.Inactive) Greetd.cancelSession();

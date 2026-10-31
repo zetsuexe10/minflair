@@ -2,12 +2,21 @@
 # Minflair (Quickshell + Hyprland) for Debian 13. Run as your normal user.
 #   ./install.sh            full: apt packages + configs      (zip from CI, has debs/)
 #   ./install.sh --no-apt   configs only (you already installed the packages)
-#   login screen is separate: sudo tools/install-greeter.sh
+#   ./install.sh --greeter  also installs the login screen (asks for sudo)
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ "$(id -u)" -ne 0 ] || { echo "Run as your normal user, not root." >&2; exit 1; }
 
-if [ "${1:-}" != "--no-apt" ] && ls "$HERE"/debs/quickshell_*.deb >/dev/null 2>&1; then
+NO_APT=0; GREETER=0
+for a in "$@"; do
+  case "$a" in
+    --no-apt) NO_APT=1 ;;
+    --greeter) GREETER=1 ;;
+    *) echo "Unknown option: $a" >&2; exit 1 ;;
+  esac
+done
+
+if [ "$NO_APT" -eq 0 ] && ls "$HERE"/debs/quickshell_*.deb >/dev/null 2>&1; then
   echo "==> Installing packages (sudo)"
   sudo apt-get update
   sudo apt-get install -y "$HERE"/debs/quickshell_*.deb \
@@ -36,12 +45,17 @@ done
 mkdir -p "$HOME/Pictures/Wallpapers"
 "$HOME/.config/hypr/scripts/minflair-env.sh"
 
+if [ "$GREETER" -eq 1 ]; then
+  echo "==> Installing the login screen"
+  sudo "$HERE/tools/install-greeter.sh"
+fi
+
 cat <<MSG
 
 Done.
  - Log out, pick/start Hyprland, and everything (qs, themes) starts by itself.
  - Theme output lives in ~/.minflair; your ~/.config/gtk-*, qt*ct and gsettings are untouched.
  - Put wallpapers in ~/Pictures/Wallpapers. Keybinds: Super+K shows all of them.
- - Login screen (optional): sudo tools/install-greeter.sh
+ - Login screen (optional): ./install.sh --no-apt --greeter, or sudo tools/install-greeter.sh
  - Logs: qs log
 MSG
