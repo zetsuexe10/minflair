@@ -20,6 +20,10 @@ QtObject {
     readonly property int railSize: 36
     readonly property int barThickness: 44
 
+    // card surfaces used by the Caelestia-style panels: a little lighter than the panel itself
+    readonly property color card: Qt.tint(Theme.opaqueBg, Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.07))
+    readonly property color cardHi: Qt.tint(Theme.opaqueBg, Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.13))
+
     // thickness reserved on one screen edge: the bar's edge is thick, the others only carry the frame
     function inset(edge) {
         if (edge === position)

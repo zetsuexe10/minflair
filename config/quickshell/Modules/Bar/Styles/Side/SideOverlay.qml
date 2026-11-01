@@ -531,7 +531,7 @@ PanelWindow {
 
     Component {
         id: dashboardComp
-        SideDashboard { widget: widgetProxy }
+        CaelDashboard { widget: widgetProxy }
     }
 
     Component {

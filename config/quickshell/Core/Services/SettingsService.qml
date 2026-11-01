@@ -33,6 +33,8 @@ Item {
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
     property bool sideOsd: true
+    property string weatherCity: ""            // empty: locate by IP
+    property bool weatherFahrenheit: false
     // Caelestia-style desktop for the side bar: frame, bar entries, scroll actions, hover panels
     readonly property var sideBarDefaults: ({
             "frame": true,
@@ -237,6 +239,14 @@ Item {
         if (settingsLoaded)
             saveSettings();
     }
+    onWeatherCityChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onWeatherFahrenheitChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onSideOsdChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -340,6 +350,8 @@ Item {
                 "sideBarPopouts": settingsService.sideBarPopouts,
                 "sideBarWindowTitle": settingsService.sideBarWindowTitle,
                 "sideOsd": settingsService.sideOsd,
+                "weatherCity": settingsService.weatherCity,
+                "weatherFahrenheit": settingsService.weatherFahrenheit,
                 "sideBarConfig": settingsService.sideBarConfig,
                 "sideScrollStep": settingsService.sideScrollStep,
                 "sideDashTab": settingsService.sideDashTab,
@@ -517,6 +529,12 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.sideBarConfig && typeof prefs.sideBarConfig === "object")
                             settingsService.sideBarConfig = prefs.sideBarConfig;
+
+                        if (typeof prefs.weatherCity === "string")
+                            settingsService.weatherCity = prefs.weatherCity;
+
+                        if (prefs.weatherFahrenheit !== undefined)
+                            settingsService.weatherFahrenheit = prefs.weatherFahrenheit;
 
                         if (prefs.sideOsd !== undefined)
                             settingsService.sideOsd = prefs.sideOsd;
