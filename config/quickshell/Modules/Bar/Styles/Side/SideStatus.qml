@@ -44,16 +44,11 @@ SidePill {
     }
 
     function nudgeVolume(wheel) {
-        if (!sink || !sink.audio)
-            return;
-        const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-        if (sink.audio.muted && step > 0)
-            sink.audio.muted = false;
-        sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + step));
+        SideState.nudgeVolume(wheel.angleDelta.y > 0 ? 1 : -1);
     }
 
-    implicitWidth: vertical ? 48 : col.implicitWidth + 16
-    implicitHeight: vertical ? col.implicitHeight + 16 : 48
+    implicitWidth: vertical ? 44 : col.implicitWidth + 16
+    implicitHeight: vertical ? col.implicitHeight + 12 : 44
 
     function centerOf(item) {
         const p = item.mapToItem(null, item.width / 2, item.height / 2);
@@ -83,6 +78,15 @@ SidePill {
                 root.capsOn = t.charAt(0) === "1";
                 root.numOn = t.charAt(1) === "1";
             }
+        }
+    }
+
+    Connections {
+        target: SideState
+
+        function onNetTickChanged() {
+            netProc.running = false;
+            netProc.running = true;
         }
     }
 
@@ -158,6 +162,18 @@ SidePill {
             }
             onScrolled: (wheel) => root.nudgeVolume(wheel)
             onHoverStarted: SideState.hover("audio", root.centerOf(volBtn))
+            onHoverEnded: SideState.release()
+        }
+
+        SideButton {
+            id: briBtn
+
+            visible: SideState.brightnessAvailable
+            icon: "sun"
+            iconSize: Constants.sizeMd
+            onClicked: SideState.popout === "audio" ? SideState.close() : SideState.open("audio", root.centerOf(briBtn))
+            onScrolled: (wheel) => SideState.nudgeBrightness(wheel.angleDelta.y > 0 ? 1 : -1)
+            onHoverStarted: SideState.hover("audio", root.centerOf(briBtn))
             onHoverEnded: SideState.release()
         }
 

@@ -13,8 +13,8 @@ SidePill {
     readonly property int count: SystemTray.items ? SystemTray.items.values.length : 0
 
     visible: count > 0
-    implicitWidth: vertical ? 48 : grid.implicitWidth + 16
-    implicitHeight: vertical ? grid.implicitHeight + 16 : 48
+    implicitWidth: vertical ? 44 : grid.implicitWidth + 16
+    implicitHeight: vertical ? grid.implicitHeight + 16 : 44
 
     Grid {
         id: grid

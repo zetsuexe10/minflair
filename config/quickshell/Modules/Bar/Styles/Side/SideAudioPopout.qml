@@ -31,12 +31,14 @@ ColumnLayout {
     implicitWidth: 300
     spacing: Constants.sizeSm
 
+    Component.onCompleted: SideState.refreshBrightness()
+
     PwObjectTracker {
         objects: Pipewire.nodes.values
     }
 
     ThemedText {
-        text: "Sound"
+        text: "Sound & display"
         font.bold: true
         customSize: Constants.sizeMd
     }
@@ -57,6 +59,14 @@ ColumnLayout {
             AudioService.setMicVolume(val);
         }
         onIconClicked: AudioService.setMicMuted(!AudioService.micMuted)
+    }
+
+    ThemedSlider {
+        Layout.fillWidth: true
+        visible: SideState.brightnessAvailable
+        value: SideState.brightness
+        icon: "sun"
+        onMoved: (val) => SideState.setBrightness(val)
     }
 
     Divider {

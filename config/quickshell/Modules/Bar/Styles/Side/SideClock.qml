@@ -19,8 +19,8 @@ SidePill {
     }
     readonly property string suffix: SettingsService.clock24h ? "" : (now.getHours() >= 12 ? "pm" : "am")
 
-    implicitWidth: vertical ? 48 : row.implicitWidth + 28
-    implicitHeight: vertical ? col.implicitHeight + 18 : 48
+    implicitWidth: vertical ? 44 : row.implicitWidth + 28
+    implicitHeight: vertical ? col.implicitHeight + 18 : 44
     color: area.containsMouse || AppState.isWidgetOpen("calendar") ? Qt.tint(Theme.bg, Theme.bgSecondary) : Theme.bg
 
     Behavior on color { ColorAnimation { duration: Constants.animFast } }

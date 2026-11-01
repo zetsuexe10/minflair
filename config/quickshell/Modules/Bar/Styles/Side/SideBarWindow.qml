@@ -16,7 +16,7 @@ PanelWindow {
 
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
-    readonly property int railSize: 48
+    readonly property int railSize: 44
     readonly property int edge: 8
     readonly property int barWidth: railSize + edge * 2     // thickness incl. margins, whichever the edge
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
@@ -67,27 +67,42 @@ PanelWindow {
         Behavior on slide { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
 
+        // Like Caelestia: scrolling anywhere on the bar changes brightness on the first half and
+        // volume on the second. Items that handle wheel themselves (workspaces, icons) win.
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.NoButton
+            onWheel: (wheel) => {
+                const frac = root.vertical ? wheel.y / height : wheel.x / width;
+                const dir = wheel.angleDelta.y > 0 ? 1 : -1;
+                if (frac < 0.5 && SideState.brightnessAvailable)
+                    SideState.nudgeBrightness(dir);
+                else
+                    SideState.nudgeVolume(dir);
+            }
+        }
+
         Loader {
             anchors.fill: parent
             active: root.isActive
 
             sourceComponent: GridLayout {
                 anchors.fill: parent
-                anchors.topMargin: root.vertical ? root.edge : 0
-                anchors.bottomMargin: root.vertical ? root.edge : 0
-                anchors.leftMargin: root.vertical ? 0 : root.edge
-                anchors.rightMargin: root.vertical ? 0 : root.edge
+                anchors.topMargin: root.vertical ? 12 : 0
+                anchors.bottomMargin: root.vertical ? 12 : 0
+                anchors.leftMargin: root.vertical ? 0 : 12
+                anchors.rightMargin: root.vertical ? 0 : 12
                 flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
                 rows: root.vertical ? 99 : 1
                 columns: root.vertical ? 1 : 99
-                rowSpacing: root.edge
-                columnSpacing: root.edge
+                rowSpacing: 6
+                columnSpacing: 6
 
                 SideButton {
                     Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 48
-                    Layout.preferredHeight: 48
-                    size: 48
+                    Layout.preferredWidth: 44
+                    Layout.preferredHeight: 44
+                    size: 44
                     icon: "apps-filled"
                     iconColor: Theme.accent
                     iconSize: Constants.sizeXl
@@ -111,8 +126,8 @@ PanelWindow {
                     Layout.alignment: Qt.AlignCenter
                     Layout.fillHeight: root.vertical
                     Layout.fillWidth: !root.vertical
-                    Layout.preferredWidth: root.vertical ? 48 : -1
-                    Layout.preferredHeight: root.vertical ? -1 : 48
+                    Layout.preferredWidth: root.vertical ? 44 : -1
+                    Layout.preferredHeight: root.vertical ? -1 : 44
                 }
 
                 SideTray {
@@ -133,9 +148,9 @@ PanelWindow {
 
                 SideButton {
                     Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 48
-                    Layout.preferredHeight: 48
-                    size: 48
+                    Layout.preferredWidth: 44
+                    Layout.preferredHeight: 44
+                    size: 44
                     icon: "power"
                     iconSize: Constants.sizeXl
                     active: AppState.isWidgetOpen("powerMenu")

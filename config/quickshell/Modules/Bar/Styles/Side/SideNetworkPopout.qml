@@ -102,8 +102,10 @@ ColumnLayout {
         id: toggleProc
 
         onRunningChanged: {
-            if (!running)
+            if (!running) {
                 root.refresh(false);
+                SideState.netTick++;
+            }
         }
     }
 
@@ -116,8 +118,10 @@ ColumnLayout {
                 try {
                     const r = JSON.parse(text.trim());
                     root.message = r.success ? "" : "Could not connect";
-                    if (r.success)
+                    if (r.success) {
                         root.pending = "";
+                        SideState.netTick++;
+                    }
                 } catch (e) {
                     root.message = "Could not connect";
                 }

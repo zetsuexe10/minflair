@@ -16,8 +16,8 @@ Item {
     readonly property real space: vertical ? height : width
     readonly property bool shown: title !== "" && space >= 96
 
-    implicitWidth: 48
-    implicitHeight: 48
+    implicitWidth: 44
+    implicitHeight: 44
 
     TextMetrics {
         id: metrics
@@ -30,8 +30,8 @@ Item {
     SidePill {
         anchors.left: parent.left
         anchors.top: parent.top
-        width: root.vertical ? 48 : Math.max(72, Math.min(root.width, root.wanted))
-        height: root.vertical ? Math.max(72, Math.min(root.height, root.wanted)) : 48
+        width: root.vertical ? 44 : Math.max(72, Math.min(root.width, root.wanted))
+        height: root.vertical ? Math.max(72, Math.min(root.height, root.wanted)) : 44
         opacity: root.shown ? 1 : 0
         visible: opacity > 0.01
         clip: true

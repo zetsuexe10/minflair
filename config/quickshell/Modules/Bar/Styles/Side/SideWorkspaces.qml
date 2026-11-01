@@ -9,21 +9,13 @@ SidePill {
     id: root
 
     property bool vertical: true
-    readonly property int slot: 32
+    readonly property int slot: 28
     readonly property int gap: 4
-    readonly property int pad: 8
+    readonly property int pad: 6
     readonly property int activeWsId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
-    readonly property int highestOccupied: {
-        let maxId = 1;
-        const list = Hyprland.workspaces ? Hyprland.workspaces.values : [];
-        for (let i = 0; i < list.length; i++) {
-            const ws = list[i];
-            if (ws && ws.id > maxId && ws.toplevels && ws.toplevels.values && ws.toplevels.values.length > 0)
-                maxId = ws.id;
-        }
-        return maxId;
-    }
-    readonly property int shown: Math.min(SettingsService.numberOfWorkspaces, Math.max(activeWsId, highestOccupied, 4))
+    // fixed number of slots: scrolling never changes the bar length, the window of ids follows the active one
+    readonly property int shown: Math.min(SettingsService.numberOfWorkspaces, 5)
+    readonly property int first: Math.max(1, Math.min(SettingsService.numberOfWorkspaces - shown + 1, activeWsId - Math.floor(shown / 2)))
     readonly property real along: shown * slot + (shown - 1) * gap + pad * 2
 
     function occupied(id) {
@@ -41,14 +33,12 @@ SidePill {
             Hyprland.dispatch('hl.dsp.focus({workspace=' + id + '})');
     }
 
-    implicitWidth: vertical ? 48 : along
-    implicitHeight: vertical ? along : 48
+    implicitWidth: vertical ? 44 : along
+    implicitHeight: vertical ? along : 44
 
-    Behavior on implicitWidth { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-    Behavior on implicitHeight { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
     Rectangle {
-        readonly property real offset: root.pad + (Math.min(root.activeWsId, root.shown) - 1) * (root.slot + root.gap)
+        readonly property real offset: root.pad + (Math.max(0, Math.min(root.shown - 1, root.activeWsId - root.first))) * (root.slot + root.gap)
 
         x: root.vertical ? (root.width - root.slot) / 2 : offset
         y: root.vertical ? offset : (root.height - root.slot) / 2
@@ -74,7 +64,7 @@ SidePill {
                 id: wsItem
 
                 required property int index
-                readonly property int wsId: index + 1
+                readonly property int wsId: root.first + index
                 readonly property bool isActive: wsId === root.activeWsId
                 readonly property bool isOccupied: root.occupied(wsId)
 
