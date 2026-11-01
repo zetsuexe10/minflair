@@ -4,10 +4,11 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Vertical workspace switcher with a sliding active indicator.
+// Workspace switcher with a sliding active indicator (vertical or horizontal).
 SidePill {
     id: root
 
+    property bool vertical: true
     readonly property int slot: 32
     readonly property int gap: 4
     readonly property int pad: 8
@@ -23,6 +24,7 @@ SidePill {
         return maxId;
     }
     readonly property int shown: Math.min(SettingsService.numberOfWorkspaces, Math.max(activeWsId, highestOccupied, 4))
+    readonly property real along: shown * slot + (shown - 1) * gap + pad * 2
 
     function occupied(id) {
         const list = Hyprland.workspaces ? Hyprland.workspaces.values : [];
@@ -39,27 +41,30 @@ SidePill {
             Hyprland.dispatch('hl.dsp.focus({workspace=' + id + '})');
     }
 
-    implicitWidth: 48
-    implicitHeight: shown * slot + (shown - 1) * gap + pad * 2
+    implicitWidth: vertical ? 48 : along
+    implicitHeight: vertical ? along : 48
 
+    Behavior on implicitWidth { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
     Behavior on implicitHeight { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
     Rectangle {
-        id: indicator
+        readonly property real offset: root.pad + (Math.min(root.activeWsId, root.shown) - 1) * (root.slot + root.gap)
 
-        x: root.pad + (root.width - root.pad * 2 - root.slot) / 2 - 0
-        y: root.pad + (Math.min(root.activeWsId, root.shown) - 1) * (root.slot + root.gap)
+        x: root.vertical ? (root.width - root.slot) / 2 : offset
+        y: root.vertical ? offset : (root.height - root.slot) / 2
         width: root.slot
         height: root.slot
         radius: width / 2
         color: Theme.accent
 
+        Behavior on x { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
         Behavior on y { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
     }
 
-    Column {
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: root.pad
+    Grid {
+        x: root.vertical ? (root.width - width) / 2 : root.pad
+        y: root.vertical ? root.pad : (root.height - height) / 2
+        columns: root.vertical ? 1 : 99
         spacing: root.gap
 
         Repeater {

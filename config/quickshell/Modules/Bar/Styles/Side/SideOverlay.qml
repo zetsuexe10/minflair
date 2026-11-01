@@ -25,6 +25,16 @@ PanelWindow {
     required property var notificationService
     required property int barWidth
 
+    readonly property string position: SettingsService.sideBarPosition
+    readonly property bool vertical: position === "left" || position === "right"
+    readonly property real gap: 4
+    readonly property real margin: 12
+    // free rectangle of the screen that is not the bar
+    readonly property real freeX: position === "left" ? barWidth : 0
+    readonly property real freeY: position === "top" ? barWidth : 0
+    readonly property real freeW: width - (vertical ? barWidth : 0)
+    readonly property real freeH: height - (vertical ? 0 : barWidth)
+
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
     readonly property var centered: ["launcher", "clipboard", "wallpaper", "powerMenu", "screenshot"]
     readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage"].concat(centered)
@@ -128,37 +138,70 @@ PanelWindow {
 
     // click outside closes, Escape closes
     MouseArea {
-        anchors.fill: parent
-        anchors.leftMargin: root.barWidth
+        x: root.freeX
+        y: root.freeY
+        width: root.freeW
+        height: root.freeH
         enabled: root.open
         focus: root.needsFocus
         Keys.onEscapePressed: AppState.closeAllWidgets()
         onClicked: AppState.closeAllWidgets()
     }
 
+    // main panel, anchored to the bar edge
     Rectangle {
         id: panel
 
         readonly property bool isCentered: root.centered.indexOf(root.shownId) !== -1
-        readonly property bool atTop: root.shownId === "dashboard"
+        readonly property bool atStart: root.shownId === "dashboard"
         readonly property int pad: (root.shownId === "powerMenu" || root.shownId === "screenshot") ? 0 : Constants.sizeLg
-        readonly property real gap: 4
+        readonly property real maxW: root.freeW - 24
+        readonly property real maxH: root.freeH - 24
 
         visible: opacity > 0.01
         opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.96
-        transformOrigin: isCentered ? Item.Center : Item.Left
-        width: Math.min(content.implicitWidth + pad * 2, root.width - root.barWidth - 24)
-        height: Math.min(content.implicitHeight + pad * 2, root.height - 24)
-        x: isCentered ? Math.round((root.width - width) / 2) : root.barWidth + gap
-        y: isCentered ? Math.round((root.height - height) / 2) : (atTop ? 12 : root.height - height - 12)
+        scale: root.open ? 1 : 0.94
+        transformOrigin: {
+            if (isCentered)
+                return Item.Center;
+            switch (root.position) {
+            case "left": return Item.Left;
+            case "right": return Item.Right;
+            case "top": return Item.Top;
+            default: return Item.Bottom;
+            }
+        }
+        width: Math.min(content.implicitWidth + pad * 2, maxW)
+        height: Math.min(content.implicitHeight + pad * 2, maxH)
+        x: {
+            if (isCentered)
+                return Math.round((root.width - width) / 2);
+            if (root.vertical)
+                return root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width;
+            return atStart ? Math.round((root.width - width) / 2) : root.width - width - root.margin;
+        }
+        y: {
+            if (isCentered)
+                return Math.round((root.height - height) / 2);
+            if (!root.vertical)
+                return root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height;
+            return atStart ? root.margin : root.height - height - root.margin;
+        }
         color: Theme.bg
         radius: Constants.size3Xl - 4
         border.width: 1
         border.color: Theme.border
 
+        // slide in from the bar edge as well as scale
+        property real slide: root.open ? 0 : 18
+        transform: Translate {
+            x: panel.isCentered || !root.vertical ? 0 : (root.position === "left" ? -panel.slide : panel.slide)
+            y: panel.isCentered || root.vertical ? 0 : (root.position === "top" ? -panel.slide : panel.slide)
+        }
+
+        Behavior on slide { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
         Behavior on height { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
 
         MouseArea {
@@ -177,12 +220,143 @@ PanelWindow {
         }
     }
 
+    // hover popout (Wi-Fi, Bluetooth, sound) beside the icon that opened it
+    Rectangle {
+        id: pop
+
+        readonly property bool wanted: root.isActive && SideState.popout !== "" && !root.open
+        property string shownPop: ""
+
+        visible: opacity > 0.01
+        opacity: wanted ? 1 : 0
+        width: Math.min(popLoader.implicitWidth + Constants.sizeLg * 2, root.freeW - 24)
+        height: Math.min(popLoader.implicitHeight + Constants.sizeLg * 2, root.freeH - 24)
+        x: {
+            if (root.vertical)
+                return root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width;
+            return Math.max(root.margin, Math.min(root.width - width - root.margin, SideState.popoutCenter - width / 2));
+        }
+        y: {
+            if (!root.vertical)
+                return root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height;
+            return Math.max(root.margin, Math.min(root.height - height - root.margin, SideState.popoutCenter - height / 2));
+        }
+        color: Theme.bg
+        radius: Constants.size3Xl - 4
+        border.width: 1
+        border.color: Theme.border
+
+        onWantedChanged: if (wanted) shownPop = SideState.popout
+        Connections {
+            target: SideState
+
+            function onPopoutChanged() {
+                if (SideState.popout !== "")
+                    pop.shownPop = SideState.popout;
+            }
+        }
+
+        Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
+        Behavior on x { enabled: pop.opacity > 0.5; NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
+        Behavior on y { enabled: pop.opacity > 0.5; NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
+        Behavior on height { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
+
+        HoverHandler {
+            onHoveredChanged: hovered ? SideState.hold() : SideState.release()
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+        }
+
+        Loader {
+            id: popLoader
+
+            anchors.fill: parent
+            anchors.margins: Constants.sizeLg
+            active: pop.visible
+            sourceComponent: pop.shownPop === "network" ? networkComp : (pop.shownPop === "bluetooth" ? bluetoothComp : (pop.shownPop === "audio" ? audioComp : null))
+        }
+    }
+
+    // volume / brightness / mic feedback
+    Rectangle {
+        id: osd
+
+        readonly property bool wanted: root.isActive && OsdService.isOpen && !root.open
+
+        visible: opacity > 0.01
+        opacity: wanted ? 1 : 0
+        width: root.vertical ? 220 : 220
+        height: 52
+        radius: height / 2
+        color: Theme.bg
+        border.width: 1
+        border.color: Theme.border
+        x: root.vertical ? (root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width) : Math.round((root.width - width) / 2)
+        y: root.vertical ? Math.round(root.height - height - 48) : (root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height)
+
+        Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
+
+        SvgIcon {
+            id: osdIcon
+
+            anchors.left: parent.left
+            anchors.leftMargin: 18
+            anchors.verticalCenter: parent.verticalCenter
+            icon: OsdService.icon
+            iconSize: Constants.sizeLg
+            iconColor: OsdService.isMuted ? Theme.muted : Theme.accent
+            flat: true
+        }
+
+        Rectangle {
+            visible: OsdService.showProgress
+            anchors.left: osdIcon.right
+            anchors.leftMargin: 12
+            anchors.right: osdText.left
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            height: 6
+            radius: 3
+            color: Theme.bgSecondary
+
+            Rectangle {
+                width: parent.width * OsdService.level
+                height: parent.height
+                radius: 3
+                color: OsdService.isMuted ? Theme.muted : Theme.accent
+
+                Behavior on width { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
+            }
+        }
+
+        ThemedText {
+            id: osdText
+
+            anchors.right: parent.right
+            anchors.rightMargin: 18
+            anchors.verticalCenter: parent.verticalCenter
+            text: OsdService.valueText
+            font.bold: true
+        }
+
+        ThemedText {
+            visible: !OsdService.showProgress
+            anchors.left: osdIcon.right
+            anchors.leftMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            text: OsdService.title
+        }
+    }
+
     // notification toast, next to the bar
     Rectangle {
         id: toastBox
 
-        x: root.barWidth + 4
-        y: 12
+        x: root.vertical ? (root.position === "left" ? root.barWidth + 4 : root.width - root.barWidth - 4 - width) : Math.round((root.width - width) / 2)
+        y: root.vertical ? 12 : (root.position === "top" ? root.barWidth + 4 : root.height - root.barWidth - 4 - height)
         width: 380
         height: Math.max(toast.notifH, 64)
         radius: 22
@@ -213,10 +387,17 @@ PanelWindow {
 
     mask: Region {
         Region {
-            x: root.barWidth
-            y: 0
-            width: root.panelVisible ? root.width - root.barWidth : 0
-            height: root.panelVisible ? root.height : 0
+            x: root.freeX
+            y: root.freeY
+            width: root.panelVisible ? root.freeW : 0
+            height: root.panelVisible ? root.freeH : 0
+        }
+
+        Region {
+            x: pop.x
+            y: pop.y
+            width: pop.visible ? pop.width : 0
+            height: pop.visible ? pop.height : 0
         }
 
         Region {
@@ -228,8 +409,23 @@ PanelWindow {
     }
 
     Component {
+        id: networkComp
+        SideNetworkPopout {}
+    }
+
+    Component {
+        id: bluetoothComp
+        SideBluetoothPopout {}
+    }
+
+    Component {
+        id: audioComp
+        SideAudioPopout {}
+    }
+
+    Component {
         id: dashboardComp
-        DashboardContent { widget: widgetProxy }
+        SideDashboard { widget: widgetProxy }
     }
 
     Component {

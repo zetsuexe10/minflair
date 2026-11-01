@@ -4,10 +4,12 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Weekday and day on top, hours over minutes below. Click opens the calendar.
+// Vertical bar: weekday and day on top, hours over minutes below. Horizontal bar: one line.
+// Click opens the calendar.
 SidePill {
     id: root
 
+    property bool vertical: true
     readonly property date now: SystemInfoService.currentTime
     readonly property string hours: {
         let h = now.getHours();
@@ -15,16 +17,18 @@ SidePill {
             h = h % 12 || 12;
         return h.toString().padStart(2, "0");
     }
+    readonly property string suffix: SettingsService.clock24h ? "" : (now.getHours() >= 12 ? "pm" : "am")
 
-    implicitWidth: 48
-    implicitHeight: layout.implicitHeight + 18
+    implicitWidth: vertical ? 48 : row.implicitWidth + 28
+    implicitHeight: vertical ? col.implicitHeight + 18 : 48
     color: area.containsMouse || AppState.isWidgetOpen("calendar") ? Qt.tint(Theme.bg, Theme.bgSecondary) : Theme.bg
 
     Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
     ColumnLayout {
-        id: layout
+        id: col
 
+        visible: root.vertical
         anchors.centerIn: parent
         spacing: 0
 
@@ -68,10 +72,37 @@ SidePill {
 
         ThemedText {
             Layout.alignment: Qt.AlignHCenter
-            visible: !SettingsService.clock24h
-            text: root.now.getHours() >= 12 ? "pm" : "am"
+            visible: root.suffix !== ""
+            text: root.suffix
             customSize: 10
             color: Theme.muted
+        }
+    }
+
+    RowLayout {
+        id: row
+
+        visible: !root.vertical
+        anchors.centerIn: parent
+        spacing: 8
+
+        ThemedText {
+            text: Qt.formatDate(root.now, "ddd d")
+            customSize: 12
+            color: Theme.accent
+            font.bold: true
+        }
+
+        Rectangle {
+            implicitWidth: 1
+            implicitHeight: 16
+            color: Theme.border
+        }
+
+        ThemedText {
+            text: root.hours + ":" + Qt.formatTime(root.now, "mm") + (root.suffix !== "" ? " " + root.suffix : "")
+            customSize: 14
+            font.bold: true
         }
     }
 

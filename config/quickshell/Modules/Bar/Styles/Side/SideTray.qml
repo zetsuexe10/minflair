@@ -9,16 +9,18 @@ import qs.Core.Components
 SidePill {
     id: root
 
+    property bool vertical: true
     readonly property int count: SystemTray.items ? SystemTray.items.values.length : 0
 
     visible: count > 0
-    implicitWidth: 48
-    implicitHeight: col.implicitHeight + 16
+    implicitWidth: vertical ? 48 : grid.implicitWidth + 16
+    implicitHeight: vertical ? grid.implicitHeight + 16 : 48
 
-    Column {
-        id: col
+    Grid {
+        id: grid
 
         anchors.centerIn: parent
+        columns: root.vertical ? 1 : 99
         spacing: 4
 
         Repeater {
@@ -55,7 +57,7 @@ SidePill {
                     cursorShape: Qt.PointingHandCursor
                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                     onClicked: (mouse) => {
-                        const p = entry.mapToItem(null, entry.width + 14, 0);
+                        const p = entry.mapToItem(null, root.vertical ? entry.width + 14 : 0, root.vertical ? 0 : entry.height + 14);
                         if (mouse.button === Qt.MiddleButton) {
                             entry.modelData.secondaryActivate();
                         } else if (mouse.button === Qt.RightButton || entry.modelData.onlyMenu) {

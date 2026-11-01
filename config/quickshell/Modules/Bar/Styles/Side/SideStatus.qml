@@ -13,6 +13,8 @@ SidePill {
 
     required property var notificationService
 
+    property bool vertical: true
+
     property bool wifiUp: false
     property bool ethUp: false
     property bool capsOn: false
@@ -45,11 +47,18 @@ SidePill {
         if (!sink || !sink.audio)
             return;
         const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
+        if (sink.audio.muted && step > 0)
+            sink.audio.muted = false;
         sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + step));
     }
 
-    implicitWidth: 48
-    implicitHeight: col.implicitHeight + 16
+    implicitWidth: vertical ? 48 : col.implicitWidth + 16
+    implicitHeight: vertical ? col.implicitHeight + 16 : 48
+
+    function centerOf(item) {
+        const p = item.mapToItem(null, item.width / 2, item.height / 2);
+        return vertical ? p.y : p.x;
+    }
 
     Process {
         id: netProc
@@ -93,10 +102,11 @@ SidePill {
         onTriggered: lockProc.running = true
     }
 
-    Column {
+    Grid {
         id: col
 
         anchors.centerIn: parent
+        columns: root.vertical ? 1 : 99
         spacing: 2
 
         SideButton {
@@ -109,31 +119,46 @@ SidePill {
         }
 
         SideButton {
+            id: netBtn
+
             icon: (root.wifiUp || root.ethUp) ? "wifi" : "wifi-off"
             iconColor: (root.wifiUp || root.ethUp) ? Theme.fg : Theme.muted
             iconSize: Constants.sizeMd
-            onClicked: AppState.toggleWidget("controlCenter")
+            active: SideState.popout === "network"
+            onClicked: SideState.popout === "network" ? SideState.close() : SideState.open("network", root.centerOf(netBtn))
+            onHoverStarted: SideState.hover("network", root.centerOf(netBtn))
+            onHoverEnded: SideState.release()
         }
 
         SideButton {
+            id: btBtn
+
             visible: root.adapter !== null
             icon: root.btOn ? "bluetooth" : "bluetooth-off"
             iconColor: root.btConnected ? Theme.accent : (root.btOn ? Theme.fg : Theme.muted)
             iconSize: Constants.sizeMd
-            onClicked: AppState.toggleWidget("controlCenter")
+            active: SideState.popout === "bluetooth"
+            onClicked: SideState.popout === "bluetooth" ? SideState.close() : SideState.open("bluetooth", root.centerOf(btBtn))
+            onHoverStarted: SideState.hover("bluetooth", root.centerOf(btBtn))
+            onHoverEnded: SideState.release()
         }
 
         SideButton {
+            id: volBtn
+
             icon: (root.muted || root.volume <= 0) ? "volume-off" : "volume"
             iconColor: root.muted ? Theme.muted : Theme.fg
             iconSize: Constants.sizeMd
+            active: SideState.popout === "audio"
             onClicked: (mouse) => {
                 if (mouse.button === Qt.MiddleButton && root.sink && root.sink.audio)
                     root.sink.audio.muted = !root.sink.audio.muted;
                 else
-                    AppState.toggleWidget("controlCenter");
+                    SideState.popout === "audio" ? SideState.close() : SideState.open("audio", root.centerOf(volBtn));
             }
             onScrolled: (wheel) => root.nudgeVolume(wheel)
+            onHoverStarted: SideState.hover("audio", root.centerOf(volBtn))
+            onHoverEnded: SideState.release()
         }
 
         SideButton {

@@ -16,6 +16,8 @@ Item {
 
     signal clicked(var mouse)
     signal scrolled(var wheel)
+    signal hoverStarted()
+    signal hoverEnded()
 
     implicitWidth: size
     implicitHeight: size
@@ -59,5 +61,7 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         onClicked: (mouse) => root.clicked(mouse)
         onWheel: (wheel) => root.scrolled(wheel)
+        onEntered: root.hoverStarted()
+        onExited: root.hoverEnded()
     }
 }

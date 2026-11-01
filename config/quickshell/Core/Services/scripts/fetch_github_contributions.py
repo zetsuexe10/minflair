@@ -148,8 +148,8 @@ def fetch_contributions_graphql(username, token):
 
     url = "https://api.github.com/graphql"
     query = """
-    query {
-      user(login: "%s") {
+    query($login: String!) {
+      user(login: $login) {
         contributionsCollection {
           contributionCalendar {
             weeks {
@@ -163,14 +163,14 @@ def fetch_contributions_graphql(username, token):
         }
       }
     }
-    """ % username
+    """
 
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64)",
     }
-    data = json.dumps({"query": query}).encode("utf-8")
+    data = json.dumps({"query": query, "variables": {"login": username}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers)
 
     try:

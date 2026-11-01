@@ -6,7 +6,7 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Floating vertical bar on the left edge: launcher, workspaces, window title, tray, status,
+// Floating bar on the left, right, top or bottom edge (Settings > Bar): launcher, workspaces, window title, tray, status,
 // clock and power. The window stays mapped for the whole session and only activates for the
 // "side" style (destroying layer surfaces on a style switch can crash Quickshell).
 PanelWindow {
@@ -14,12 +14,16 @@ PanelWindow {
 
     required property var notificationService
 
-    readonly property int railWidth: 48
+    readonly property string position: SettingsService.sideBarPosition
+    readonly property bool vertical: position === "left" || position === "right"
+    readonly property int railSize: 48
     readonly property int edge: 8
-    readonly property int barWidth: railWidth + edge * 2
+    readonly property int barWidth: railSize + edge * 2     // thickness incl. margins, whichever the edge
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
     readonly property bool fullscreen: HyprlandService.isTrueFullscreen
     readonly property bool shown: isActive && !fullscreen
+    // how far the rail is pushed off-screen while hidden
+    readonly property real hideShift: shown ? 0 : -(barWidth)
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-side-bar"
@@ -27,47 +31,60 @@ PanelWindow {
     color: "transparent"
     focusable: false
     visible: SettingsService.settingsLoaded
-    implicitWidth: barWidth
+    implicitWidth: vertical ? barWidth : 0
+    implicitHeight: vertical ? 0 : barWidth
 
     anchors {
-        top: true
-        bottom: true
-        left: true
+        top: root.position !== "bottom"
+        bottom: root.position !== "top"
+        left: root.position !== "right"
+        right: root.position !== "left"
     }
 
+    // only the rail itself takes input
     mask: Region {
         Region {
-            x: root.edge
-            y: 0
-            width: root.shown ? root.railWidth : 0
-            height: root.shown ? root.height : 0
+            x: root.position === "right" ? root.width - root.barWidth + root.edge : (root.vertical ? root.edge : 0)
+            y: root.position === "bottom" ? root.height - root.barWidth + root.edge : (root.vertical ? 0 : root.edge)
+            width: !root.shown ? 0 : (root.vertical ? root.railSize : root.width)
+            height: !root.shown ? 0 : (root.vertical ? root.height : root.railSize)
         }
     }
 
     Item {
         id: rail
 
-        x: root.edge - (root.shown ? 0 : root.barWidth)
-        width: root.railWidth
-        height: parent.height
+        // slide towards the screen edge when hidden
+        readonly property real slide: root.shown ? 0 : root.hideShift
+
+        x: root.vertical ? (root.position === "left" ? root.edge + slide : root.width - root.edge - root.railSize - slide) : 0
+        y: root.vertical ? 0 : (root.position === "top" ? root.edge + slide : root.height - root.edge - root.railSize - slide)
+        width: root.vertical ? root.railSize : parent.width
+        height: root.vertical ? parent.height : root.railSize
         opacity: root.shown ? 1 : 0
         visible: opacity > 0.01
 
-        Behavior on x { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
+        Behavior on slide { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
 
         Loader {
             anchors.fill: parent
             active: root.isActive
 
-            sourceComponent: ColumnLayout {
+            sourceComponent: GridLayout {
                 anchors.fill: parent
-                anchors.topMargin: root.edge
-                anchors.bottomMargin: root.edge
-                spacing: root.edge
+                anchors.topMargin: root.vertical ? root.edge : 0
+                anchors.bottomMargin: root.vertical ? root.edge : 0
+                anchors.leftMargin: root.vertical ? 0 : root.edge
+                anchors.rightMargin: root.vertical ? 0 : root.edge
+                flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+                rows: root.vertical ? 99 : 1
+                columns: root.vertical ? 1 : 99
+                rowSpacing: root.edge
+                columnSpacing: root.edge
 
                 SideButton {
-                    Layout.alignment: Qt.AlignHCenter
+                    Layout.alignment: Qt.AlignCenter
                     Layout.preferredWidth: 48
                     Layout.preferredHeight: 48
                     size: 48
@@ -85,30 +102,37 @@ PanelWindow {
                 }
 
                 SideWorkspaces {
-                    Layout.alignment: Qt.AlignHCenter
+                    vertical: root.vertical
+                    Layout.alignment: Qt.AlignCenter
                 }
 
                 SideActiveWindow {
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 48
+                    vertical: root.vertical
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.fillHeight: root.vertical
+                    Layout.fillWidth: !root.vertical
+                    Layout.preferredWidth: root.vertical ? 48 : -1
+                    Layout.preferredHeight: root.vertical ? -1 : 48
                 }
 
                 SideTray {
-                    Layout.alignment: Qt.AlignHCenter
+                    vertical: root.vertical
+                    Layout.alignment: Qt.AlignCenter
                 }
 
                 SideStatus {
-                    Layout.alignment: Qt.AlignHCenter
+                    vertical: root.vertical
+                    Layout.alignment: Qt.AlignCenter
                     notificationService: root.notificationService
                 }
 
                 SideClock {
-                    Layout.alignment: Qt.AlignHCenter
+                    vertical: root.vertical
+                    Layout.alignment: Qt.AlignCenter
                 }
 
                 SideButton {
-                    Layout.alignment: Qt.AlignHCenter
+                    Layout.alignment: Qt.AlignCenter
                     Layout.preferredWidth: 48
                     Layout.preferredHeight: 48
                     size: 48

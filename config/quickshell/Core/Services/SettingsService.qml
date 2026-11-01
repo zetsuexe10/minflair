@@ -28,6 +28,10 @@ Item {
     property string cursorTheme: "Vimix-cursors"
     property int cursorSize: 16
     property string barStyle: "convex"
+    // Side bar style (third style): its own placement and options
+    property string sideBarPosition: "left"
+    property bool sideBarPopouts: true
+    property bool sideBarWindowTitle: true
     readonly property var barStyles: ["convex", "island", "side"]
     readonly property var barStyleNames: ({
         "convex": "Convex",
@@ -190,6 +194,21 @@ Item {
             applyCursor(cursorTheme, cursorSize);
         }
     }
+    onSideBarPositionChanged: {
+        if (settingsLoaded)
+            saveSettings();
+
+    }
+    onSideBarPopoutsChanged: {
+        if (settingsLoaded)
+            saveSettings();
+
+    }
+    onSideBarWindowTitleChanged: {
+        if (settingsLoaded)
+            saveSettings();
+
+    }
     onBarStyleChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -267,6 +286,9 @@ Item {
                 "cursorTheme": settingsService.cursorTheme,
                 "cursorSize": settingsService.cursorSize,
                 "barStyle": settingsService.barStyle,
+                "sideBarPosition": settingsService.sideBarPosition,
+                "sideBarPopouts": settingsService.sideBarPopouts,
+                "sideBarWindowTitle": settingsService.sideBarWindowTitle,
                 "islandRightMode": settingsService.islandRightMode,
                 "islandShowWorkspaces": settingsService.islandShowWorkspaces,
                 "islandShowTray": settingsService.islandShowTray,
@@ -430,6 +452,15 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                             else
                                 settingsService.barStyle = "convex";
                         }
+                        if (["left", "right", "top", "bottom"].indexOf(prefs.sideBarPosition) !== -1)
+                            settingsService.sideBarPosition = prefs.sideBarPosition;
+
+                        if (prefs.sideBarPopouts !== undefined)
+                            settingsService.sideBarPopouts = prefs.sideBarPopouts;
+
+                        if (prefs.sideBarWindowTitle !== undefined)
+                            settingsService.sideBarWindowTitle = prefs.sideBarWindowTitle;
+
                         if (prefs.islandRightMode !== undefined)
                             settingsService.islandRightMode = prefs.islandRightMode;
 

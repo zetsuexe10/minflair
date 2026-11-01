@@ -35,6 +35,54 @@ AppContainer {
 
     }
 
+    // SIDE BAR OPTIONS
+    AppGroup {
+        title: "Side Bar"
+        icon: "bar"
+        visible: SettingsService.barStyle === "side"
+
+        SettingSegmented {
+            label: "Position"
+            description: "Which screen edge the bar sits on"
+            model: [{
+                "text": "Left",
+                "value": "left"
+            }, {
+                "text": "Right",
+                "value": "right"
+            }, {
+                "text": "Top",
+                "value": "top"
+            }, {
+                "text": "Bottom",
+                "value": "bottom"
+            }]
+            currentValue: SettingsService.sideBarPosition
+            onActivated: (value) => {
+                SettingsService.sideBarPosition = value;
+            }
+        }
+
+        SettingToggle {
+            label: "Hover Popouts"
+            description: "Open the Wi-Fi, Bluetooth and audio panels when hovering their icons"
+            checked: SettingsService.sideBarPopouts
+            onCheckedChanged: {
+                SettingsService.sideBarPopouts = checked;
+            }
+        }
+
+        SettingToggle {
+            label: "Window Title"
+            description: "Show the focused window's title on the bar"
+            checked: SettingsService.sideBarWindowTitle
+            onCheckedChanged: {
+                SettingsService.sideBarWindowTitle = checked;
+            }
+        }
+
+    }
+
     // ISLAND MODE WIDGETS
     AppGroup {
         title: "Island Bar Widgets"
