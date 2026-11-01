@@ -276,7 +276,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: Constants.sizeLg
             active: pop.visible
-            sourceComponent: pop.shownPop === "network" ? networkComp : (pop.shownPop === "bluetooth" ? bluetoothComp : (pop.shownPop === "audio" ? audioComp : null))
+            sourceComponent: pop.shownPop === "network" ? networkComp : (pop.shownPop === "bluetooth" ? bluetoothComp : (pop.shownPop === "audio" ? audioComp : (pop.shownPop === "calendar" ? calendarPopComp : (pop.shownPop === "notifications" ? notifPopComp : null))))
         }
     }
 
@@ -406,6 +406,16 @@ PanelWindow {
             width: toastBox.visible ? toastBox.width : 0
             height: toastBox.visible ? toastBox.height : 0
         }
+    }
+
+    Component {
+        id: calendarPopComp
+        CalendarWidget {}
+    }
+
+    Component {
+        id: notifPopComp
+        SideNotifPopout { notificationService: root.notificationService }
     }
 
     Component {

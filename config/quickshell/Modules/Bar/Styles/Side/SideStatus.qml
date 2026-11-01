@@ -184,6 +184,10 @@ SidePill {
         }
 
         SideButton {
+            id: bellBtn
+
+            onHoverStarted: SideState.hover("notifications", root.centerOf(bellBtn))
+            onHoverEnded: SideState.release()
             icon: (root.notificationService && root.notificationService.dndEnabled) ? "bell-off" : "bell"
             iconColor: (root.notificationService && root.notificationService.unreadCount > 0) ? Theme.accent : Theme.fg
             iconSize: Constants.sizeMd

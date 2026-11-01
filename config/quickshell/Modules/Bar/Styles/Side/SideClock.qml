@@ -113,5 +113,10 @@ SidePill {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: AppState.toggleWidget("calendar")
+        onEntered: {
+            const p = root.mapToItem(null, root.width / 2, root.height / 2);
+            SideState.hover("calendar", root.vertical ? p.y : p.x);
+        }
+        onExited: SideState.release()
     }
 }
