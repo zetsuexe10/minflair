@@ -93,9 +93,15 @@ Log: `/var/tmp/minflair-greeter/greeter.log`. The layout and icons are adapted f
 
 Shell command behind them: `qs ipc call bar cycle|prev|get|set <convex|island|side>`. The style is also in Settings > Bar.
 
-The **Side** style is a floating vertical bar on the left: launcher, workspaces, focused window title, tray, status
-(network, Bluetooth, volume, keyboard layout, lock keys, notifications), clock and power. It has no battery indicator.
-Widgets (control center, calendar, dashboard, ...) and notification toasts open next to it.
+The **Side** style is a floating bar that can sit on the left, right, top or bottom (Settings > Bar > Side Bar):
+launcher, workspaces, focused window title, tray, status (network, Bluetooth, volume, keyboard layout, lock keys,
+notifications), clock and power. It has no battery indicator.
+
+- Hovering or clicking the network, Bluetooth or volume icon opens its own popout: Wi-Fi list with password entry,
+  Bluetooth devices, output/microphone sliders and device pickers. Scrolling over the volume icon changes the volume,
+  middle click mutes; an on-screen pill shows the change. Hover popouts can be turned off in Settings.
+- The dashboard has Dashboard / Media / Performance tabs with a sliding indicator.
+- Widgets and notification toasts open next to the bar on whichever edge it is on.
 
 | Navigation | |
 | :-- | :-- |
