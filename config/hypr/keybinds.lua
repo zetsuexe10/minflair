@@ -146,6 +146,8 @@ hl.bind("CTRL + ALT + C", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 
 -- # Toggle Settings
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_settings"))
+-- # Toggle Shell Settings (side bar, dashboard, GitHub)
+hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_side_settings"))
 -- # Toggle Keybinds Cheat Sheet
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_keybinds"))
 -- # Toggle Pomodoro

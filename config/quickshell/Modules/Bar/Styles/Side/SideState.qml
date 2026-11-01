@@ -26,7 +26,7 @@ QtObject {
     }
 
     function nudgeBrightness(dir) {
-        setBrightness(brightness + dir * 5);
+        setBrightness(brightness + dir * SettingsService.sideScrollStep);
     }
 
     function refreshBrightness() {
@@ -40,7 +40,7 @@ QtObject {
             return;
         if (sink.audio.muted && dir > 0)
             sink.audio.muted = false;
-        sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + dir * 0.05));
+        sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + dir * SettingsService.sideScrollStep / 100));
     }
 
     function hover(name, center) {

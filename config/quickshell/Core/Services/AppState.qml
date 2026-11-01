@@ -28,7 +28,7 @@ Item {
     property real activeNotificationWidth: 0
     property real activeNotificationHeight: 0
     readonly property var focusWidgets: ["launcher", "clipboard", "wallpaper", "screenshot", "powerMenu"]
-    readonly property var standaloneWindows: ["minflair_settings", "minflair_keybinds", "pomodoro"]
+    readonly property var standaloneWindows: ["minflair_settings", "minflair_keybinds", "minflair_side_settings", "pomodoro"]
     readonly property int activeTrayIndex: {
         if (!activeWidget || !activeWidget.startsWith("systemTray_"))
             return -1;

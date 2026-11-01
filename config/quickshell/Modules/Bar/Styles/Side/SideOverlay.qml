@@ -284,7 +284,7 @@ PanelWindow {
     Rectangle {
         id: osd
 
-        readonly property bool wanted: root.isActive && OsdService.isOpen && !root.open
+        readonly property bool wanted: root.isActive && SettingsService.sideOsd && OsdService.isOpen && !root.open
 
         visible: opacity > 0.01
         opacity: wanted ? 1 : 0

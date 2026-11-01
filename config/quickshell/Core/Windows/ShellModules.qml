@@ -6,6 +6,7 @@ import qs.Modules.Launcher
 import qs.Modules.LockScreen
 import qs.Modules.Pomodoro
 import qs.Modules.Settings
+import qs.Modules.SideSettings
 import qs.Modules.WallpaperSelector
 
 Item {
@@ -97,6 +98,18 @@ Item {
 
         sourceComponent: Component {
             Settings {
+            }
+
+        }
+
+    }
+
+    WidgetLoader {
+        widgetId: "minflair_side_settings"
+        exclusive: false
+
+        sourceComponent: Component {
+            SideSettings {
             }
 
         }

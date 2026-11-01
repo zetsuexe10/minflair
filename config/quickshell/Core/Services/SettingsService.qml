@@ -32,6 +32,9 @@ Item {
     property string sideBarPosition: "left"
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
+    property bool sideOsd: true
+    property int sideScrollStep: 5
+    property int sideDashTab: 0
     readonly property var barStyles: ["convex", "island", "side"]
     readonly property var barStyleNames: ({
         "convex": "Convex",
@@ -199,6 +202,18 @@ Item {
             saveSettings();
 
     }
+    onSideOsdChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onSideScrollStepChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onSideDashTabChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onSideBarPopoutsChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -289,6 +304,9 @@ Item {
                 "sideBarPosition": settingsService.sideBarPosition,
                 "sideBarPopouts": settingsService.sideBarPopouts,
                 "sideBarWindowTitle": settingsService.sideBarWindowTitle,
+                "sideOsd": settingsService.sideOsd,
+                "sideScrollStep": settingsService.sideScrollStep,
+                "sideDashTab": settingsService.sideDashTab,
                 "islandRightMode": settingsService.islandRightMode,
                 "islandShowWorkspaces": settingsService.islandShowWorkspaces,
                 "islandShowTray": settingsService.islandShowTray,
@@ -460,6 +478,15 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.sideBarWindowTitle !== undefined)
                             settingsService.sideBarWindowTitle = prefs.sideBarWindowTitle;
+
+                        if (prefs.sideOsd !== undefined)
+                            settingsService.sideOsd = prefs.sideOsd;
+
+                        if (prefs.sideScrollStep !== undefined)
+                            settingsService.sideScrollStep = Math.max(1, Math.min(20, prefs.sideScrollStep));
+
+                        if (prefs.sideDashTab !== undefined)
+                            settingsService.sideDashTab = Math.max(0, Math.min(3, prefs.sideDashTab));
 
                         if (prefs.islandRightMode !== undefined)
                             settingsService.islandRightMode = prefs.islandRightMode;

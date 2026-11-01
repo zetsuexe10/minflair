@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Core
 import qs.Core.Components
+import qs.Core.Services
 import qs.Modules.Calendar
 import qs.Modules.Dashboard
 import qs.Modules.Music
@@ -13,7 +14,7 @@ Item {
     id: root
 
     required property var widget
-    property int current: 0
+    property int current: SettingsService.sideDashTab
     readonly property var tabs: [
         { label: "Dashboard", icon: "layout-filled" },
         { label: "Media", icon: "music" },
