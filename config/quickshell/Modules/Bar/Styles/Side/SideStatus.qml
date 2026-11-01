@@ -47,8 +47,8 @@ SidePill {
         SideState.nudgeVolume(wheel.angleDelta.y > 0 ? 1 : -1);
     }
 
-    implicitWidth: vertical ? 44 : col.implicitWidth + 16
-    implicitHeight: vertical ? col.implicitHeight + 12 : 44
+    implicitWidth: vertical ? SideState.railSize : col.implicitWidth + 16
+    implicitHeight: vertical ? col.implicitHeight + 10 : SideState.railSize
 
     function centerOf(item) {
         const p = item.mapToItem(null, item.width / 2, item.height / 2);

@@ -9,9 +9,9 @@ SidePill {
     id: root
 
     property bool vertical: true
-    readonly property int slot: 28
+    readonly property int slot: 24
     readonly property int gap: 4
-    readonly property int pad: 6
+    readonly property int pad: 5
     readonly property int activeWsId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
     // fixed number of slots: scrolling never changes the bar length, the window of ids follows the active one
     readonly property int shown: Math.min(SettingsService.numberOfWorkspaces, 5)
@@ -33,8 +33,8 @@ SidePill {
             Hyprland.dispatch('hl.dsp.focus({workspace=' + id + '})');
     }
 
-    implicitWidth: vertical ? 44 : along
-    implicitHeight: vertical ? along : 44
+    implicitWidth: vertical ? SideState.railSize : along
+    implicitHeight: vertical ? along : SideState.railSize
 
 
     Rectangle {

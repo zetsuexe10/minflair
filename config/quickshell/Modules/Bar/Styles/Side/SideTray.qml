@@ -13,8 +13,8 @@ SidePill {
     readonly property int count: SystemTray.items ? SystemTray.items.values.length : 0
 
     visible: count > 0
-    implicitWidth: vertical ? 44 : grid.implicitWidth + 16
-    implicitHeight: vertical ? grid.implicitHeight + 16 : 44
+    implicitWidth: vertical ? SideState.railSize : grid.implicitWidth + 16
+    implicitHeight: vertical ? grid.implicitHeight + 12 : SideState.railSize
 
     Grid {
         id: grid
@@ -31,8 +31,8 @@ SidePill {
 
                 required property var modelData
 
-                width: 32
-                height: 32
+                width: 26
+                height: 26
 
                 Rectangle {
                     anchors.fill: parent

@@ -17,7 +17,8 @@ QtObject {
     readonly property bool frame: SettingsService.sideCfg("frame")
     readonly property int border: SettingsService.sideCfg("border")
     readonly property int rounding: SettingsService.sideCfg("rounding")
-    readonly property int barThickness: 56
+    readonly property int railSize: 36
+    readonly property int barThickness: 44
 
     // thickness reserved on one screen edge: the bar's edge is thick, the others only carry the frame
     function inset(edge) {

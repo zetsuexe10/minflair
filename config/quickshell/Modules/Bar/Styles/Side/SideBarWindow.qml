@@ -16,7 +16,7 @@ PanelWindow {
 
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
-    readonly property int railSize: 44
+    readonly property int railSize: SideState.railSize
     readonly property int barWidth: SideState.barThickness     // thickness of the bar strip, whichever the edge
     readonly property int edge: Math.round((barWidth - railSize) / 2)
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
@@ -104,9 +104,9 @@ PanelWindow {
                 SideButton {
                     visible: SettingsService.sideCfg("entries", "logo")
                     Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 44
-                    Layout.preferredHeight: 44
-                    size: 44
+                    Layout.preferredWidth: root.railSize
+                    Layout.preferredHeight: root.railSize
+                    size: root.railSize
                     icon: "apps-filled"
                     iconColor: Theme.accent
                     iconSize: Constants.sizeXl
@@ -132,8 +132,8 @@ PanelWindow {
                     Layout.alignment: Qt.AlignCenter
                     Layout.fillHeight: root.vertical
                     Layout.fillWidth: !root.vertical
-                    Layout.preferredWidth: root.vertical ? 44 : -1
-                    Layout.preferredHeight: root.vertical ? -1 : 44
+                    Layout.preferredWidth: root.vertical ? root.railSize : -1
+                    Layout.preferredHeight: root.vertical ? -1 : root.railSize
                 }
 
                 SideTray {
@@ -167,9 +167,9 @@ PanelWindow {
                     onHoverStarted: SideState.sessionHover = true
                     onHoverEnded: SideState.sessionHover = false
                     Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: 44
-                    Layout.preferredHeight: 44
-                    size: 44
+                    Layout.preferredWidth: root.railSize
+                    Layout.preferredHeight: root.railSize
+                    size: root.railSize
                     icon: "power"
                     iconSize: Constants.sizeXl
                     active: AppState.isWidgetOpen("powerMenu")

@@ -19,8 +19,8 @@ SidePill {
     }
     readonly property string suffix: SettingsService.clock24h ? "" : (now.getHours() >= 12 ? "pm" : "am")
 
-    implicitWidth: vertical ? 44 : row.implicitWidth + 28
-    implicitHeight: vertical ? col.implicitHeight + 18 : 44
+    implicitWidth: vertical ? SideState.railSize : row.implicitWidth + 28
+    implicitHeight: vertical ? col.implicitHeight + 14 : SideState.railSize
     color: area.containsMouse || AppState.isWidgetOpen("calendar") ? Qt.tint(Theme.bg, Theme.bgSecondary) : Theme.bg
 
     Behavior on color { ColorAnimation { duration: Constants.animFast } }
@@ -42,7 +42,7 @@ SidePill {
         ThemedText {
             Layout.alignment: Qt.AlignHCenter
             text: Qt.formatDate(root.now, "d")
-            customSize: 15
+            customSize: 13
             font.bold: true
             color: Theme.accent
         }
@@ -59,14 +59,14 @@ SidePill {
         ThemedText {
             Layout.alignment: Qt.AlignHCenter
             text: root.hours
-            customSize: 15
+            customSize: 13
             font.bold: true
         }
 
         ThemedText {
             Layout.alignment: Qt.AlignHCenter
             text: Qt.formatTime(root.now, "mm")
-            customSize: 15
+            customSize: 13
             font.bold: true
         }
 

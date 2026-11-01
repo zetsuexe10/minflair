@@ -11,7 +11,7 @@ Item {
     property color iconColor: Theme.fg
     property bool active: false
     property int iconSize: Constants.sizeLg
-    property int size: 34
+    property int size: 28
     readonly property bool hovered: area.containsMouse
 
     signal clicked(var mouse)
