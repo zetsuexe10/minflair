@@ -36,11 +36,12 @@ PanelWindow {
     readonly property bool attached: SideState.frame
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
     readonly property bool fullscreen: HyprlandService.isTrueFullscreen
-    readonly property var centered: ["launcher", "clipboard", "wallpaper", "powerMenu", "screenshot"]
-    readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage"].concat(centered)
+    readonly property var centered: ["clipboard", "wallpaper", "powerMenu", "screenshot"]
+    readonly property var keyboardWidgets: centered.concat(["launcher"])
+    readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage", "launcher"].concat(centered)
     readonly property string activeId: (isActive && handled.indexOf(AppState.activeWidget) !== -1) ? AppState.activeWidget : ""
     readonly property bool open: activeId !== ""
-    readonly property bool needsFocus: open && centered.indexOf(activeId) !== -1
+    readonly property bool needsFocus: open && keyboardWidgets.indexOf(activeId) !== -1
     property string shownId: ""
     readonly property bool panelVisible: shownId !== ""
     readonly property bool isCentered: centered.indexOf(shownId) !== -1
@@ -265,10 +266,11 @@ PanelWindow {
             id: panelDock
 
             readonly property bool isDash: root.shownId === "dashboard"
+            readonly property bool isLauncher: root.shownId === "launcher"
             property bool hovered: panelHover.hovered
 
-            edge: isDash ? "top" : root.position
-            align: isDash ? "center" : "end"
+            edge: isDash ? "top" : (isLauncher ? "bottom" : root.position)
+            align: (isDash || isLauncher) ? "center" : "end"
             open: root.open && !root.isCentered
             attached: root.attached
             rounding: SideState.rounding
@@ -567,7 +569,7 @@ PanelWindow {
 
     Component {
         id: launcherComp
-        LauncherContent { widget: widgetProxy }
+        CaelLauncher { widget: widgetProxy }
     }
 
     Component {
