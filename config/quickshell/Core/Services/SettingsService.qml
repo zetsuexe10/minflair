@@ -33,6 +33,37 @@ Item {
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
     property bool sideOsd: true
+    // Caelestia-style desktop for the side bar: frame, bar entries, scroll actions, hover panels
+    readonly property var sideBarDefaults: ({
+            "frame": true,
+            "border": 10,
+            "rounding": 24,
+            "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
+            "scroll": {"workspaces": true, "volume": true, "brightness": true},
+            "hover": {"dashboard": true, "session": true, "launcher": false}
+        })
+    property var sideBarConfig: sideBarDefaults
+
+    function sideCfg(group, key) {
+        const c = sideBarConfig;
+        if (key === undefined)
+            return (c && c[group] !== undefined) ? c[group] : sideBarDefaults[group];
+        const g = (c && c[group]) ? c[group] : {};
+        return g[key] !== undefined ? g[key] : sideBarDefaults[group][key];
+    }
+
+    function setSideCfg(group, key, value) {
+        const next = JSON.parse(JSON.stringify(sideBarConfig || {}));
+        if (key === undefined) {
+            next[group] = value;
+        } else {
+            if (!next[group])
+                next[group] = {};
+            next[group][key] = value;
+        }
+        sideBarConfig = next;
+    }
+
     property int sideScrollStep: 5
     property int sideDashTab: 0
     readonly property var barStyles: ["convex", "island", "side"]
@@ -202,6 +233,10 @@ Item {
             saveSettings();
 
     }
+    onSideBarConfigChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onSideOsdChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -305,6 +340,7 @@ Item {
                 "sideBarPopouts": settingsService.sideBarPopouts,
                 "sideBarWindowTitle": settingsService.sideBarWindowTitle,
                 "sideOsd": settingsService.sideOsd,
+                "sideBarConfig": settingsService.sideBarConfig,
                 "sideScrollStep": settingsService.sideScrollStep,
                 "sideDashTab": settingsService.sideDashTab,
                 "islandRightMode": settingsService.islandRightMode,
@@ -478,6 +514,9 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.sideBarWindowTitle !== undefined)
                             settingsService.sideBarWindowTitle = prefs.sideBarWindowTitle;
+
+                        if (prefs.sideBarConfig && typeof prefs.sideBarConfig === "object")
+                            settingsService.sideBarConfig = prefs.sideBarConfig;
 
                         if (prefs.sideOsd !== undefined)
                             settingsService.sideOsd = prefs.sideOsd;

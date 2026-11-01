@@ -12,6 +12,20 @@ QtObject {
     property real popoutCenter: 0       // position of the hovered icon along the bar, in screen pixels
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts
 
+    // geometry shared by the bar, the frame and the panels
+    readonly property string position: SettingsService.sideBarPosition
+    readonly property bool frame: SettingsService.sideCfg("frame")
+    readonly property int border: SettingsService.sideCfg("border")
+    readonly property int rounding: SettingsService.sideCfg("rounding")
+    readonly property int barThickness: 56
+
+    // thickness reserved on one screen edge: the bar's edge is thick, the others only carry the frame
+    function inset(edge) {
+        if (edge === position)
+            return barThickness;
+        return frame ? border : 0;
+    }
+
     property int netTick: 0             // bumped when the network changed, so the bar icon refreshes now
     property real brightness: 0         // 0..100
     property bool brightnessAvailable: false
