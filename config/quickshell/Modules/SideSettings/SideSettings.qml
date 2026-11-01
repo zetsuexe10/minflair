@@ -190,6 +190,112 @@ AppWindow {
             }
 
             AppGroup {
+                title: "Frame"
+                icon: "layout-filled"
+
+                SettingToggle {
+                    label: "Screen Frame"
+                    description: "A border around the whole screen with rounded corners; panels grow out of it like Caelestia"
+                    checked: SettingsService.sideCfg("frame")
+                    onCheckedChanged: SettingsService.setSideCfg("frame", undefined, checked)
+                }
+
+                SettingSpinBox {
+                    label: "Border Thickness"
+                    description: "Width of the frame on the edges without the bar"
+                    value: SettingsService.sideCfg("border")
+                    from: 4
+                    to: 24
+                    stepSize: 1
+                    decimals: 0
+                    suffix: " px"
+                    onMoved: (val) => SettingsService.setSideCfg("border", undefined, val)
+                }
+
+                SettingSpinBox {
+                    label: "Corner Rounding"
+                    description: "Radius of the frame's inner corners and of the panels"
+                    value: SettingsService.sideCfg("rounding")
+                    from: 0
+                    to: 48
+                    stepSize: 2
+                    decimals: 0
+                    suffix: " px"
+                    onMoved: (val) => SettingsService.setSideCfg("rounding", undefined, val)
+                }
+            }
+
+            AppGroup {
+                title: "Bar Entries"
+                icon: "bar"
+
+                Repeater {
+                    model: [
+                        { "key": "logo", "label": "Launcher button", "desc": "Opens the launcher" },
+                        { "key": "workspaces", "label": "Workspaces", "desc": "Five slots that follow the active workspace" },
+                        { "key": "activeWindow", "label": "Active window", "desc": "Title of the focused window" },
+                        { "key": "tray", "label": "System tray", "desc": "Tray icons" },
+                        { "key": "statusIcons", "label": "Status icons", "desc": "Network, Bluetooth, volume, brightness, keyboard, notifications" },
+                        { "key": "clock", "label": "Clock", "desc": "Date and time" },
+                        { "key": "power", "label": "Power button", "desc": "Hover or click opens the power panel" }
+                    ]
+
+                    SettingToggle {
+                        required property var modelData
+
+                        label: modelData.label
+                        description: modelData.desc
+                        checked: SettingsService.sideCfg("entries", modelData.key)
+                        onCheckedChanged: SettingsService.setSideCfg("entries", modelData.key, checked)
+                    }
+                }
+            }
+
+            AppGroup {
+                title: "Scroll Actions"
+                icon: "volume"
+
+                Repeater {
+                    model: [
+                        { "key": "workspaces", "label": "Workspaces", "desc": "Scroll over the workspaces to switch" },
+                        { "key": "volume", "label": "Volume", "desc": "Scroll the first half of the bar" },
+                        { "key": "brightness", "label": "Brightness", "desc": "Scroll the second half of the bar" }
+                    ]
+
+                    SettingToggle {
+                        required property var modelData
+
+                        label: modelData.label
+                        description: modelData.desc
+                        checked: SettingsService.sideCfg("scroll", modelData.key)
+                        onCheckedChanged: SettingsService.setSideCfg("scroll", modelData.key, checked)
+                    }
+                }
+            }
+
+            AppGroup {
+                title: "Hover Panels"
+                icon: "star"
+
+                Repeater {
+                    model: [
+                        { "key": "session", "label": "Power panel", "desc": "Hover the right edge or the power button" },
+                        { "key": "dashboard", "label": "Dashboard", "desc": "Hover the top edge, centre" },
+                        { "key": "launcher", "label": "Launcher", "desc": "Hover the bottom edge, centre" }
+                    ]
+
+                    SettingToggle {
+                        required property var modelData
+
+                        label: modelData.label
+                        description: modelData.desc
+                        checked: SettingsService.sideCfg("hover", modelData.key)
+                        onCheckedChanged: SettingsService.setSideCfg("hover", modelData.key, checked)
+                    }
+                }
+            }
+
+            AppGroup {
                 title: "Popouts & Scrolling"
                 icon: "volume"
 
@@ -202,7 +308,7 @@ AppWindow {
 
                 SettingSpinBox {
                     label: "Scroll Step"
-                    description: "Percent per notch for brightness and volume. Scroll the first half of the bar for brightness, the second for volume"
+                    description: "Percent per notch for brightness and volume"
                     value: SettingsService.sideScrollStep
                     from: 1
                     to: 20
@@ -345,7 +451,7 @@ AppWindow {
                         { "k": "Super + K", "v": "Keybinds cheat sheet" },
                         { "k": "Ctrl + Alt + C", "v": "Calendar" },
                         { "k": "Ctrl + Alt + F", "v": "System usage" },
-                        { "k": "Scroll on the bar", "v": "Brightness (first half) / volume (second half)" },
+                        { "k": "Scroll on the bar", "v": "Volume (first half) / brightness (second half)" },
                         { "k": "Scroll on workspaces", "v": "Switch workspace" },
                         { "k": "Middle click volume icon", "v": "Mute" }
                     ]

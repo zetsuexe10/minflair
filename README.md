@@ -94,15 +94,19 @@ Log: `/var/tmp/minflair-greeter/greeter.log`. The layout and icons are adapted f
 
 Shell command behind them: `qs ipc call bar cycle|prev|get|set <convex|island|side>`. The style is also in Settings > Bar.
 
-The **Side** style is a floating bar that can sit on the left, right, top or bottom (Settings > Bar > Side Bar):
-launcher, workspaces, focused window title, tray, status (network, Bluetooth, volume, keyboard layout, lock keys,
-notifications), clock and power. It has no battery indicator.
+The **Side** style is modelled on Caelestia: a solid frame around the screen with rounded inner corners, thick on the
+bar's edge, and panels that grow out of it. The bar can sit on the left, right, top or bottom.
 
-- Hovering or clicking the network, Bluetooth or volume icon opens its own popout: Wi-Fi list with password entry,
-  Bluetooth devices, output/microphone sliders and device pickers. Scrolling over the volume icon changes the volume,
-  middle click mutes; an on-screen pill shows the change. Hover popouts can be turned off in Settings.
-- The dashboard has Dashboard / Media / Performance tabs with a sliding indicator.
-- Widgets and notification toasts open next to the bar on whichever edge it is on.
+- **Bar:** launcher, workspaces (five slots following the active one), focused window title, tray, status icons
+  (network, Bluetooth, volume, brightness, keyboard layout, lock keys, notifications), clock, power. No battery.
+  Each entry can be turned off.
+- **Hover panels:** the power panel opens on the right edge or the power button, the dashboard on the top edge, the
+  launcher (off by default) on the bottom edge. The Wi-Fi, Bluetooth, sound, calendar and notification panels open
+  from their bar icons.
+- **Scroll:** over the first half of the bar changes volume, over the second half brightness, over the workspaces
+  switches workspace. A vertical indicator on the right edge shows the change.
+- **Dashboard:** Dashboard / Media / Performance / Calendar tabs with a sliding indicator.
+- **Settings:** `Super+Ctrl+S` opens the shell panel (frame, entries, scroll actions, hover panels, GitHub).
 
 | Navigation | |
 | :-- | :-- |
