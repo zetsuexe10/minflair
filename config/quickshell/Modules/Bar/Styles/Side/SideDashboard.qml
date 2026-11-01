@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.Core
 import qs.Core.Components
+import qs.Modules.Calendar
 import qs.Modules.Dashboard
 import qs.Modules.Music
 import qs.Modules.SystemUsage as SystemUsageModule
@@ -16,10 +17,11 @@ Item {
     readonly property var tabs: [
         { label: "Dashboard", icon: "layout-filled" },
         { label: "Media", icon: "music" },
-        { label: "Performance", icon: "cpu" }
+        { label: "Performance", icon: "cpu" },
+        { label: "Calendar", icon: "calendar" }
     ]
-    readonly property real viewWidth: Math.max(420, dash.implicitWidth, media.implicitWidth, perf.implicitWidth)
-    readonly property real viewHeight: [dash, media, perf][current].implicitHeight
+    readonly property real viewWidth: Math.max(460, dash.implicitWidth, media.implicitWidth, perf.implicitWidth, cal.implicitWidth)
+    readonly property real viewHeight: [dash, media, perf, cal][current].implicitHeight
 
     implicitWidth: viewWidth
     implicitHeight: bar.height + Constants.sizeSm + viewHeight
@@ -135,9 +137,23 @@ Item {
             slot: 2
             sourceComponent: SystemUsageModule.SystemUsageContent { widget: root.widget }
         }
+
+        View {
+            id: calView
+
+            slot: 3
+            sourceComponent: CalendarWidget { widget: root.widget }
+        }
     }
 
     // implicit sizes of the hosted pages
+    QtObject {
+        id: cal
+
+        readonly property real implicitWidth: calView.item ? calView.item.implicitWidth : 0
+        readonly property real implicitHeight: calView.item ? calView.item.implicitHeight : 0
+    }
+
     QtObject {
         id: dash
 
