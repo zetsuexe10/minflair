@@ -55,7 +55,7 @@ PanelWindow {
         id: rail
 
         // slide towards the screen edge when hidden
-        readonly property real slide: root.shown ? 0 : root.hideShift
+        property real slide: root.shown ? 0 : root.hideShift
 
         x: root.vertical ? (root.position === "left" ? root.edge + slide : root.width - root.edge - root.railSize - slide) : 0
         y: root.vertical ? 0 : (root.position === "top" ? root.edge + slide : root.height - root.edge - root.railSize - slide)

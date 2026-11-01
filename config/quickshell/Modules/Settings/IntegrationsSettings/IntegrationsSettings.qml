@@ -209,6 +209,14 @@ AppContainer {
                 }
             }
 
+            ThemedText {
+                visible: GithubService.tokenMessage !== ""
+                Layout.fillWidth: true
+                text: GithubService.tokenMessage + (GithubService.tokenStatus === "valid" && GithubService.rateLimit > 0 ? " · " + GithubService.rateRemaining + "/" + GithubService.rateLimit + " requests left" : "")
+                color: GithubService.tokenStatus === "valid" ? Theme.accent : "#e06b74"
+                wrapMode: Text.WordWrap
+            }
+
         }
 
     }
