@@ -17,8 +17,8 @@ PanelWindow {
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
     readonly property int railSize: 44
-    readonly property int edge: 8
-    readonly property int barWidth: railSize + edge * 2     // thickness incl. margins, whichever the edge
+    readonly property int barWidth: SideState.barThickness     // thickness of the bar strip, whichever the edge
+    readonly property int edge: Math.round((barWidth - railSize) / 2)
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
     readonly property bool fullscreen: HyprlandService.isTrueFullscreen
     readonly property bool shown: isActive && !fullscreen
@@ -67,18 +67,21 @@ PanelWindow {
         Behavior on slide { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
 
-        // Like Caelestia: scrolling anywhere on the bar changes brightness on the first half and
-        // volume on the second. Items that handle wheel themselves (workspaces, icons) win.
+        // Like Caelestia: scrolling anywhere on the bar changes volume on the first half and
+        // brightness on the second. Items that handle wheel themselves (workspaces, icons) win.
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.NoButton
             onWheel: (wheel) => {
                 const frac = root.vertical ? wheel.y / height : wheel.x / width;
                 const dir = wheel.angleDelta.y > 0 ? 1 : -1;
-                if (frac < 0.5 && SideState.brightnessAvailable)
+                // first half: volume, second half: brightness (as in Caelestia)
+                if (frac < 0.5) {
+                    if (SettingsService.sideCfg("scroll", "volume"))
+                        SideState.nudgeVolume(dir);
+                } else if (SettingsService.sideCfg("scroll", "brightness") && SideState.brightnessAvailable) {
                     SideState.nudgeBrightness(dir);
-                else
-                    SideState.nudgeVolume(dir);
+                }
             }
         }
 
@@ -99,6 +102,7 @@ PanelWindow {
                 columnSpacing: 6
 
                 SideButton {
+                    visible: SettingsService.sideCfg("entries", "logo")
                     Layout.alignment: Qt.AlignCenter
                     Layout.preferredWidth: 44
                     Layout.preferredHeight: 44
@@ -117,11 +121,13 @@ PanelWindow {
                 }
 
                 SideWorkspaces {
+                    visible: SettingsService.sideCfg("entries", "workspaces")
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                 }
 
                 SideActiveWindow {
+                    visible: SettingsService.sideCfg("entries", "activeWindow")
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                     Layout.fillHeight: root.vertical
@@ -131,22 +137,35 @@ PanelWindow {
                 }
 
                 SideTray {
+                    visible: SettingsService.sideCfg("entries", "tray")
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                 }
 
                 SideStatus {
+                    visible: SettingsService.sideCfg("entries", "statusIcons")
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                     notificationService: root.notificationService
                 }
 
                 SideClock {
+                    visible: SettingsService.sideCfg("entries", "clock")
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                 }
 
+                // pushes the sections above to the start when the window title is turned off
+                Item {
+                    visible: !SettingsService.sideCfg("entries", "activeWindow")
+                    Layout.fillHeight: root.vertical
+                    Layout.fillWidth: !root.vertical
+                }
+
                 SideButton {
+                    visible: SettingsService.sideCfg("entries", "power")
+                    onHoverStarted: SideState.sessionHover = true
+                    onHoverEnded: SideState.sessionHover = false
                     Layout.alignment: Qt.AlignCenter
                     Layout.preferredWidth: 44
                     Layout.preferredHeight: 44

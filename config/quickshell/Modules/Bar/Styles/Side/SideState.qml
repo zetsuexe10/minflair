@@ -26,6 +26,7 @@ QtObject {
         return frame ? border : 0;
     }
 
+    property bool sessionHover: false   // power button hovered: opens the power panel
     property int netTick: 0             // bumped when the network changed, so the bar icon refreshes now
     property real brightness: 0         // 0..100
     property bool brightnessAvailable: false

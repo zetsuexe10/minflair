@@ -16,26 +16,26 @@ import qs.Modules.ScreenCapture
 import qs.Modules.SystemUsage as SystemUsageModule
 import qs.Modules.WallpaperSelector
 
-// Hosts every widget (control center, dashboard, calendar, launcher, ...) and the notification
-// toasts while the "side" bar style is active. Panels open next to the bar; focus widgets such as
-// the launcher open centred. Mapped for the whole session, inert for the other styles.
+// Hosts every widget (control center, dashboard, calendar, launcher, ...), the hover popouts, the
+// power panel, the volume/brightness indicator and the notification toasts of the "side" style.
+// Panels grow out of the frame ("docks"); focus widgets such as the launcher open centred.
+// Mapped for the whole session, inert for the other styles.
 PanelWindow {
     id: root
 
     required property var notificationService
-    required property int barWidth
 
-    readonly property string position: SettingsService.sideBarPosition
+    readonly property string position: SideState.position
     readonly property bool vertical: position === "left" || position === "right"
-    readonly property real gap: 4
-    readonly property real margin: 12
-    // free rectangle of the screen that is not the bar
-    readonly property real freeX: position === "left" ? barWidth : 0
-    readonly property real freeY: position === "top" ? barWidth : 0
-    readonly property real freeW: width - (vertical ? barWidth : 0)
-    readonly property real freeH: height - (vertical ? 0 : barWidth)
-
+    readonly property real insL: SideState.inset("left")
+    readonly property real insR: SideState.inset("right")
+    readonly property real insT: SideState.inset("top")
+    readonly property real insB: SideState.inset("bottom")
+    readonly property real freeW: width - insL - insR
+    readonly property real freeH: height - insT - insB
+    readonly property bool attached: SideState.frame
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
+    readonly property bool fullscreen: HyprlandService.isTrueFullscreen
     readonly property var centered: ["launcher", "clipboard", "wallpaper", "powerMenu", "screenshot"]
     readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage"].concat(centered)
     readonly property string activeId: (isActive && handled.indexOf(AppState.activeWidget) !== -1) ? AppState.activeWidget : ""
@@ -43,8 +43,44 @@ PanelWindow {
     readonly property bool needsFocus: open && centered.indexOf(activeId) !== -1
     property string shownId: ""
     readonly property bool panelVisible: shownId !== ""
+    readonly property bool isCentered: centered.indexOf(shownId) !== -1
     property var _pendingFocusItem: null
     property int _focusAttempts: 0
+    property bool dashByHover: false
+    readonly property bool hoverDashboard: SettingsService.sideCfg("hover", "dashboard")
+    readonly property bool hoverSession: SettingsService.sideCfg("hover", "session")
+    readonly property bool hoverLauncher: SettingsService.sideCfg("hover", "launcher")
+    readonly property real zoneThickness: Math.max(4, attached ? SideState.border : 4)
+
+    // a flag that turns on at once and off after a short delay, so moving between a trigger and its panel does not flicker
+    component Latch: QtObject {
+        id: latch
+
+        property bool wanted: false
+        property int delay: 280
+        property bool on: false
+        property Timer timer: Timer {
+            interval: latch.delay
+            onTriggered: latch.on = false
+        }
+
+        onWantedChanged: {
+            if (wanted) {
+                timer.stop();
+                on = true;
+            } else {
+                timer.restart();
+            }
+        }
+    }
+
+    component HotZone: Item {
+        property alias hovered: hh.hovered
+
+        HoverHandler {
+            id: hh
+        }
+    }
 
     function componentFor(id) {
         switch (id) {
@@ -84,6 +120,8 @@ PanelWindow {
         } else {
             closeTimer.restart();
         }
+        if (activeId !== "dashboard")
+            dashByHover = false;
     }
 
     WlrLayershell.layer: WlrLayer.Top
@@ -117,7 +155,7 @@ PanelWindow {
     Timer {
         id: closeTimer
 
-        interval: Constants.animNormal + 40
+        interval: Constants.animSlow + 80
         onTriggered: root.shownId = ""
     }
 
@@ -136,10 +174,75 @@ PanelWindow {
         }
     }
 
+    // ---- hover triggers on the frame ----------------------------------------------------------
+
+    Latch {
+        id: sessionLatch
+
+        wanted: root.isActive && !root.fullscreen && root.hoverSession && (hotSession.hovered || sessionDock.hovered || SideState.sessionHover)
+    }
+
+    Latch {
+        id: dashLatch
+
+        delay: 350
+        wanted: root.isActive && !root.fullscreen && root.hoverDashboard && (hotDash.hovered || (root.dashByHover && panelDock.hovered))
+        onOnChanged: {
+            if (on && AppState.activeWidget === "") {
+                root.dashByHover = true;
+                AppState.openWidget("dashboard");
+            } else if (!on && root.dashByHover) {
+                root.dashByHover = false;
+                AppState.closeAllWidgets();
+            }
+        }
+    }
+
+    Connections {
+        target: hotLauncher
+
+        function onHoveredChanged() {
+            if (hotLauncher.hovered && root.isActive && !root.fullscreen && root.hoverLauncher && AppState.activeWidget === "")
+                AppState.openWidget("launcher");
+        }
+    }
+
+    HotZone {
+        id: hotDash
+
+        enabled: root.hoverDashboard && root.position !== "top"
+        x: root.insL + (root.freeW - width) / 2
+        y: 0
+        width: 360
+        height: root.zoneThickness
+    }
+
+    HotZone {
+        id: hotSession
+
+        enabled: root.hoverSession && root.position !== "right"
+        x: root.width - width
+        y: root.insT + (root.freeH - height) / 2
+        width: root.zoneThickness
+        height: 220
+    }
+
+    HotZone {
+        id: hotLauncher
+
+        enabled: root.hoverLauncher && root.position !== "bottom"
+        x: root.insL + (root.freeW - width) / 2
+        y: root.height - height
+        width: 360
+        height: root.zoneThickness
+    }
+
+    // ---- stage: the screen minus the frame, panels live in here ---------------------------------
+
     // click outside closes, Escape closes
     MouseArea {
-        x: root.freeX
-        y: root.freeY
+        x: root.insL
+        y: root.insT
         width: root.freeW
         height: root.freeH
         enabled: root.open
@@ -148,61 +251,157 @@ PanelWindow {
         onClicked: AppState.closeAllWidgets()
     }
 
-    // main panel, anchored to the bar edge
-    Rectangle {
-        id: panel
+    Item {
+        id: stage
 
-        readonly property bool isCentered: root.centered.indexOf(root.shownId) !== -1
-        readonly property bool atStart: root.shownId === "dashboard"
-        readonly property int pad: (root.shownId === "powerMenu" || root.shownId === "screenshot") ? 0 : Constants.sizeLg
-        readonly property real maxW: root.freeW - 24
-        readonly property real maxH: root.freeH - 24
+        x: root.insL
+        y: root.insT
+        width: root.freeW
+        height: root.freeH
+        clip: true
 
-        visible: opacity > 0.01
-        opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.94
-        transformOrigin: {
-            if (isCentered)
-                return Item.Center;
-            switch (root.position) {
-            case "left": return Item.Left;
-            case "right": return Item.Right;
-            case "top": return Item.Top;
-            default: return Item.Bottom;
+        // widgets, attached to the bar's edge (the dashboard hangs from the top edge)
+        SideDock {
+            id: panelDock
+
+            readonly property bool isDash: root.shownId === "dashboard"
+            property bool hovered: panelHover.hovered
+
+            edge: isDash ? "top" : root.position
+            align: isDash ? "center" : "end"
+            open: root.open && !root.isCentered
+            attached: root.attached
+            rounding: SideState.rounding
+            contentWidth: panelLoader.item ? panelLoader.item.implicitWidth : 0
+            contentHeight: panelLoader.item ? panelLoader.item.implicitHeight : 0
+
+            HoverHandler {
+                id: panelHover
+            }
+
+            Loader {
+                id: panelLoader
+
+                anchors.fill: parent
+                anchors.margins: panelDock.padding
+                active: root.panelVisible && !root.isCentered
+                sourceComponent: root.componentFor(root.shownId)
+                onLoaded: root.prepare(item)
             }
         }
-        width: Math.min(content.implicitWidth + pad * 2, maxW)
-        height: Math.min(content.implicitHeight + pad * 2, maxH)
-        x: {
-            if (isCentered)
-                return Math.round((root.width - width) / 2);
-            if (root.vertical)
-                return root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width;
-            return atStart ? Math.round((root.width - width) / 2) : root.width - width - root.margin;
+
+        // hover popouts (Wi-Fi, Bluetooth, sound, calendar, notifications) beside the icon that opened them
+        SideDock {
+            id: popDock
+
+            readonly property bool wanted: root.isActive && SideState.popout !== "" && !root.open
+            property string shownPop: ""
+            property bool hovered: popHover.hovered
+
+            edge: root.position
+            center: SideState.popoutCenter - (root.vertical ? root.insT : root.insL)
+            open: wanted
+            attached: root.attached
+            rounding: SideState.rounding
+            contentWidth: popLoader.item ? popLoader.item.implicitWidth : 0
+            contentHeight: popLoader.item ? popLoader.item.implicitHeight : 0
+            onWantedChanged: if (wanted) shownPop = SideState.popout
+
+            Connections {
+                target: SideState
+
+                function onPopoutChanged() {
+                    if (SideState.popout !== "")
+                        popDock.shownPop = SideState.popout;
+                }
+            }
+
+            HoverHandler {
+                id: popHover
+
+                onHoveredChanged: hovered ? SideState.hold() : SideState.release()
+            }
+
+            Loader {
+                id: popLoader
+
+                anchors.fill: parent
+                anchors.margins: popDock.padding
+                active: popDock.shown
+                sourceComponent: popDock.shownPop === "network" ? networkComp : (popDock.shownPop === "bluetooth" ? bluetoothComp : (popDock.shownPop === "audio" ? audioComp : (popDock.shownPop === "calendar" ? calendarPopComp : (popDock.shownPop === "notifications" ? notifPopComp : null))))
+            }
         }
-        y: {
-            if (isCentered)
-                return Math.round((root.height - height) / 2);
-            if (!root.vertical)
-                return root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height;
-            return atStart ? root.margin : root.height - height - root.margin;
+
+        // power panel on the right edge
+        SideDock {
+            id: sessionDock
+
+            property bool hovered: sessionHover.hovered
+
+            edge: "right"
+            align: "center"
+            padding: 14
+            open: root.isActive && sessionLatch.on
+            attached: root.attached
+            rounding: SideState.rounding
+            contentWidth: session.implicitWidth
+            contentHeight: session.implicitHeight
+
+            HoverHandler {
+                id: sessionHover
+            }
+
+            SideSession {
+                id: session
+
+                x: sessionDock.padding
+                y: sessionDock.padding
+                onDone: sessionLatch.on = false
+            }
         }
+
+        // volume / brightness / microphone feedback on the right edge
+        SideDock {
+            id: osdDock
+
+            edge: "right"
+            align: "center"
+            padding: 14
+            open: root.isActive && SettingsService.sideOsd && OsdService.isOpen && !root.open && !sessionLatch.on
+            attached: root.attached
+            rounding: SideState.rounding
+            contentWidth: osd.implicitWidth
+            contentHeight: osd.implicitHeight
+
+            SideOsd {
+                id: osd
+
+                x: osdDock.padding
+                y: osdDock.padding
+            }
+        }
+    }
+
+    // focus widgets (launcher, clipboard, ...) float in the middle
+    Rectangle {
+        id: centerPanel
+
+        readonly property int pad: (root.shownId === "powerMenu" || root.shownId === "screenshot") ? 0 : Constants.sizeLg
+
+        visible: opacity > 0.01
+        opacity: (root.open && root.isCentered) ? 1 : 0
+        scale: (root.open && root.isCentered) ? 1 : 0.94
+        width: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
+        height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
+        x: Math.round(root.insL + (root.freeW - width) / 2)
+        y: Math.round(root.insT + (root.freeH - height) / 2)
         color: Theme.bg
         radius: Constants.size3Xl - 4
         border.width: 1
         border.color: Theme.border
 
-        // slide in from the bar edge as well as scale
-        property real slide: root.open ? 0 : 18
-        transform: Translate {
-            x: panel.isCentered || !root.vertical ? 0 : (root.position === "left" ? -panel.slide : panel.slide)
-            y: panel.isCentered || root.vertical ? 0 : (root.position === "top" ? -panel.slide : panel.slide)
-        }
-
-        Behavior on slide { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
-        Behavior on height { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
 
         MouseArea {
             anchors.fill: parent
@@ -210,153 +409,22 @@ PanelWindow {
         }
 
         Loader {
-            id: content
+            id: centerLoader
 
             anchors.fill: parent
-            anchors.margins: panel.pad
-            active: root.panelVisible
+            anchors.margins: centerPanel.pad
+            active: root.panelVisible && root.isCentered
             sourceComponent: root.componentFor(root.shownId)
             onLoaded: root.prepare(item)
         }
     }
 
-    // hover popout (Wi-Fi, Bluetooth, sound) beside the icon that opened it
-    Rectangle {
-        id: pop
-
-        readonly property bool wanted: root.isActive && SideState.popout !== "" && !root.open
-        property string shownPop: ""
-
-        visible: opacity > 0.01
-        opacity: wanted ? 1 : 0
-        width: Math.min(popLoader.implicitWidth + Constants.sizeLg * 2, root.freeW - 24)
-        height: Math.min(popLoader.implicitHeight + Constants.sizeLg * 2, root.freeH - 24)
-        x: {
-            if (root.vertical)
-                return root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width;
-            return Math.max(root.margin, Math.min(root.width - width - root.margin, SideState.popoutCenter - width / 2));
-        }
-        y: {
-            if (!root.vertical)
-                return root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height;
-            return Math.max(root.margin, Math.min(root.height - height - root.margin, SideState.popoutCenter - height / 2));
-        }
-        color: Theme.bg
-        radius: Constants.size3Xl - 4
-        border.width: 1
-        border.color: Theme.border
-
-        onWantedChanged: if (wanted) shownPop = SideState.popout
-        Connections {
-            target: SideState
-
-            function onPopoutChanged() {
-                if (SideState.popout !== "")
-                    pop.shownPop = SideState.popout;
-            }
-        }
-
-        Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-        Behavior on x { enabled: pop.opacity > 0.5; NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
-        Behavior on y { enabled: pop.opacity > 0.5; NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
-        Behavior on height { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
-
-        HoverHandler {
-            onHoveredChanged: hovered ? SideState.hold() : SideState.release()
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        Loader {
-            id: popLoader
-
-            anchors.fill: parent
-            anchors.margins: Constants.sizeLg
-            active: pop.visible
-            sourceComponent: pop.shownPop === "network" ? networkComp : (pop.shownPop === "bluetooth" ? bluetoothComp : (pop.shownPop === "audio" ? audioComp : (pop.shownPop === "calendar" ? calendarPopComp : (pop.shownPop === "notifications" ? notifPopComp : null))))
-        }
-    }
-
-    // volume / brightness / mic feedback
-    Rectangle {
-        id: osd
-
-        readonly property bool wanted: root.isActive && SettingsService.sideOsd && OsdService.isOpen && !root.open
-
-        visible: opacity > 0.01
-        opacity: wanted ? 1 : 0
-        width: root.vertical ? 220 : 220
-        height: 52
-        radius: height / 2
-        color: Theme.bg
-        border.width: 1
-        border.color: Theme.border
-        x: root.vertical ? (root.position === "left" ? root.barWidth + root.gap : root.width - root.barWidth - root.gap - width) : Math.round((root.width - width) / 2)
-        y: root.vertical ? Math.round(root.height - height - 48) : (root.position === "top" ? root.barWidth + root.gap : root.height - root.barWidth - root.gap - height)
-
-        Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-
-        SvgIcon {
-            id: osdIcon
-
-            anchors.left: parent.left
-            anchors.leftMargin: 18
-            anchors.verticalCenter: parent.verticalCenter
-            icon: OsdService.icon
-            iconSize: Constants.sizeLg
-            iconColor: OsdService.isMuted ? Theme.muted : Theme.accent
-            flat: true
-        }
-
-        Rectangle {
-            visible: OsdService.showProgress
-            anchors.left: osdIcon.right
-            anchors.leftMargin: 12
-            anchors.right: osdText.left
-            anchors.rightMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            height: 6
-            radius: 3
-            color: Theme.bgSecondary
-
-            Rectangle {
-                width: parent.width * OsdService.level
-                height: parent.height
-                radius: 3
-                color: OsdService.isMuted ? Theme.muted : Theme.accent
-
-                Behavior on width { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
-            }
-        }
-
-        ThemedText {
-            id: osdText
-
-            anchors.right: parent.right
-            anchors.rightMargin: 18
-            anchors.verticalCenter: parent.verticalCenter
-            text: OsdService.valueText
-            font.bold: true
-        }
-
-        ThemedText {
-            visible: !OsdService.showProgress
-            anchors.left: osdIcon.right
-            anchors.leftMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-            text: OsdService.title
-        }
-    }
-
-    // notification toast, next to the bar
+    // notification toast, top right under the frame
     Rectangle {
         id: toastBox
 
-        x: root.vertical ? (root.position === "left" ? root.barWidth + 4 : root.width - root.barWidth - 4 - width) : Math.round((root.width - width) / 2)
-        y: root.vertical ? 12 : (root.position === "top" ? root.barWidth + 4 : root.height - root.barWidth - 4 - height)
+        x: root.width - root.insR - 12 - width
+        y: root.insT + 12
         width: 380
         height: Math.max(toast.notifH, 64)
         radius: 22
@@ -387,17 +455,24 @@ PanelWindow {
 
     mask: Region {
         Region {
-            x: root.freeX
-            y: root.freeY
-            width: root.panelVisible ? root.freeW : 0
-            height: root.panelVisible ? root.freeH : 0
+            x: root.insL
+            y: root.insT
+            width: (root.open || root.panelVisible) ? root.freeW : 0
+            height: (root.open || root.panelVisible) ? root.freeH : 0
         }
 
         Region {
-            x: pop.x
-            y: pop.y
-            width: pop.visible ? pop.width : 0
-            height: pop.visible ? pop.height : 0
+            x: stage.x + popDock.x
+            y: stage.y + popDock.y
+            width: popDock.shown ? popDock.width : 0
+            height: popDock.shown ? popDock.height : 0
+        }
+
+        Region {
+            x: stage.x + sessionDock.x
+            y: stage.y + sessionDock.y
+            width: sessionDock.shown ? sessionDock.width : 0
+            height: sessionDock.shown ? sessionDock.height : 0
         }
 
         Region {
@@ -405,6 +480,27 @@ PanelWindow {
             y: toastBox.y
             width: toastBox.visible ? toastBox.width : 0
             height: toastBox.visible ? toastBox.height : 0
+        }
+
+        Region {
+            x: hotDash.x
+            y: hotDash.y
+            width: hotDash.enabled ? hotDash.width : 0
+            height: hotDash.enabled ? hotDash.height : 0
+        }
+
+        Region {
+            x: hotSession.x
+            y: hotSession.y
+            width: hotSession.enabled ? hotSession.width : 0
+            height: hotSession.enabled ? hotSession.height : 0
+        }
+
+        Region {
+            x: hotLauncher.x
+            y: hotLauncher.y
+            width: hotLauncher.enabled ? hotLauncher.width : 0
+            height: hotLauncher.enabled ? hotLauncher.height : 0
         }
     }
 

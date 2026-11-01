@@ -113,6 +113,7 @@ SidePill {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
+        enabled: SettingsService.sideCfg("scroll", "workspaces")
         onWheel: (wheel) => root.go(root.activeWsId + (wheel.angleDelta.y > 0 ? -1 : 1))
     }
 }

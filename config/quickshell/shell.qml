@@ -178,8 +178,11 @@ ShellRoot {
 
     SideOverlay {
         notificationService: globalNotificationService
-        barWidth: sideBarSurface.barWidth
     }
+
+    SideFrame {}
+
+    SideExclusions {}
 
     GamingOverlay {
         id: gamingOverlaySurface

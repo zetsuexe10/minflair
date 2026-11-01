@@ -3,8 +3,9 @@ import qs.Core
 
 // Rounded capsule that groups one section of the side bar.
 Rectangle {
-    color: Theme.bg
+    // on the frame the pill is a slightly lighter surface; floating it is the usual translucent card
+    color: SideState.frame ? Qt.tint(Theme.opaqueBg, Theme.bgSecondary) : Theme.bg
     radius: Math.min(width, height) / 2
-    border.width: 1
+    border.width: SideState.frame ? 0 : 1
     border.color: Theme.border
 }
