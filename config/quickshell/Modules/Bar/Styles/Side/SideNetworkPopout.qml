@@ -83,8 +83,20 @@ ColumnLayout {
             onStreamFinished: {
                 try {
                     const list = JSON.parse(text.trim());
-                    if (Array.isArray(list))
-                        root.networks = list;
+                    if (Array.isArray(list)) {
+                        // drop hidden entries and duplicates, connected first then strongest
+                        const seen = {};
+                        const clean = [];
+                        for (let i = 0; i < list.length; i++) {
+                            const n = list[i];
+                            if (!n || !n.ssid || seen[n.ssid])
+                                continue;
+                            seen[n.ssid] = true;
+                            clean.push(n);
+                        }
+                        clean.sort((a, b) => (b.active ? 1000 : 0) + (parseInt(b.signal) || 0) - ((a.active ? 1000 : 0) + (parseInt(a.signal) || 0)));
+                        root.networks = clean;
+                    }
                 } catch (e) {
                 }
                 // first pass used the cached list; follow with a real rescan once
@@ -260,7 +272,7 @@ ColumnLayout {
         id: list
 
         Layout.fillWidth: true
-        Layout.preferredHeight: Math.min(contentHeight, 300)
+        Layout.preferredHeight: Math.max(1, Math.min(contentHeight, 280))
         visible: root.radio && root.networks.length > 0 && root.pending === ""
         clip: true
         spacing: 2
