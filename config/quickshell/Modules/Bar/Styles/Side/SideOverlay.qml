@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import qs.Core
 import qs.Core.Components
 import qs.Core.Services
@@ -139,6 +140,12 @@ PanelWindow {
         bottom: true
         left: true
         right: true
+    }
+
+    // without a grab Hyprland keeps the keyboard on the previous window
+    HyprlandFocusGrab {
+        active: root.needsFocus
+        windows: [root]
     }
 
     QtObject {

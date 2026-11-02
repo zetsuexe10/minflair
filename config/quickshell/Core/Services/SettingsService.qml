@@ -41,6 +41,7 @@ Item {
             "border": 10,
             "rounding": 24,
             "logoImage": "",
+            "mode": "amoled",
             "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
             "scroll": {"workspaces": true, "volume": true, "brightness": true},
             "hover": {"dashboard": true, "session": true, "launcher": false}

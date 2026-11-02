@@ -75,6 +75,9 @@ SidePill {
 
                 width: root.slot
                 height: root.slot
+                scale: hover.pressed ? 0.86 : (hover.containsMouse ? 1.14 : 1)
+
+                Behavior on scale { SpringAnimation { spring: 3.4; damping: 0.3; epsilon: 0.002 } }
 
                 Rectangle {
                     anchors.fill: parent

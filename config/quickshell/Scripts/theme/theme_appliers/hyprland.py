@@ -4,6 +4,16 @@ import subprocess
 from color_utils import hypr_color
 
 
+def _gtk_theme(dark):
+    try:
+        import json
+        from minflair_paths import STATE
+        chosen = json.load(open(STATE)).get("gtk_theme")
+    except Exception:
+        chosen = None
+    return chosen or ("adw-gtk3-dark" if dark else "adw-gtk3")
+
+
 def apply(home, colors):
     bg = colors["bg"]
     border = colors["border"]
@@ -60,7 +70,7 @@ $muted_alpha = {hypr_color(muted, "aa")}
     # new GTK clients read these from the session environment (a reload does not rebuild it)
     gtk_dark = colors.get("is_dark", True)
     for k, v in (
-        ("GTK_THEME", "adw-gtk3-dark" if gtk_dark else "adw-gtk3"),
+        ("GTK_THEME", _gtk_theme(gtk_dark)),
         ("ADW_DEBUG_COLOR_SCHEME", "prefer-dark" if gtk_dark else "prefer-light"),
     ):
         try:

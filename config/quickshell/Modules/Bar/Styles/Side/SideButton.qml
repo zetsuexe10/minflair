@@ -23,14 +23,17 @@ Item {
     implicitWidth: size
     implicitHeight: size
 
+    // macOS-like springy response to the pointer
+    scale: area.pressed ? 0.84 : (hovered ? 1.14 : 1)
+
+    Behavior on scale { SpringAnimation { spring: 3.4; damping: 0.3; epsilon: 0.002 } }
+
     Rectangle {
         anchors.fill: parent
         radius: width / 2
         color: root.active ? SideState.selected : (root.hovered ? SideState.card : "transparent")
-        scale: area.pressed ? 0.92 : 1
 
-        Behavior on color { ColorAnimation { duration: Constants.animFast } }
-        Behavior on scale { NumberAnimation { duration: Constants.animUltraFast } }
+        Behavior on color { ColorAnimation { duration: 180 } }
     }
 
     Image {
@@ -58,7 +61,7 @@ Item {
         iconSize: root.iconSize
         flat: true
 
-        Behavior on iconColor { ColorAnimation { duration: Constants.animFast } }
+        Behavior on iconColor { ColorAnimation { duration: 180 } }
     }
 
     SideText {

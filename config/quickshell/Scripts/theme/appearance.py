@@ -7,7 +7,7 @@ independent of the app font set here.
 
   appearance.py list            JSON: fonts, icon themes, cursor themes
   appearance.py get             JSON: current values
-  appearance.py set '<json>'    keys: gtk_font, gtk_font_size, icon_theme, cursor, cursor_size
+  appearance.py set '<json>'    keys: gtk_theme, gtk_font, gtk_font_size, icon_theme, cursor, cursor_size
 """
 import sys
 
@@ -27,7 +27,14 @@ ICON_DIRS = [
     "/usr/local/share/icons",
     "/usr/share/icons",
 ]
+THEME_DIRS = [
+    os.path.join(HOME, ".themes"),
+    os.path.join(HOME, ".local/share/themes"),
+    "/usr/local/share/themes",
+    "/usr/share/themes",
+]
 DEFAULTS = {
+    "gtk_theme": "",
     "gtk_font": "",
     "gtk_font_size": 11,
     "icon_theme": "",
@@ -72,6 +79,18 @@ def themes():
                     and not os.path.isdir(os.path.join(base, "cursors")):
                 icons.add(name)
     return sorted(icons, key=str.lower), sorted(cursors, key=str.lower)
+
+
+def gtk_themes():
+    found = set()
+    for d in THEME_DIRS:
+        if not os.path.isdir(d):
+            continue
+        for name in os.listdir(d):
+            base = os.path.join(d, name)
+            if os.path.isdir(os.path.join(base, "gtk-3.0")) or os.path.isdir(os.path.join(base, "gtk-4.0")):
+                found.add(name)
+    return sorted(found, key=str.lower)
 
 
 def fonts():
@@ -125,8 +144,11 @@ def hypr(*args):
         pass
 
 
-def apply(cur):
+def apply(cur, is_dark=True):
     keys = {}
+    chosen = cur["gtk_theme"] or ("adw-gtk3-dark" if is_dark else "adw-gtk3")
+    keys["gtk-theme-name"] = chosen
+    hypr("setenv", "GTK_THEME", chosen)
     if cur["gtk_font"]:
         keys["gtk-font-name"] = f'{cur["gtk_font"]} {cur["gtk_font_size"]}'
     if cur["icon_theme"]:
@@ -171,7 +193,7 @@ def main():
     st = load()
     if cmd == "list":
         icons, cursors = themes()
-        print(json.dumps({"fonts": fonts(), "icons": icons, "cursors": cursors}))
+        print(json.dumps({"fonts": fonts(), "icons": icons, "cursors": cursors, "gtkThemes": gtk_themes()}))
     elif cmd == "get":
         print(json.dumps(current(st)))
     elif cmd == "set":
@@ -190,7 +212,7 @@ def main():
         if cur["cursor"]:
             st["cursor"] = cur["cursor"]
         save(st)
-        apply(cur)
+        apply(cur, st.get("is_dark", True))
         print(json.dumps(cur))
     else:
         print(__doc__)

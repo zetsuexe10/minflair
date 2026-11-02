@@ -28,9 +28,11 @@ QtObject {
     property string currentScheme: "Default"
     property real bgOpacity: 1
     property color _rawBg: themes[0].dark.bg
-    property color opaqueBg: _rawBg
-    property color bg: Qt.rgba(_rawBg.r, _rawBg.g, _rawBg.b, bgOpacity)
+    // the side style's AMOLED mode paints dark themes pure black everywhere
+    readonly property bool amoled: SettingsService.barStyle === "side" && SettingsService.sideCfg("mode") === "amoled"
     property bool isDark: ColorUtils.isDark(_rawBg)
+    property color opaqueBg: (amoled && isDark) ? "#000000" : _rawBg
+    property color bg: (amoled && isDark) ? Qt.rgba(0, 0, 0, bgOpacity) : Qt.rgba(_rawBg.r, _rawBg.g, _rawBg.b, bgOpacity)
     property color overlayBase: isDark ? Qt.rgba(fg.r * 0.3 + accent.r * 0.7, fg.g * 0.3 + accent.g * 0.7, fg.b * 0.3 + accent.b * 0.7, 1) : accent
     property color bgSecondary: Qt.rgba(overlayBase.r, overlayBase.g, overlayBase.b, isDark ? 0.06 : 0.07)
     property color bgTertiary: Qt.rgba(overlayBase.r, overlayBase.g, overlayBase.b, isDark ? 0.02 : 0.04)
@@ -79,6 +81,15 @@ QtObject {
         accent = scheme.accent;
         accentComplementary = scheme.accentComplementary;
         saveScheme();
+    }
+
+    function setDarkMode(dark) {
+        if (isDark === dark)
+            return ;
+        if (generateFromWallpaper)
+            applyWallpaperTheme(dark);
+        else
+            applyScheme(dark ? themes[0].dark : themes[0].light);
     }
 
     function applyWallpaperTheme(isDark) {

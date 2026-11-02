@@ -74,13 +74,13 @@ def apply(home, colors):
     for k, v in named.items():
         css += f"@define-color {k} {sanitize_color(v)};\n"
 
-    theme = "adw-gtk3-dark" if is_dark else "adw-gtk3"
     prev = {}
     try:
         with open(STATE) as f:
             prev = json.load(f)
     except Exception:
         pass
+    theme = prev.get("gtk_theme") or ("adw-gtk3-dark" if is_dark else "adw-gtk3")
     extra = {
         "dark": "1" if is_dark else "0",
         "font": (f'{prev["gtk_font"]} {prev.get("gtk_font_size", 11)}' if prev.get("gtk_font") else prev.get("font")),

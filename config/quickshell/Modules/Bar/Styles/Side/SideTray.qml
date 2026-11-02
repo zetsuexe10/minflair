@@ -33,6 +33,9 @@ SidePill {
 
                 width: 26
                 height: 26
+                scale: area.pressed ? 0.84 : (area.containsMouse ? 1.16 : 1)
+
+                Behavior on scale { SpringAnimation { spring: 3.4; damping: 0.3; epsilon: 0.002 } }
 
                 Rectangle {
                     anchors.fill: parent
@@ -40,7 +43,7 @@ SidePill {
                     color: SideState.card
                     opacity: area.containsMouse ? 1 : 0
 
-                    Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
+                    Behavior on opacity { NumberAnimation { duration: 160 } }
                 }
 
                 IconImage {

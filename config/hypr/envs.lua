@@ -57,6 +57,10 @@ do
 	if sf then
 		local s = sf:read("a") or ""
 		sf:close()
+		local g = s:match('"gtk_theme"%s*:%s*"([^"]+)"')
+		if g then
+			hl.env("GTK_THEME", g)
+		end
 		local c = s:match('"cursor"%s*:%s*"([^"]+)"')
 		local z = s:match('"cursor_size"%s*:%s*(%d+)')
 		if c then

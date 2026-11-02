@@ -9,8 +9,9 @@ import Quickshell.Io
 QtObject {
     id: root
 
-    property var values: ({ "gtk_font": "", "gtk_font_size": 11, "icon_theme": "", "cursor": "", "cursor_size": 24 })
+    property var values: ({ "gtk_theme": "", "gtk_font": "", "gtk_font_size": 11, "icon_theme": "", "cursor": "", "cursor_size": 24 })
     property var fonts: []
+    property var gtkThemes: []
     property var iconThemes: []
     property var cursorThemes: []
     property bool loaded: false
@@ -65,6 +66,7 @@ QtObject {
                     const d = JSON.parse(text);
                     root.fonts = d.fonts || [];
                     root.iconThemes = d.icons || [];
+                    root.gtkThemes = d.gtkThemes || [];
                     root.cursorThemes = d.cursors || [];
                     root.loaded = true;
                 } catch (e) {}

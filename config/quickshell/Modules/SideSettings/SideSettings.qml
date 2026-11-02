@@ -19,6 +19,7 @@ AppWindow {
 
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
+    readonly property var modeOptions: [{ "text": "AMOLED", "value": "amoled" }, { "text": "Dark", "value": "dark" }, { "text": "Light", "value": "light" }, { "text": "Theme", "value": "auto" }]
     readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
 
     readonly property var pages: [
@@ -51,6 +52,9 @@ AppWindow {
             ] }
         ] },
         { "title": "Frame & Style", "icon": "layout-filled", "sub": "The screen frame the panels grow from", "sections": [
+            { "name": "Colours", "rows": [
+                { "kind": "select", "label": "Mode", "desc": "AMOLED is pure black; the whole shell follows it", "cfg": ["mode"], "options": modeOptions }
+            ] },
             { "name": "Frame", "rows": [
                 { "kind": "toggle", "label": "Screen frame", "desc": "A border around the screen with rounded corners", "cfg": ["frame"] },
                 { "kind": "stepper", "label": "Border thickness", "desc": "Width of the frame on the edges without the bar", "cfg": ["border"], "from": 4, "to": 24, "step": 1, "suffix": " px" },
@@ -58,6 +62,9 @@ AppWindow {
             ] }
         ] },
         { "title": "App Appearance", "icon": "font", "sub": "GTK / Qt apps in this session only", "sections": [
+            { "name": "GTK theme", "rows": [
+                { "kind": "picker", "label": "GTK theme", "desc": "Empty = adw-gtk3 following light/dark. Pick any installed theme (Adwaita, Breeze, adw-gtk3, ...). Only adw-gtk3 takes the shell colours", "app": "gtk_theme", "list": "gtkThemes", "placeholder": "adw-gtk3 (auto)" }
+            ] },
             { "name": "Font", "rows": [
                 { "kind": "picker", "label": "App font", "desc": "Font for GTK and Qt apps. The shell font is not affected", "app": "gtk_font", "list": "fonts", "placeholder": "Font family" },
                 { "kind": "stepper", "label": "App font size", "desc": "Point size for GTK and Qt apps", "app": "gtk_font_size", "from": 6, "to": 32, "step": 1, "suffix": " pt" }

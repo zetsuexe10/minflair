@@ -106,6 +106,10 @@ SidePill {
         }
     }
 
+    scale: area.pressed ? 0.95 : (area.containsMouse ? 1.05 : 1)
+
+    Behavior on scale { SpringAnimation { spring: 3.2; damping: 0.3; epsilon: 0.002 } }
+
     MouseArea {
         id: area
 
