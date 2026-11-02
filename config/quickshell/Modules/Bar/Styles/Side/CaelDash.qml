@@ -11,8 +11,7 @@ import qs.Core.Services
 Item {
     id: root
 
-    implicitWidth: 730
-    implicitHeight: 410
+    implicitHeight: Math.round(410 * Math.max(1, SettingsService.fontScale))
 
     property string uptime: ""
     readonly property string home: Quickshell.env("HOME")
@@ -233,6 +232,15 @@ Item {
                             customSize: 30
                             font.bold: true
                             color: SideState.muted
+                        }
+
+                        SideText {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            visible: !SettingsService.clock24h
+                            text: parent.parent.now.getHours() < 12 ? "AM" : "PM"
+                            customSize: 11
+                            font.bold: true
+                            color: SideState.primary
                         }
 
                         Item { width: 1; height: 10 }

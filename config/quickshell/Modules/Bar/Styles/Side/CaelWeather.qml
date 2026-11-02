@@ -8,8 +8,7 @@ import qs.Core.Services
 Item {
     id: root
 
-    implicitWidth: 730
-    implicitHeight: 330
+    implicitHeight: Math.round(330 * Math.max(1, SettingsService.fontScale))
 
     function dayName(iso) {
         const p = iso.split("-");

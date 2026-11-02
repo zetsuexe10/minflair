@@ -8,8 +8,7 @@ import qs.Core.Services
 Item {
     id: root
 
-    implicitWidth: 730
-    implicitHeight: 410
+    implicitHeight: Math.round(410 * Math.max(1, SettingsService.fontScale))
 
     CaelCard {
         anchors.fill: parent

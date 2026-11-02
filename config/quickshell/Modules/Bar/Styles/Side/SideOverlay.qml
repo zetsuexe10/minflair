@@ -41,7 +41,8 @@ PanelWindow {
     readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage", "launcher"].concat(centered)
     readonly property string activeId: (isActive && handled.indexOf(AppState.activeWidget) !== -1) ? AppState.activeWidget : ""
     readonly property bool open: activeId !== ""
-    readonly property bool needsFocus: open && keyboardWidgets.indexOf(activeId) !== -1
+    // the dashboard only takes the keyboard when it was opened on purpose (not by hovering the edge)
+    readonly property bool needsFocus: open && (keyboardWidgets.indexOf(activeId) !== -1 || (activeId === "dashboard" && !dashByHover))
     property string shownId: ""
     readonly property bool panelVisible: shownId !== ""
     readonly property bool isCentered: centered.indexOf(shownId) !== -1
@@ -194,7 +195,20 @@ PanelWindow {
                 AppState.openWidget("dashboard");
             } else if (!on && root.dashByHover) {
                 root.dashByHover = false;
-                AppState.closeAllWidgets();
+                if (AppState.activeWidget === "dashboard")
+                    AppState.closeWidget("dashboard");
+            }
+        }
+    }
+
+    // pointer still in the zone when another widget closed: open the dashboard then
+    Connections {
+        target: AppState
+
+        function onActiveWidgetChanged() {
+            if (AppState.activeWidget === "" && dashLatch.on && !root.dashByHover && root.isActive && root.hoverDashboard) {
+                root.dashByHover = true;
+                AppState.openWidget("dashboard");
             }
         }
     }
@@ -274,8 +288,13 @@ PanelWindow {
             open: root.open && !root.isCentered
             attached: root.attached
             rounding: SideState.rounding
-            contentWidth: panelLoader.item ? panelLoader.item.implicitWidth : 0
-            contentHeight: panelLoader.item ? panelLoader.item.implicitHeight : 0
+            property real lastW: 0
+            property real lastH: 0
+
+            contentWidth: panelLoader.item ? panelLoader.item.implicitWidth : lastW
+            contentHeight: panelLoader.item ? panelLoader.item.implicitHeight : lastH
+            onContentWidthChanged: if (panelLoader.item) lastW = contentWidth
+            onContentHeightChanged: if (panelLoader.item) lastH = contentHeight
 
             HoverHandler {
                 id: panelHover
@@ -533,7 +552,10 @@ PanelWindow {
 
     Component {
         id: dashboardComp
-        CaelDashboard { widget: widgetProxy }
+        CaelDashboard {
+            widget: widgetProxy
+            maxWidth: stage.width - 2 * (SideState.rounding + 24)
+        }
     }
 
     Component {

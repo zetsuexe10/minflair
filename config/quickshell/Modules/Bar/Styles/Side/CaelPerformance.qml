@@ -8,8 +8,7 @@ import qs.Core.Services
 Item {
     id: root
 
-    implicitWidth: 730
-    implicitHeight: 300
+    implicitHeight: Math.round(300 * Math.max(1, SettingsService.fontScale))
 
     readonly property var items: [
         { "icon": "cpu", "name": "CPU", "v": SystemStats.cpuUsage, "a": SystemStats.cpuTemp, "b": SystemStats.cpuFreq, "c": 0 },

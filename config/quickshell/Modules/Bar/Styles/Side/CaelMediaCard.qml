@@ -15,13 +15,6 @@ Item {
     implicitWidth: large ? 420 : 200
     implicitHeight: large ? 340 : 410
 
-    Timer {
-        interval: 1000
-        running: root.visible && root.player !== null && MprisService.isPlaying
-        repeat: true
-        onTriggered: if (root.player) root.player.positionChanged()
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: root.large ? 24 : 16
