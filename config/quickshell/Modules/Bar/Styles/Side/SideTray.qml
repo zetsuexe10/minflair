@@ -37,7 +37,7 @@ SidePill {
                 Rectangle {
                     anchors.fill: parent
                     radius: width / 2
-                    color: Theme.bgSecondary
+                    color: SideState.card
                     opacity: area.containsMouse ? 1 : 0
 
                     Behavior on opacity { NumberAnimation { duration: Constants.animFast } }

@@ -232,7 +232,7 @@ Item {
                 visible: icon.status !== Image.Ready
                 icon: row.modelData.kind === "app" ? "rocket" : row.modelData.icon
                 iconSize: 24
-                iconColor: row.modelData.kind === "calc" ? Theme.accent : Theme.muted
+                iconColor: row.modelData.kind === "calc" ? SideState.primary : SideState.muted
                 flat: true
             }
 
@@ -243,7 +243,7 @@ Item {
                 anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
 
-                ThemedText {
+                SideText {
                     width: parent.width
                     text: row.modelData.name
                     customSize: row.modelData.kind === "calc" ? 18 : 13
@@ -251,11 +251,11 @@ Item {
                     elide: Text.ElideRight
                 }
 
-                ThemedText {
+                SideText {
                     width: parent.width
                     text: row.modelData.sub
                     customSize: 10
-                    color: Theme.muted
+                    color: SideState.muted
                     elide: Text.ElideRight
                     visible: text !== ""
                 }
@@ -291,7 +291,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             icon: root.actionMode ? "chevron-right" : "search"
             iconSize: Constants.sizeMd
-            iconColor: input.activeFocus ? Theme.accent : Theme.muted
+            iconColor: input.activeFocus ? SideState.primary : SideState.muted
             flat: true
         }
 
@@ -303,9 +303,9 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: 18
             anchors.verticalCenter: parent.verticalCenter
-            color: Theme.fg
-            selectionColor: Theme.accent
-            selectedTextColor: Theme.opaqueBg
+            color: SideState.fg
+            selectionColor: SideState.primary
+            selectedTextColor: SideState.surface
             font.family: Constants.fontFamily
             font.pixelSize: Math.round(14 * SettingsService.fontScale)
             clip: true
@@ -328,7 +328,7 @@ Item {
             Text {
                 visible: input.text === ""
                 text: "Search apps, type > for actions, = to calculate"
-                color: Theme.muted
+                color: SideState.muted
                 font: input.font
             }
         }

@@ -149,15 +149,15 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 0
 
-            ThemedText {
+            SideText {
                 text: "Wi-Fi"
                 font.bold: true
                 customSize: Constants.sizeMd
             }
 
-            ThemedText {
+            SideText {
                 text: !root.radio ? "Off" : (root.connected !== "" ? root.connected : "Not connected")
-                color: Theme.muted
+                color: SideState.muted
                 customSize: 10
                 elide: Text.ElideRight
             }
@@ -178,9 +178,9 @@ ColumnLayout {
             implicitWidth: 44
             implicitHeight: 24
             radius: 12
-            color: root.radio ? Theme.accent : Theme.bgSecondary
+            color: root.radio ? SideState.primary : SideState.card
             border.width: 1
-            border.color: Theme.border
+            border.color: SideState.outline
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -190,7 +190,7 @@ ColumnLayout {
                 radius: 9
                 y: 3
                 x: root.radio ? parent.width - width - 3 : 3
-                color: root.radio ? Theme.opaqueBg : Theme.fg
+                color: root.radio ? SideState.surface : SideState.fg
 
                 Behavior on x { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
             }
@@ -205,7 +205,7 @@ ColumnLayout {
         }
     }
 
-    ThemedText {
+    SideText {
         visible: root.message !== ""
         text: root.message
         color: "#e06b74"
@@ -218,9 +218,9 @@ ColumnLayout {
         visible: root.pending !== ""
         spacing: Constants.size2Xs
 
-        ThemedText {
+        SideText {
             text: "Password for " + root.pending
-            color: Theme.muted
+            color: SideState.muted
             customSize: Constants.sizeSm
             elide: Text.ElideRight
             Layout.fillWidth: true
@@ -244,7 +244,7 @@ ColumnLayout {
             SideButton {
                 icon: "check"
                 size: 32
-                iconColor: Theme.accent
+                iconColor: SideState.primary
                 onClicked: {
                     if (pw.text !== "")
                         root.connectTo(root.pending, pw.text);
@@ -262,10 +262,10 @@ ColumnLayout {
         }
     }
 
-    ThemedText {
+    SideText {
         visible: root.radio && root.networks.length === 0
         text: "Scanning..."
-        color: Theme.muted
+        color: SideState.muted
     }
 
     ListView {
@@ -286,7 +286,7 @@ ColumnLayout {
             width: ListView.view.width
             height: 40
             radius: 12
-            color: modelData.active ? Theme.bgAccent : (hover.hovered ? Theme.bgSecondary : "transparent")
+            color: modelData.active ? SideState.selected : (hover.hovered ? SideState.card : "transparent")
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -297,7 +297,7 @@ ColumnLayout {
                 anchors.leftMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 icon: root.icon(row.modelData.signal)
-                iconColor: row.modelData.active ? Theme.accent : Theme.fg
+                iconColor: row.modelData.active ? SideState.primary : SideState.fg
                 iconSize: Constants.sizeMd
                 flat: true
             }
@@ -310,18 +310,18 @@ ColumnLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 0
 
-                ThemedText {
+                SideText {
                     Layout.fillWidth: true
                     text: row.modelData.ssid
                     elide: Text.ElideRight
                     font.bold: row.modelData.active
                 }
 
-                ThemedText {
+                SideText {
                     text: row.modelData.active ? "Connected" : (row.modelData.saved ? "Saved" : "")
                     visible: text !== ""
                     customSize: 10
-                    color: row.modelData.active ? Theme.accent : Theme.muted
+                    color: row.modelData.active ? SideState.primary : SideState.muted
                 }
             }
 
@@ -333,7 +333,7 @@ ColumnLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: row.modelData.security !== "" && row.modelData.security !== "--"
                 icon: "lock"
-                iconColor: Theme.muted
+                iconColor: SideState.muted
                 iconSize: Constants.sizeSm
                 flat: true
             }
@@ -350,10 +350,10 @@ ColumnLayout {
         }
     }
 
-    ThemedText {
+    SideText {
         visible: root.busy
         text: "Connecting..."
-        color: Theme.accent
+        color: SideState.primary
         customSize: Constants.sizeSm
     }
 }

@@ -25,11 +25,11 @@ Item {
             Layout.preferredHeight: 150
             corner: 30
 
-            ThemedText {
+            SideText {
                 anchors.centerIn: parent
                 visible: !WeatherService.loaded
                 text: WeatherService.errorText !== "" ? WeatherService.errorText : "Loading weather..."
-                color: Theme.muted
+                color: SideState.muted
             }
 
             RowLayout {
@@ -41,21 +41,21 @@ Item {
                 Text {
                     text: WeatherService.glyph
                     font.pixelSize: 72
-                    color: Theme.accent
+                    color: SideState.primary
                 }
 
                 ColumnLayout {
                     spacing: 0
 
-                    ThemedText {
+                    SideText {
                         text: WeatherService.temp + WeatherService.unit
                         customSize: 36
                         font.bold: true
                     }
 
-                    ThemedText {
+                    SideText {
                         text: WeatherService.description + " · " + WeatherService.city
-                        color: Theme.muted
+                        color: SideState.muted
                     }
                 }
 
@@ -81,13 +81,13 @@ Item {
 
                             spacing: 0
 
-                            ThemedText {
+                            SideText {
                                 text: parent.modelData.k
-                                color: Theme.muted
+                                color: SideState.muted
                                 customSize: 10
                             }
 
-                            ThemedText {
+                            SideText {
                                 text: parent.modelData.v
                                 font.bold: true
                             }
@@ -120,11 +120,11 @@ Item {
                         anchors.centerIn: parent
                         spacing: 6
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: dayCard.index === 0 ? "Today" : root.dayName(dayCard.modelData.date)
                             customSize: 11
-                            color: dayCard.index === 0 ? Theme.accent : Theme.muted
+                            color: dayCard.index === 0 ? SideState.primary : SideState.muted
                             font.bold: true
                         }
 
@@ -132,19 +132,19 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: WeatherService.glyphFor(dayCard.modelData.code, true)
                             font.pixelSize: 26
-                            color: Theme.fg
+                            color: SideState.fg
                         }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: dayCard.modelData.max + "°"
                             font.bold: true
                         }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: dayCard.modelData.min + "°"
-                            color: Theme.muted
+                            color: SideState.muted
                         }
                     }
                 }

@@ -19,7 +19,7 @@ QtObject {
         },
         "light": {
             "name": "Default Light",
-            "bg": '#e8dbff',
+            "bg": '#f4effc',
             "fg": '#1e1a2e',
             "accent": '#7040e8',
             "accentComplementary": '#e840a1'
@@ -32,9 +32,9 @@ QtObject {
     property color bg: Qt.rgba(_rawBg.r, _rawBg.g, _rawBg.b, bgOpacity)
     property bool isDark: ColorUtils.isDark(_rawBg)
     property color overlayBase: isDark ? Qt.rgba(fg.r * 0.3 + accent.r * 0.7, fg.g * 0.3 + accent.g * 0.7, fg.b * 0.3 + accent.b * 0.7, 1) : accent
-    property color bgSecondary: Qt.rgba(overlayBase.r, overlayBase.g, overlayBase.b, isDark ? 0.06 : 0.1)
+    property color bgSecondary: Qt.rgba(overlayBase.r, overlayBase.g, overlayBase.b, isDark ? 0.06 : 0.07)
     property color bgTertiary: Qt.rgba(overlayBase.r, overlayBase.g, overlayBase.b, isDark ? 0.02 : 0.04)
-    property color bgAccent: Qt.rgba(accent.r, accent.g, accent.b, isDark ? 0.15 : 0.3)
+    property color bgAccent: Qt.rgba(accent.r, accent.g, accent.b, isDark ? 0.15 : 0.2)
     property color bgAccentComplementary: Qt.rgba(accentComplementary.r, accentComplementary.g, accentComplementary.b, isDark ? 0.15 : 0.3)
     property color fg: themes[0].dark.fg
     property color muted: Qt.rgba(fg.r, fg.g, fg.b, 0.4)

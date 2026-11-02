@@ -40,7 +40,7 @@ Item {
         Behavior on width { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
         Behavior on height { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
-        ThemedText {
+        SideText {
             anchors.centerIn: parent
             width: (root.vertical ? parent.height : parent.width) - 28
             rotation: root.vertical ? -90 : 0
@@ -48,7 +48,7 @@ Item {
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             customSize: 12
-            color: Theme.muted
+            color: SideState.muted
             maximumLineCount: 1
         }
     }

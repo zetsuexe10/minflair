@@ -37,18 +37,23 @@ SidePill {
     implicitHeight: vertical ? along : SideState.railSize
 
 
+    // Stretchy indicator: the leading edge moves first, the trailing edge catches up.
+    // Own fixed durations so it animates even when the global animation factor is 0.
+    readonly property real step: slot + gap
+    readonly property real target: pad + Math.max(0, Math.min(shown - 1, activeWsId - first)) * step
+    property real edgeA: target
+    property real edgeB: target + slot
+    Behavior on edgeA { NumberAnimation { duration: root.edgeA > root.target ? 150 : 260; easing.type: Easing.OutCubic } }
+    Behavior on edgeB { NumberAnimation { duration: root.edgeB > root.target + root.slot ? 260 : 150; easing.type: Easing.OutCubic } }
+    onTargetChanged: { edgeA = target; edgeB = target + slot; }
+
     Rectangle {
-        readonly property real offset: root.pad + (Math.max(0, Math.min(root.shown - 1, root.activeWsId - root.first))) * (root.slot + root.gap)
-
-        x: root.vertical ? (root.width - root.slot) / 2 : offset
-        y: root.vertical ? offset : (root.height - root.slot) / 2
-        width: root.slot
-        height: root.slot
-        radius: width / 2
-        color: Theme.accent
-
-        Behavior on x { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
-        Behavior on y { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 1.1 } }
+        x: root.vertical ? (root.width - root.slot) / 2 : root.edgeA
+        y: root.vertical ? root.edgeA : (root.height - root.slot) / 2
+        width: root.vertical ? root.slot : root.edgeB - root.edgeA
+        height: root.vertical ? root.edgeB - root.edgeA : root.slot
+        radius: root.slot / 2
+        color: SideState.primary
     }
 
     Grid {
@@ -74,19 +79,21 @@ SidePill {
                 Rectangle {
                     anchors.fill: parent
                     radius: width / 2
-                    color: Theme.bgSecondary
+                    color: SideState.card
                     opacity: (!wsItem.isActive && hover.containsMouse) ? 1 : 0
 
                     Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
                 }
 
-                ThemedText {
+                SideText {
                     anchors.centerIn: parent
                     visible: wsItem.isActive || wsItem.isOccupied
                     text: wsItem.wsId
                     customSize: 13
                     font.bold: true
-                    color: wsItem.isActive ? Theme.opaqueBg : Theme.fg
+                    color: wsItem.isActive ? SideState.surface : SideState.fg
+
+                    Behavior on color { ColorAnimation { duration: 200 } }
                 }
 
                 Rectangle {
@@ -95,7 +102,7 @@ SidePill {
                     width: 6
                     height: 6
                     radius: 3
-                    color: Theme.muted
+                    color: SideState.muted
                 }
 
                 MouseArea {

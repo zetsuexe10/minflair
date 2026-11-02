@@ -77,16 +77,16 @@ Item {
         visible: root.attached
         edge: root.edge
         rounding: root.rounding
-        fill: Theme.opaqueBg
+        fill: SideState.surface
     }
 
     Rectangle {
         anchors.fill: parent
         visible: !root.attached
         radius: root.rounding
-        color: Theme.bg
+        color: SideState.surface
         border.width: 1
-        border.color: Theme.border
+        border.color: SideState.outline
     }
 
     Item {

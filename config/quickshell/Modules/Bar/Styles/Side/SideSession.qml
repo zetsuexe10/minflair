@@ -45,7 +45,7 @@ Column {
             width: 68
             height: 68
             radius: isArmed ? 20 : (hover.hovered ? 26 : 22)
-            color: isArmed ? "#c0434d" : (hover.hovered ? Theme.bgAccent : Theme.bgSecondary)
+            color: isArmed ? "#c0434d" : (hover.hovered ? SideState.selected : SideState.card)
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
             Behavior on radius { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
@@ -54,11 +54,11 @@ Column {
                 anchors.centerIn: parent
                 icon: btn.modelData.icon
                 iconSize: 26
-                iconColor: btn.isArmed ? "#ffffff" : (hover.hovered ? Theme.accent : Theme.fg)
+                iconColor: btn.isArmed ? "#ffffff" : (hover.hovered ? SideState.primary : SideState.fg)
                 flat: true
             }
 
-            ThemedText {
+            SideText {
                 visible: btn.isArmed
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom

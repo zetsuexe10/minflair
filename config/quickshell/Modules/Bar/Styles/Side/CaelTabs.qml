@@ -39,7 +39,7 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 2
                     radius: 14
-                    color: Theme.fg
+                    color: SideState.fg
                     opacity: tabHover.hovered ? 0.07 : 0
 
                     Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
@@ -53,15 +53,15 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         icon: tab.modelData.icon
                         iconSize: Constants.sizeLg
-                        iconColor: tab.isCurrent ? Theme.accent : Theme.muted
+                        iconColor: tab.isCurrent ? SideState.primary : SideState.muted
                         flat: true
                     }
 
-                    ThemedText {
+                    SideText {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: tab.modelData.label
                         customSize: 11
-                        color: tab.isCurrent ? Theme.accent : Theme.muted
+                        color: tab.isCurrent ? SideState.primary : SideState.muted
                         font.bold: tab.isCurrent
                     }
                 }
@@ -94,7 +94,7 @@ Item {
             width: parent.width
             height: 6
             radius: 3
-            color: Theme.accent
+            color: SideState.primary
         }
     }
 
@@ -102,7 +102,7 @@ Item {
         anchors.bottom: parent.bottom
         width: parent.width
         height: 1
-        color: Theme.border
+        color: SideState.outline
     }
 
     WheelHandler {

@@ -116,7 +116,7 @@ SidePill {
         SideButton {
             visible: root.capsOn || root.numOn
             icon: root.capsOn ? "caps-lock-filled" : "keyboard-filled"
-            iconColor: Theme.accent
+            iconColor: SideState.primary
             active: true
             iconSize: Constants.sizeMd
             onClicked: AppState.toggleWidget("controlCenter")
@@ -126,7 +126,7 @@ SidePill {
             id: netBtn
 
             icon: (root.wifiUp || root.ethUp) ? "wifi" : "wifi-off"
-            iconColor: (root.wifiUp || root.ethUp) ? Theme.fg : Theme.muted
+            iconColor: (root.wifiUp || root.ethUp) ? SideState.fg : SideState.muted
             iconSize: Constants.sizeMd
             active: SideState.popout === "network"
             onClicked: SideState.popout === "network" ? SideState.close() : SideState.open("network", root.centerOf(netBtn))
@@ -139,7 +139,7 @@ SidePill {
 
             visible: root.adapter !== null
             icon: root.btOn ? "bluetooth" : "bluetooth-off"
-            iconColor: root.btConnected ? Theme.accent : (root.btOn ? Theme.fg : Theme.muted)
+            iconColor: root.btConnected ? SideState.primary : (root.btOn ? SideState.fg : SideState.muted)
             iconSize: Constants.sizeMd
             active: SideState.popout === "bluetooth"
             onClicked: SideState.popout === "bluetooth" ? SideState.close() : SideState.open("bluetooth", root.centerOf(btBtn))
@@ -151,7 +151,7 @@ SidePill {
             id: volBtn
 
             icon: (root.muted || root.volume <= 0) ? "volume-off" : "volume"
-            iconColor: root.muted ? Theme.muted : Theme.fg
+            iconColor: root.muted ? SideState.muted : SideState.fg
             iconSize: Constants.sizeMd
             active: SideState.popout === "audio"
             onClicked: (mouse) => {
@@ -189,7 +189,7 @@ SidePill {
             onHoverStarted: SideState.hover("notifications", root.centerOf(bellBtn))
             onHoverEnded: SideState.release()
             icon: (root.notificationService && root.notificationService.dndEnabled) ? "bell-off" : "bell"
-            iconColor: (root.notificationService && root.notificationService.unreadCount > 0) ? Theme.accent : Theme.fg
+            iconColor: (root.notificationService && root.notificationService.unreadCount > 0) ? SideState.primary : SideState.fg
             iconSize: Constants.sizeMd
             active: AppState.isWidgetOpen("notificationsCenter")
             onClicked: AppState.toggleWidget("notificationsCenter")

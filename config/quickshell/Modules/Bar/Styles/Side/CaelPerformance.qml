@@ -44,39 +44,39 @@ Item {
                         height: 130
                         stroke: 10
                         value: card.modelData.v / 100
-                        fg: card.modelData.c === 0 ? Theme.accent : (card.modelData.c === 1 ? Theme.accentComplementary : (card.modelData.c === 2 ? Qt.lighter(Theme.accent, 1.3) : Qt.darker(Theme.accentComplementary, 1.1)))
+                        fg: card.modelData.c === 0 ? SideState.primary : (card.modelData.c === 1 ? Theme.accentComplementary : (card.modelData.c === 2 ? Qt.lighter(SideState.primary, 1.3) : Qt.darker(Theme.accentComplementary, 1.1)))
 
                         Column {
                             anchors.centerIn: parent
 
-                            ThemedText {
+                            SideText {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: Math.round(card.modelData.v) + "%"
                                 customSize: 22
                                 font.bold: true
                             }
 
-                            ThemedText {
+                            SideText {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: card.modelData.name
-                                color: Theme.muted
+                                color: SideState.muted
                                 customSize: 11
                             }
                         }
                     }
 
-                    ThemedText {
+                    SideText {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: card.modelData.a
                         font.bold: true
                     }
 
-                    ThemedText {
+                    SideText {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: 150
                         horizontalAlignment: Text.AlignHCenter
                         text: card.modelData.b
-                        color: Theme.muted
+                        color: SideState.muted
                         customSize: 10
                         elide: Text.ElideRight
                     }

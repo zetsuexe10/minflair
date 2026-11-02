@@ -7,8 +7,8 @@ Item {
     id: root
 
     property real value: 0                 // 0..1
-    property color fg: Theme.accent
-    property color track: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.12)
+    property color fg: SideState.primary
+    property color track: Qt.rgba(SideState.fg.r, SideState.fg.g, SideState.fg.b, 0.12)
     property real stroke: 6
     default property alias contents: holder.data
     readonly property real v: Math.max(0, Math.min(1, value))

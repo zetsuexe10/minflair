@@ -37,7 +37,7 @@ ColumnLayout {
         objects: Pipewire.nodes.values
     }
 
-    ThemedText {
+    SideText {
         text: "Sound & display"
         font.bold: true
         customSize: Constants.sizeMd
@@ -73,9 +73,9 @@ ColumnLayout {
         Layout.fillWidth: true
     }
 
-    ThemedText {
+    SideText {
         text: "Output"
-        color: Theme.muted
+        color: SideState.muted
         customSize: Constants.sizeSm
     }
 
@@ -92,11 +92,11 @@ ColumnLayout {
         }
     }
 
-    ThemedText {
+    SideText {
         visible: root.sources.length > 0
         Layout.topMargin: Constants.size2Xs
         text: "Input"
-        color: Theme.muted
+        color: SideState.muted
         customSize: Constants.sizeSm
     }
 
@@ -123,7 +123,7 @@ ColumnLayout {
 
         implicitHeight: 34
         radius: 12
-        color: selected ? Theme.bgAccent : (rowHover.hovered ? Theme.bgSecondary : "transparent")
+        color: selected ? SideState.selected : (rowHover.hovered ? SideState.card : "transparent")
 
         Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -138,19 +138,19 @@ ColumnLayout {
             radius: 7
             color: "transparent"
             border.width: 2
-            border.color: row.selected ? Theme.accent : Theme.muted
+            border.color: row.selected ? SideState.primary : SideState.muted
 
             Rectangle {
                 anchors.centerIn: parent
                 width: 6
                 height: 6
                 radius: 3
-                color: Theme.accent
+                color: SideState.primary
                 visible: row.selected
             }
         }
 
-        ThemedText {
+        SideText {
             anchors.left: dot.right
             anchors.leftMargin: 10
             anchors.right: parent.right
@@ -158,7 +158,7 @@ ColumnLayout {
             anchors.verticalCenter: parent.verticalCenter
             text: row.text
             elide: Text.ElideRight
-            color: row.selected ? Theme.fg : Theme.muted
+            color: row.selected ? SideState.fg : SideState.muted
         }
 
         HoverHandler {

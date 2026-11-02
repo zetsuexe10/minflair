@@ -20,15 +20,15 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 0
 
-            ThemedText {
+            SideText {
                 text: "Notifications"
                 font.bold: true
                 customSize: Constants.sizeMd
             }
 
-            ThemedText {
+            SideText {
                 text: root.notificationService.unreadCount === 0 ? "All caught up" : root.notificationService.unreadCount + " in history"
-                color: Theme.muted
+                color: SideState.muted
                 customSize: 10
             }
         }
@@ -38,7 +38,7 @@ ColumnLayout {
         Layout.fillWidth: true
         implicitHeight: 44
         radius: 14
-        color: root.notificationService.dndEnabled ? Theme.bgAccent : Theme.bgSecondary
+        color: root.notificationService.dndEnabled ? SideState.selected : SideState.card
 
         Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -49,12 +49,12 @@ ColumnLayout {
             anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
             icon: root.notificationService.dndEnabled ? "bell-off" : "bell"
-            iconColor: root.notificationService.dndEnabled ? Theme.accent : Theme.fg
+            iconColor: root.notificationService.dndEnabled ? SideState.primary : SideState.fg
             iconSize: Constants.sizeMd
             flat: true
         }
 
-        ThemedText {
+        SideText {
             anchors.left: dndIcon.right
             anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
@@ -68,9 +68,9 @@ ColumnLayout {
             width: 40
             height: 22
             radius: 11
-            color: root.notificationService.dndEnabled ? Theme.accent : Theme.bg
+            color: root.notificationService.dndEnabled ? SideState.primary : SideState.surface
             border.width: 1
-            border.color: Theme.border
+            border.color: SideState.outline
 
             Rectangle {
                 width: 16
@@ -78,7 +78,7 @@ ColumnLayout {
                 radius: 8
                 y: 3
                 x: root.notificationService.dndEnabled ? parent.width - width - 3 : 3
-                color: root.notificationService.dndEnabled ? Theme.opaqueBg : Theme.fg
+                color: root.notificationService.dndEnabled ? SideState.surface : SideState.fg
 
                 Behavior on x { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
             }
@@ -111,11 +111,11 @@ ColumnLayout {
                 Layout.fillWidth: true
                 implicitHeight: 36
                 radius: 12
-                color: bh.hovered ? Theme.bgAccent : Theme.bgSecondary
+                color: bh.hovered ? SideState.selected : SideState.card
 
                 Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
-                ThemedText {
+                SideText {
                     anchors.centerIn: parent
                     text: btn.modelData.label
                 }

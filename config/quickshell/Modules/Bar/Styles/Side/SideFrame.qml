@@ -38,7 +38,7 @@ PanelWindow {
         insetTop: SideState.inset("top")
         insetBottom: SideState.inset("bottom")
         rounding: SideState.rounding
-        fill: Theme.opaqueBg
+        fill: SideState.surface
 
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
     }

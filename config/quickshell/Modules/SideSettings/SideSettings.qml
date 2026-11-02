@@ -177,7 +177,7 @@ AppWindow {
                 radius: 22
                 color: SideState.card
                 border.width: searchInput.activeFocus ? 1 : 0
-                border.color: Theme.accent
+                border.color: SideState.primary
 
                 SvgIcon {
                     id: searchIcon
@@ -187,7 +187,7 @@ AppWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "search"
                     iconSize: Constants.sizeMd
-                    iconColor: searchInput.activeFocus ? Theme.accent : Theme.muted
+                    iconColor: searchInput.activeFocus ? SideState.primary : SideState.muted
                     flat: true
                 }
 
@@ -199,9 +199,9 @@ AppWindow {
                     anchors.right: parent.right
                     anchors.rightMargin: 14
                     anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.fg
-                    selectionColor: Theme.accent
-                    selectedTextColor: Theme.opaqueBg
+                    color: SideState.fg
+                    selectionColor: SideState.primary
+                    selectedTextColor: SideState.surface
                     font.family: Constants.fontFamily
                     font.pixelSize: Math.round(13 * SettingsService.fontScale)
                     clip: true
@@ -211,7 +211,7 @@ AppWindow {
                         visible: searchInput.text === ""
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Search settings"
-                        color: Theme.muted
+                        color: SideState.muted
                         font: searchInput.font
                     }
                 }
@@ -227,7 +227,7 @@ AppWindow {
                     width: parent.width
                     height: 48
                     radius: 24
-                    color: Theme.bgAccent
+                    color: SideState.selected
                     y: root.page * 54
                     opacity: root.q === "" ? 1 : 0
 
@@ -255,7 +255,7 @@ AppWindow {
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 24
-                                color: Theme.fg
+                                color: SideState.fg
                                 opacity: (navHover.hovered && !navItem.current) ? 0.06 : 0
 
                                 Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
@@ -269,18 +269,18 @@ AppWindow {
                                 anchors.verticalCenter: parent.verticalCenter
                                 icon: navItem.modelData.icon
                                 iconSize: Constants.sizeMd
-                                iconColor: navItem.current ? Theme.accent : Theme.muted
+                                iconColor: navItem.current ? SideState.primary : SideState.muted
                                 flat: true
                             }
 
-                            ThemedText {
+                            SideText {
                                 anchors.left: navIcon.right
                                 anchors.leftMargin: 14
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: navItem.modelData.title
                                 customSize: 13
                                 font.bold: navItem.current
-                                color: navItem.current ? Theme.fg : Theme.muted
+                                color: navItem.current ? SideState.fg : SideState.muted
                             }
 
                             HoverHandler {
@@ -304,7 +304,7 @@ AppWindow {
         Rectangle {
             Layout.fillHeight: true
             Layout.preferredWidth: 1
-            color: Theme.border
+            color: SideState.outline
         }
 
         // ---- page ----
@@ -315,15 +315,15 @@ AppWindow {
             Layout.bottomMargin: 0
             spacing: 4
 
-            ThemedText {
+            SideText {
                 text: root.q !== "" ? "Search" : root.pages[root.page].title
                 customSize: 24
                 font.bold: true
             }
 
-            ThemedText {
+            SideText {
                 text: root.q !== "" ? root.results.length + " results" : root.pages[root.page].sub
-                color: Theme.muted
+                color: SideState.muted
             }
 
             Flickable {
@@ -398,10 +398,10 @@ AppWindow {
                             width: pageCol.width
                             spacing: 8
 
-                            ThemedText {
+                            SideText {
                                 topPadding: 10
                                 text: sec.modelData.name
-                                color: Theme.accent
+                                color: SideState.primary
                                 customSize: 12
                                 font.bold: true
                             }

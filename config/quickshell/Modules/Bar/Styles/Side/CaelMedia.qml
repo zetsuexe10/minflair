@@ -31,17 +31,17 @@ Item {
                 Layout.fillHeight: true
                 spacing: 10
 
-                ThemedText {
+                SideText {
                     text: MprisService.activePlayerName !== "" ? MprisService.activePlayerName : "No player"
-                    color: Theme.accent
+                    color: SideState.primary
                     font.bold: true
                     customSize: 13
                 }
 
-                ThemedText {
+                SideText {
                     Layout.fillWidth: true
                     text: MprisService.activePlayer ? (MprisService.activePlayer.trackAlbum || "") : ""
-                    color: Theme.muted
+                    color: SideState.muted
                     elide: Text.ElideRight
                     visible: text !== ""
                 }
@@ -50,10 +50,10 @@ Item {
                     Layout.fillHeight: true
                 }
 
-                ThemedText {
+                SideText {
                     Layout.fillWidth: true
                     text: MprisService.activePlayer ? MprisService.formatTime(MprisService.activePlayer.position) + " / " + MprisService.formatTime(MprisService.activePlayer.length) : ""
-                    color: Theme.muted
+                    color: SideState.muted
                     horizontalAlignment: Text.AlignRight
                 }
             }

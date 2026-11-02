@@ -17,7 +17,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         icon: OsdService.icon
         iconSize: Constants.sizeLg
-        iconColor: OsdService.isMuted ? Theme.muted : Theme.accent
+        iconColor: OsdService.isMuted ? SideState.muted : SideState.primary
         flat: true
     }
 
@@ -30,20 +30,20 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: 10
         radius: 5
-        color: Theme.bgSecondary
+        color: SideState.card
 
         Rectangle {
             anchors.bottom: parent.bottom
             width: parent.width
             height: parent.height * OsdService.level
             radius: 5
-            color: OsdService.isMuted ? Theme.muted : Theme.accent
+            color: OsdService.isMuted ? SideState.muted : SideState.primary
 
             Behavior on height { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
         }
     }
 
-    ThemedText {
+    SideText {
         id: label
 
         anchors.bottom: parent.bottom

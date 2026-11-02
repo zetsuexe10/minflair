@@ -397,10 +397,10 @@ PanelWindow {
         height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
         x: Math.round(root.insL + (root.freeW - width) / 2)
         y: Math.round(root.insT + (root.freeH - height) / 2)
-        color: Theme.bg
+        color: SideState.surface
         radius: Constants.size3Xl - 4
         border.width: 1
-        border.color: Theme.border
+        border.color: SideState.outline
 
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
@@ -430,9 +430,9 @@ PanelWindow {
         width: 380
         height: Math.max(toast.notifH, 64)
         radius: 22
-        color: Theme.bg
+        color: SideState.surface
         border.width: 1
-        border.color: Theme.border
+        border.color: SideState.outline
         opacity: toast.opacity
         visible: toast.visible && root.isActive
 

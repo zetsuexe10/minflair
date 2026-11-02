@@ -73,10 +73,10 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: WeatherService.glyph
                                 font.pixelSize: 38
-                                color: Theme.accent
+                                color: SideState.primary
                             }
 
-                            ThemedText {
+                            SideText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: WeatherService.temp + WeatherService.unit
                                 customSize: 24
@@ -84,25 +84,25 @@ Item {
                             }
                         }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: WeatherService.description
-                            color: Theme.muted
+                            color: SideState.muted
                         }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: WeatherService.city
                             customSize: 10
-                            color: Theme.muted
+                            color: SideState.muted
                         }
                     }
 
-                    ThemedText {
+                    SideText {
                         anchors.centerIn: parent
                         visible: !WeatherService.loaded
                         text: WeatherService.errorText !== "" ? WeatherService.errorText : "Loading weather..."
-                        color: Theme.muted
+                        color: SideState.muted
                     }
                 }
 
@@ -134,13 +134,13 @@ Item {
                                 visible: status === Image.Ready
                             }
 
-                            ThemedText {
+                            SideText {
                                 anchors.centerIn: parent
                                 visible: face.status !== Image.Ready
                                 text: (SystemStats.username || "?").charAt(0).toUpperCase()
                                 customSize: 34
                                 font.bold: true
-                                color: Theme.accent
+                                color: SideState.primary
                             }
                         }
 
@@ -149,7 +149,7 @@ Item {
                             Layout.alignment: Qt.AlignVCenter
                             spacing: 6
 
-                            ThemedText {
+                            SideText {
                                 text: SystemStats.username
                                 customSize: 16
                                 font.bold: true
@@ -167,19 +167,19 @@ Item {
 
                                     spacing: 8
 
-                                    ThemedText {
+                                    SideText {
                                         Layout.preferredWidth: 22
                                         text: parent.modelData.k
-                                        color: Theme.accent
+                                        color: SideState.primary
                                         customSize: 10
                                         font.bold: true
                                     }
 
-                                    ThemedText {
+                                    SideText {
                                         Layout.fillWidth: true
                                         text: parent.modelData.v
                                         elide: Text.ElideRight
-                                        color: Theme.muted
+                                        color: SideState.muted
                                     }
                                 }
                             }
@@ -205,17 +205,17 @@ Item {
                         anchors.centerIn: parent
                         spacing: 0
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: Qt.formatDate(parent.parent.now, "ddd")
-                            color: Theme.accent
+                            color: SideState.primary
                             customSize: 12
                             font.bold: true
                         }
 
                         Item { width: 1; height: 10 }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: {
                                 let h = parent.parent.now.getHours();
@@ -227,21 +227,21 @@ Item {
                             font.bold: true
                         }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: Qt.formatTime(parent.parent.now, "mm")
                             customSize: 30
                             font.bold: true
-                            color: Theme.muted
+                            color: SideState.muted
                         }
 
                         Item { width: 1; height: 10 }
 
-                        ThemedText {
+                        SideText {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: Qt.formatDate(parent.parent.now, "d MMM")
                             customSize: 11
-                            color: Theme.muted
+                            color: SideState.muted
                         }
                     }
                 }
@@ -286,6 +286,7 @@ Item {
                                     anchors.centerIn: parent
                                     icon: "chevron-left"
                                     iconSize: 16
+                                    iconColor: SideState.fg
                                     flat: true
                                 }
 
@@ -293,13 +294,13 @@ Item {
                                 TapHandler { onTapped: calCard.shift(-1) }
                             }
 
-                            ThemedText {
+                            SideText {
                                 Layout.fillWidth: true
                                 horizontalAlignment: Text.AlignHCenter
                                 text: Qt.locale().monthName(calCard.viewMonth) + " " + calCard.viewYear
                                 font.bold: true
                                 customSize: 13
-                                color: Theme.accent
+                                color: SideState.primary
 
                                 TapHandler {
                                     onTapped: {
@@ -319,6 +320,7 @@ Item {
                                     anchors.centerIn: parent
                                     icon: "chevron-right"
                                     iconSize: 16
+                                    iconColor: SideState.fg
                                     flat: true
                                 }
 
@@ -344,10 +346,10 @@ Item {
                                     width: parent.cw
                                     height: parent.ch
 
-                                    ThemedText {
+                                    SideText {
                                         anchors.centerIn: parent
                                         text: Qt.locale().dayName((calCard.firstDow + index) % 7, Locale.NarrowFormat)
-                                        color: Theme.muted
+                                        color: SideState.muted
                                         customSize: 10
                                         font.bold: true
                                     }
@@ -373,16 +375,16 @@ Item {
                                         width: Math.min(parent.width, parent.height) - 2
                                         height: width
                                         radius: width / 2
-                                        color: Theme.accent
+                                        color: SideState.primary
                                         visible: cell.isToday
                                     }
 
-                                    ThemedText {
+                                    SideText {
                                         anchors.centerIn: parent
                                         text: cell.d.getDate()
                                         customSize: 11
                                         font.bold: cell.isToday
-                                        color: cell.isToday ? Theme.opaqueBg : (cell.inMonth ? Theme.fg : Theme.muted)
+                                        color: cell.isToday ? SideState.surface : (cell.inMonth ? SideState.fg : SideState.muted)
                                         opacity: cell.inMonth || cell.isToday ? 1 : 0.5
                                     }
                                 }
@@ -417,7 +419,7 @@ Item {
                                 height: 58
                                 stroke: 5
                                 value: modelData.v
-                                fg: modelData.c === 0 ? Theme.accent : (modelData.c === 1 ? Theme.accentComplementary : Qt.lighter(Theme.accent, 1.4))
+                                fg: modelData.c === 0 ? SideState.primary : (modelData.c === 1 ? Theme.accentComplementary : Qt.lighter(SideState.primary, 1.4))
 
                                 SvgIcon {
                                     anchors.centerIn: parent

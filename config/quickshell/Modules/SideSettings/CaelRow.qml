@@ -42,7 +42,7 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter
             spacing: 2
 
-            ThemedText {
+            SideText {
                 Layout.fillWidth: true
                 text: root.label
                 customSize: 13
@@ -50,11 +50,11 @@ Rectangle {
                 elide: Text.ElideRight
             }
 
-            ThemedText {
+            SideText {
                 Layout.fillWidth: true
                 visible: root.desc !== ""
                 text: root.desc
-                color: Theme.muted
+                color: SideState.muted
                 customSize: 11
                 wrapMode: Text.WordWrap
             }
@@ -73,7 +73,7 @@ Rectangle {
             implicitWidth: 46
             implicitHeight: 26
             radius: 13
-            color: root.value ? Theme.accent : SideState.cardHi
+            color: root.value ? SideState.primary : SideState.cardHi
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -84,7 +84,7 @@ Rectangle {
                 height: width
                 anchors.verticalCenter: parent.verticalCenter
                 radius: width / 2
-                color: root.value ? Theme.opaqueBg : Theme.fg
+                color: root.value ? SideState.surface : SideState.fg
 
                 Behavior on x { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
                 Behavior on width { NumberAnimation { duration: Constants.animFast } }
@@ -118,11 +118,11 @@ Rectangle {
                     Rectangle {
                         anchors.fill: parent
                         radius: 15
-                        color: parent.modelData === 0 ? "transparent" : (bh.hovered ? Theme.bgAccent : SideState.cardHi)
+                        color: parent.modelData === 0 ? "transparent" : (bh.hovered ? SideState.selected : SideState.cardHi)
                         visible: parent.modelData !== 0
                     }
 
-                    ThemedText {
+                    SideText {
                         anchors.centerIn: parent
                         text: parent.modelData === 0 ? (root.value + root.suffix) : (parent.modelData < 0 ? "−" : "+")
                         font.bold: true
@@ -160,18 +160,18 @@ Rectangle {
                     width: lbl.implicitWidth + 24
                     height: 30
                     radius: 15
-                    color: root.value === modelData.value ? Theme.accent : (sh.hovered ? SideState.cardHi : "transparent")
+                    color: root.value === modelData.value ? SideState.primary : (sh.hovered ? SideState.cardHi : "transparent")
 
                     Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
-                    ThemedText {
+                    SideText {
                         id: lbl
 
                         anchors.centerIn: parent
                         text: parent.modelData.text
                         customSize: 12
                         font.bold: root.value === parent.modelData.value
-                        color: root.value === parent.modelData.value ? Theme.opaqueBg : Theme.fg
+                        color: root.value === parent.modelData.value ? SideState.surface : SideState.fg
                     }
 
                     HoverHandler {
@@ -197,7 +197,7 @@ Rectangle {
             radius: 17
             color: SideState.cardHi
             border.width: input.activeFocus ? 1 : 0
-            border.color: Theme.accent
+            border.color: SideState.primary
 
             TextInput {
                 id: input
@@ -207,9 +207,9 @@ Rectangle {
                 anchors.rightMargin: 14
                 verticalAlignment: TextInput.AlignVCenter
                 text: root.value === null ? "" : String(root.value)
-                color: Theme.fg
-                selectionColor: Theme.accent
-                selectedTextColor: Theme.opaqueBg
+                color: SideState.fg
+                selectionColor: SideState.primary
+                selectedTextColor: SideState.surface
                 echoMode: root.password ? TextInput.Password : TextInput.Normal
                 font.family: Constants.fontFamily
                 font.pixelSize: Math.round(12 * SettingsService.fontScale)
@@ -220,7 +220,7 @@ Rectangle {
                     visible: input.text === ""
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.placeholder
-                    color: Theme.muted
+                    color: SideState.muted
                     font: input.font
                 }
             }
@@ -234,17 +234,17 @@ Rectangle {
             implicitWidth: btnLabel.implicitWidth + 32
             implicitHeight: 32
             radius: 16
-            color: bth.hovered ? Theme.accent : SideState.cardHi
+            color: bth.hovered ? SideState.primary : SideState.cardHi
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
-            ThemedText {
+            SideText {
                 id: btnLabel
 
                 anchors.centerIn: parent
                 text: root.value === null ? "Run" : String(root.value)
                 font.bold: true
-                color: bth.hovered ? Theme.opaqueBg : Theme.fg
+                color: bth.hovered ? SideState.surface : SideState.fg
             }
 
             HoverHandler {
@@ -262,9 +262,9 @@ Rectangle {
     Component {
         id: infoC
 
-        ThemedText {
+        SideText {
             text: root.value === null ? "" : String(root.value)
-            color: Theme.muted
+            color: SideState.muted
             font.bold: true
         }
     }

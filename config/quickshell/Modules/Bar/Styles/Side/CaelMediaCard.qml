@@ -51,12 +51,12 @@ Item {
                 visible: art.status !== Image.Ready
                 icon: "music"
                 iconSize: 44
-                iconColor: Theme.muted
+                iconColor: SideState.muted
                 flat: true
             }
         }
 
-        ThemedText {
+        SideText {
             Layout.fillWidth: true
             Layout.topMargin: 4
             horizontalAlignment: Text.AlignHCenter
@@ -66,11 +66,11 @@ Item {
             elide: Text.ElideRight
         }
 
-        ThemedText {
+        SideText {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             text: root.player ? (root.player.trackArtist || "") : "Open a music player"
-            color: Theme.muted
+            color: SideState.muted
             elide: Text.ElideRight
         }
 
@@ -83,13 +83,13 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 6
             radius: 3
-            color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.12)
+            color: Qt.rgba(SideState.fg.r, SideState.fg.g, SideState.fg.b, 0.12)
 
             Rectangle {
                 width: parent.width * root.progress
                 height: parent.height
                 radius: 3
-                color: Theme.accent
+                color: SideState.primary
 
                 Behavior on width { NumberAnimation { duration: 400; easing.type: Easing.Linear } }
             }
@@ -123,7 +123,7 @@ Item {
                     Layout.preferredWidth: main ? 52 : 40
                     Layout.preferredHeight: main ? 52 : 40
                     radius: main ? (MprisService.isPlaying ? 16 : 26) : 20
-                    color: main ? Theme.accent : (bh.hovered ? SideState.cardHi : SideState.card)
+                    color: main ? SideState.primary : (bh.hovered ? SideState.cardHi : SideState.card)
 
                     Behavior on radius { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack } }
                     Behavior on color { ColorAnimation { duration: Constants.animFast } }
@@ -132,7 +132,7 @@ Item {
                         anchors.centerIn: parent
                         icon: btn.main ? (MprisService.isPlaying ? "player-pause" : "player-play") : btn.modelData.icon
                         iconSize: btn.main ? 22 : 18
-                        iconColor: btn.main ? Theme.opaqueBg : Theme.fg
+                        iconColor: btn.main ? SideState.surface : SideState.fg
                         flat: true
                     }
 

@@ -72,7 +72,7 @@ def generate_palette(histogram_colors):
 
     bg_s = max(0.10, min(0.20, dominant_sat * 0.5))
     bg_val_dark = force_hsl(dominant_hue, bg_s, bg_color["l"], bg_s, 0.04)
-    bg_val_light = force_hsl(dominant_hue, bg_s, bg_color["l"], bg_s, 0.92)
+    bg_val_light = force_hsl(dominant_hue, bg_s, bg_color["l"], bg_s * 0.8, 0.955)
 
     top_colors = color_objs[:10]
     colorful_top = [c for c in top_colors if get_chroma(c) >= 0.08]

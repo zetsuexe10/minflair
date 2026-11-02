@@ -25,7 +25,7 @@ ColumnLayout {
     RowLayout {
         Layout.fillWidth: true
 
-        ThemedText {
+        SideText {
             Layout.fillWidth: true
             text: "Bluetooth"
             font.bold: true
@@ -38,9 +38,9 @@ ColumnLayout {
             implicitWidth: 44
             implicitHeight: 24
             radius: 12
-            color: (root.adapter && root.adapter.enabled) ? Theme.accent : Theme.bgSecondary
+            color: (root.adapter && root.adapter.enabled) ? SideState.primary : SideState.card
             border.width: 1
-            border.color: Theme.border
+            border.color: SideState.outline
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -50,7 +50,7 @@ ColumnLayout {
                 radius: 9
                 y: 3
                 x: (root.adapter && root.adapter.enabled) ? parent.width - width - 3 : 3
-                color: (root.adapter && root.adapter.enabled) ? Theme.opaqueBg : Theme.fg
+                color: (root.adapter && root.adapter.enabled) ? SideState.surface : SideState.fg
 
                 Behavior on x { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutCubic } }
             }
@@ -64,16 +64,16 @@ ColumnLayout {
         }
     }
 
-    ThemedText {
+    SideText {
         visible: root.adapter && root.adapter.enabled && root.devices.length === 0
         text: "No paired devices"
-        color: Theme.muted
+        color: SideState.muted
     }
 
-    ThemedText {
+    SideText {
         visible: root.adapter && !root.adapter.enabled
         text: "Bluetooth is off"
-        color: Theme.muted
+        color: SideState.muted
     }
 
     Repeater {
@@ -87,7 +87,7 @@ ColumnLayout {
             Layout.fillWidth: true
             implicitHeight: 40
             radius: 12
-            color: modelData.connected ? Theme.bgAccent : (hover.hovered ? Theme.bgSecondary : "transparent")
+            color: modelData.connected ? SideState.selected : (hover.hovered ? SideState.card : "transparent")
 
             Behavior on color { ColorAnimation { duration: Constants.animFast } }
 
@@ -99,16 +99,16 @@ ColumnLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 0
 
-                ThemedText {
+                SideText {
                     Layout.fillWidth: true
                     text: row.modelData.name || row.modelData.deviceName || "Device"
                     elide: Text.ElideRight
                 }
 
-                ThemedText {
+                SideText {
                     text: row.modelData.connected ? "Connected" + (row.modelData.batteryAvailable ? " · " + Math.round(row.modelData.battery * 100) + "%" : "") : "Not connected"
                     customSize: 10
-                    color: row.modelData.connected ? Theme.accent : Theme.muted
+                    color: row.modelData.connected ? SideState.primary : SideState.muted
                 }
             }
 
