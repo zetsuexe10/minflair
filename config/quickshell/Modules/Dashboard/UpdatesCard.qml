@@ -17,7 +17,8 @@ Card {
     readonly property bool isUpdating: UpdateService.isSystemUpdating
 
     function runUpdate() {
-        Quickshell.execDetached(["x-terminal-emulator", "-e", "sh", "-c", "sudo apt update && sudo apt full-upgrade; echo; echo Done. Press Enter.; read _"]);
+        const upd = "if command -v paru >/dev/null; then paru -Syu; elif command -v yay >/dev/null; then yay -Syu; elif command -v pacman >/dev/null; then sudo pacman -Syu; elif command -v apt >/dev/null; then sudo apt update && sudo apt full-upgrade; elif command -v dnf >/dev/null; then sudo dnf upgrade; fi; echo; echo Done. Press Enter.; read _";
+        Quickshell.execDetached(["sh", "-c", "t=${TERMINAL:-}; for c in \"$t\" kitty foot alacritty wezterm konsole gnome-terminal x-terminal-emulator xterm; do [ -n \"$c\" ] && command -v \"$c\" >/dev/null && { exec \"$c\" -e sh -c \"$1\"; }; done", "sh", upd]);
     }
 
     contentPadding: Constants.sizeMd
@@ -143,7 +144,7 @@ Card {
 
                             let total = (parseInt(root.pacmanUpdates) || 0) + (parseInt(root.aurUpdates) || 0);
                             if (total > 0)
-                                return "APT: " + root.pacmanUpdates;
+                                return "Updates: " + (parseInt(root.pacmanUpdates) || 0) + ((parseInt(root.aurUpdates) || 0) > 0 ? " + " + root.aurUpdates + " AUR" : "");
 
                             return "All packages are currently up to date";
                         }

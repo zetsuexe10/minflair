@@ -43,7 +43,8 @@ Item {
     Process {
         id: pacmanProc
 
-        command: ["sh", "-c", "apt list --upgradable 2>/dev/null | grep -c upgradable || true"]
+        // distro-agnostic: pacman (Arch), apt (Debian/Ubuntu), dnf (Fedora)
+        command: ["sh", "-c", "if command -v checkupdates >/dev/null; then checkupdates 2>/dev/null | wc -l; elif command -v pacman >/dev/null; then pacman -Qu 2>/dev/null | wc -l; elif command -v apt >/dev/null; then apt list --upgradable 2>/dev/null | grep -c upgradable || true; elif command -v dnf >/dev/null; then dnf -q check-update 2>/dev/null | grep -cE '^[A-Za-z0-9_.+-]+\\.[A-Za-z0-9_]+ ' || true; else echo 0; fi"]
 
         stdout: SplitParser {
             onRead: (data) => {
@@ -56,7 +57,7 @@ Item {
     Process {
         id: aurProc
 
-        command: ["sh", "-c", "echo 0"]
+        command: ["sh", "-c", "if command -v paru >/dev/null; then paru -Qua 2>/dev/null | wc -l; elif command -v yay >/dev/null; then yay -Qua 2>/dev/null | wc -l; else echo 0; fi"]
 
         stdout: SplitParser {
             onRead: (data) => {
@@ -69,7 +70,7 @@ Item {
     Process {
         id: checkLockProc
 
-        command: ["sh", "-c", "pgrep -x 'apt|apt-get|dpkg|aptitude' >/dev/null"]
+        command: ["sh", "-c", "pgrep -x 'pacman|paru|yay|apt|apt-get|dpkg|aptitude|dnf' >/dev/null"]
         onExited: (code) => {
             updateService.isSystemUpdating = (code === 0);
         }
