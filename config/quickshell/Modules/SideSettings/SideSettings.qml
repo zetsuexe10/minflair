@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import qs.Core
 import qs.Core.Components
 import qs.Core.Services
+import Quickshell.Io
 import qs.Core.Windows
 import qs.Modules.Bar.Styles.Side
 
@@ -25,6 +26,11 @@ AppWindow {
             { "name": "Position", "rows": [
                 { "kind": "select", "label": "Position", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": positionOptions },
                 { "kind": "stepper", "label": "Workspaces", "desc": "Total number; the bar shows five at a time and follows the active one", "prop": "numberOfWorkspaces", "from": 1, "to": 20, "step": 1 }
+            ] },
+            { "name": "Launcher button", "rows": [
+                { "kind": "text", "label": "Button image", "desc": "PNG, SVG or JPG path (e.g. ~/Pictures/logo.png). Leave empty for the default icon", "cfg": ["logoImage"], "placeholder": "~/Pictures/logo.png" },
+                { "kind": "button", "label": "Choose image", "desc": "Pick a file from a dialog", "action": "browseLogo", "value": "Browse" },
+                { "kind": "button", "label": "Reset image", "desc": "Go back to the built-in icon", "action": "resetLogo", "value": "Reset" }
             ] },
             { "name": "Entries", "rows": [
                 { "kind": "toggle", "label": "Launcher button", "desc": "Opens the launcher", "cfg": ["entries", "logo"] },
@@ -149,6 +155,23 @@ AppWindow {
     function act(row) {
         if (row.action === "githubRefresh")
             GithubService.fetchData();
+        else if (row.action === "resetLogo")
+            SettingsService.setSideCfg("logoImage", undefined, "");
+        else if (row.action === "browseLogo")
+            logoPicker.running = true;
+    }
+
+    Process {
+        id: logoPicker
+
+        command: ["sh", "-c", "zenity --file-selection --title='Launcher button image' --file-filter='Images | *.png *.svg *.jpg *.jpeg *.webp' 2>/dev/null || kdialog --getopenfilename \"$HOME\" 'image/*' 2>/dev/null"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const p = text.trim();
+                if (p !== "")
+                    SettingsService.setSideCfg("logoImage", undefined, p);
+            }
+        }
     }
 
     widgetId: "minflair_side_settings"

@@ -1,4 +1,5 @@
 pragma Singleton
+import Quickshell
 import QtQuick
 import Quickshell.Io
 import Quickshell.Services.Pipewire
@@ -19,6 +20,16 @@ QtObject {
     readonly property int rounding: SettingsService.sideCfg("rounding")
     readonly property int railSize: 36
     readonly property int barThickness: 44
+
+    // custom launcher button image (absolute path or ~/..., empty = built-in icon)
+    readonly property string logoSource: {
+        let p = String(SettingsService.sideCfg("logoImage") || "").trim();
+        if (p === "")
+            return "";
+        if (p.indexOf("~/") === 0)
+            p = Quickshell.env("HOME") + p.substring(1);
+        return p.indexOf("file://") === 0 || p.indexOf("/") !== 0 ? p : "file://" + p;
+    }
 
     // Caelestia-like Material palette for the whole side desktop, derived from the accent hue so
     // it follows light/dark mode and the wallpaper theme but keeps its own softer personality.

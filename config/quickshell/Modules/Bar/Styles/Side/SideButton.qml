@@ -9,6 +9,7 @@ Item {
     property string icon: ""
     property string label: ""
     property color iconColor: SideState.fg
+    property string imageSource: ""
     property bool active: false
     property int iconSize: Constants.sizeLg
     property int size: 28
@@ -32,8 +33,25 @@ Item {
         Behavior on scale { NumberAnimation { duration: Constants.animUltraFast } }
     }
 
+    Image {
+        id: img
+
+        readonly property int box: Math.round(root.size * 0.62)
+
+        visible: status === Image.Ready
+        anchors.centerIn: parent
+        width: box
+        height: box
+        source: root.imageSource
+        sourceSize: Qt.size(box * 2, box * 2)
+        fillMode: Image.PreserveAspectFit
+        asynchronous: true
+        smooth: true
+        mipmap: true
+    }
+
     SvgIcon {
-        visible: root.icon !== ""
+        visible: root.icon !== "" && !img.visible
         anchors.centerIn: parent
         icon: root.icon
         iconColor: root.iconColor
