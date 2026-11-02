@@ -39,6 +39,8 @@ QtObject {
     readonly property color fg: Qt.hsla(hue, dark ? 0.12 : 0.22, dark ? 0.91 : 0.13, 1)
     readonly property color muted: Qt.hsla(hue, dark ? 0.08 : 0.12, dark ? 0.66 : 0.40, 1)
     readonly property color primary: Qt.hsla(hue, dark ? 0.80 : 0.55, dark ? 0.76 : 0.42, 1)
+    readonly property color secondary: Qt.hsla((hue + 0.14) % 1, dark ? 0.70 : 0.50, dark ? 0.74 : 0.44, 1)
+    readonly property color tertiary: Qt.hsla((hue + 0.58) % 1, dark ? 0.62 : 0.48, dark ? 0.74 : 0.44, 1)
     readonly property color onPrimary: Qt.hsla(hue, dark ? 0.40 : 0.60, dark ? 0.16 : 0.98, 1)
     readonly property color card: Qt.tint(surface, Qt.rgba(fg.r, fg.g, fg.b, dark ? 0.07 : 0.055))
     readonly property color cardHi: Qt.tint(surface, Qt.rgba(fg.r, fg.g, fg.b, dark ? 0.13 : 0.10))

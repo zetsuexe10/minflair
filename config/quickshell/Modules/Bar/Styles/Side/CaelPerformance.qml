@@ -23,13 +23,15 @@ Item {
         spacing: 10
 
         Repeater {
-            model: root.items.filter(i => i.show !== false)
+            model: root.items.length
 
             CaelCard {
                 id: card
 
-                required property var modelData
+                required property int index
+                readonly property var modelData: root.items[index]
 
+                visible: modelData.show !== false
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 corner: 30
@@ -44,7 +46,7 @@ Item {
                         height: 130
                         stroke: 10
                         value: card.modelData.v / 100
-                        fg: card.modelData.c === 0 ? SideState.primary : (card.modelData.c === 1 ? Theme.accentComplementary : (card.modelData.c === 2 ? Qt.lighter(SideState.primary, 1.3) : Qt.darker(Theme.accentComplementary, 1.1)))
+                        fg: card.modelData.c === 0 ? SideState.primary : (card.modelData.c === 1 ? SideState.secondary : (card.modelData.c === 2 ? SideState.tertiary : Qt.darker(SideState.secondary, 1.1)))
 
                         Column {
                             anchors.centerIn: parent

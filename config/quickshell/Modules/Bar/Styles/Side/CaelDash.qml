@@ -404,22 +404,23 @@ Item {
                         spacing: 12
 
                         Repeater {
-                            model: [
-                                { "icon": "cpu", "v": SystemStats.cpuUsage / 100, "c": 0 },
-                                { "icon": "memory", "v": SystemStats.memUsage / 100, "c": 1 },
-                                { "icon": "disk", "v": SystemStats.disks.length > 0 ? SystemStats.disks[0].usage / 100 : 0, "c": 2 }
-                            ]
+                            model: 3
 
                             CaelGauge {
                                 id: gauge
 
-                                required property var modelData
+                                required property int index
+                                readonly property var modelData: [
+                                    { "icon": "cpu", "v": SystemStats.cpuUsage / 100, "c": 0 },
+                                    { "icon": "memory", "v": SystemStats.memUsage / 100, "c": 1 },
+                                    { "icon": "disk", "v": SystemStats.disks.length > 0 ? SystemStats.disks[0].usage / 100 : 0, "c": 2 }
+                                ][index]
 
                                 width: 58
                                 height: 58
                                 stroke: 5
                                 value: modelData.v
-                                fg: modelData.c === 0 ? SideState.primary : (modelData.c === 1 ? Theme.accentComplementary : Qt.lighter(SideState.primary, 1.4))
+                                fg: modelData.c === 0 ? SideState.primary : (modelData.c === 1 ? SideState.secondary : SideState.tertiary)
 
                                 SvgIcon {
                                     anchors.centerIn: parent
