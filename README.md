@@ -1,150 +1,61 @@
-# Minflair for Debian 13 (trixie)
+# Minflair Quickshell: Side + Island
 
-Quickshell desktop shell (bar styles, launcher, control center, notifications, music, clipboard, wallpaper
-selector, lock screen) with Hyprland dotfiles and an optional Quickshell login screen. Ported from
-[t4lentles5/minflair](https://github.com/t4lentles5/minflair) (GPL-3.0).
+The Quickshell configuration of Minflair with two bar styles, for **Arch Linux** (and anything else with
+Hyprland and Quickshell 0.3 or newer):
 
-## Requirements
-- Hyprland 0.55+ (Lua config; `trixie-backports`)
-- Quickshell 0.3 (not in trixie; the CI builds a `.deb`)
-- Packages: `./tools/check-deps.sh` lists what is missing and changes nothing
+- **Side**: a Caelestia-style desktop. A frame around the screen (or a floating round *island* capsule that
+  grows when hovered), hover panels, a Caelestia dashboard (Dashboard / Media / Performance / Weather), a bottom
+  launcher, power panel, volume/brightness OSD, Wi-Fi / Bluetooth / sound popouts and its own settings panel. AMOLED by default.
+- **Island**: the dynamic-island bar, with widgets expanding out of it.
 
-Defaults: terminal `foot`, wallpapers `swaybg`, GTK theme `adw-gtk3`, cursor `Vimix-cursors` at size 16
-(not packaged in Debian: `git clone https://github.com/vinceliuice/Vimix-cursors && cd Vimix-cursors && ./install.sh`;
-Adwaita is used until it is installed).
+Only the Quickshell config is in this branch: no compositor config, greeter or installer.
 
 ## Install
-```bash
-./install.sh --no-apt              # configs only (packages already installed)
-./install.sh --no-apt --greeter    # same, plus the login screen
-./install.sh                       # CI zip only: also installs the .deb and all packages
+```sh
+sudo pacman -S hyprland quickshell python python-pillow socat wl-clipboard brightnessctl playerctl \
+     swaybg grim slurp imagemagick networkmanager bluez bluez-utils pipewire wireplumber ttf-inter
+# quickshell must be 0.3+; if the repo version is older use quickshell-git from the AUR
+git clone -b quickshell-side-island https://github.com/zetsuexe10/minflair ~/minflair
+mkdir -p ~/.config && cp -r ~/minflair/config/quickshell ~/.config/quickshell
+qs            # or: exec-once = qs   in your Hyprland config
 ```
-Existing `~/.config/quickshell` and `~/.config/hypr` are moved to `.bak.<date>`.
-Put wallpapers in `~/Pictures/Wallpapers`, then log in to a Hyprland session.
+Optional: `paru -S adw-gtk3` for the GTK theme the shell recolours, `qt6ct` for Qt apps, `zenity` for file pickers.
 
-## Layout
-| Path | Purpose |
-| :-- | :-- |
-| `config/quickshell/` | the shell, installed to `~/.config/quickshell` |
-| `config/hypr/` | Hyprland config and helper scripts, installed to `~/.config/hypr` |
-| `greeter/` | login screen (QML, `sessions.py`, `components/`, `assets/`) |
-| `install.sh`, `uninstall.sh` | install / remove the user configs |
-| `tools/check-deps.sh` | report missing packages |
-| `tools/doctor.sh` | diagnose a shell that does not load or crashes |
-| `tools/install-greeter.sh` | install or revert the login screen (root) |
-| `tools/greeter-launch.sh` | greetd entry point (cage + Quickshell, gtkgreet fallback) |
-| `ci/`, `.github/` | Quickshell `.deb` build, smoke test, release zip |
-
-## Login screen
-A Quickshell greeter that runs on greetd inside cage. It shows the user, password and a session picker with
-readable names (Hyprland, Hyprland (uwsm), labwc, Openbox, FlickOS, ...), read from `/usr/share/wayland-sessions`
-and `/usr/share/xsessions`. Colours and the blurred wallpaper follow the shell: choosing a wallpaper
-(`Ctrl+Alt+W`) regenerates them.
-
-```bash
-sudo tools/install-greeter.sh            # install (disables SDDM, enables greetd)
-sudo tools/install-greeter.sh --revert   # restore the original greeter
-sudo systemctl restart greetd            # apply without rebooting (ends the graphical session)
+## Hyprland binds (hyprland.conf)
 ```
-If the greeter fails within a few seconds of starting, the stock gtkgreet screen is used instead.
-Log: `/var/tmp/minflair-greeter/greeter.log`. The layout and icons are adapted from the Archcraft SDDM theme
-(GPLv3, see `greeter/assets/NOTICE`).
+exec-once = qs
+bind = SUPER, A,      exec, socat - UNIX-CONNECT:/tmp/quickshell_launcher
+bind = SUPER, V,      exec, socat - UNIX-CONNECT:/tmp/quickshell_clipboard
+bind = CTRL ALT, W,   exec, socat - UNIX-CONNECT:/tmp/quickshell_wallpaper
+bind = CTRL ALT, X,   exec, socat - UNIX-CONNECT:/tmp/quickshell_powerMenu
+bind = CTRL ALT, S,   exec, socat - UNIX-CONNECT:/tmp/quickshell_controlCenter
+bind = SUPER SHIFT, S, exec, socat - UNIX-CONNECT:/tmp/quickshell_screenshot
+bind = SUPER CTRL, S, exec, socat - UNIX-CONNECT:/tmp/quickshell_minflair_side_settings
+bind = SUPER ALT, 1,  exec, qs ipc call bar set island
+bind = SUPER ALT, 2,  exec, qs ipc call bar set side
+```
+With Hyprland's Lua config use `hl.bind(mod .. " + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_launcher"))`.
 
-## Keybinds (`Super+K` shows them in the shell)
-`Super` = mod key.
+## Side style
+- **Settings** (`Super+Ctrl+S`): bar position and entries, launcher button image, layout (frame or island, alignment, offset),
+  colours (AMOLED / Dark / Light / follow theme), hover panels, dashboard and weather, wallpaper folders, GitHub,
+  and **App Appearance**.
+- **Island layout**: Settings > Layout > Island mode. A round capsule with the launcher and workspaces; hover it and it grows to
+  the whole bar. Put it on any edge, at the start, centre or end, with an offset.
+- **Wallpapers**: `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders too). Arrow keys browse, Enter sets.
+- **Scroll** the first half of the bar for volume, the second half for brightness, the workspaces to switch.
 
-| Apps | |
-| :-- | :-- |
-| `Super+Return` / `Super+Shift+Return` | foot / floating foot |
-| `Super+E` / `Super+B` | file manager (nautilus) / browser |
-| `Super+Shift+C` | colour picker |
-| `Super+Space` | switch keyboard layout |
-
-| Shell widgets | |
-| :-- | :-- |
-| `Super+A` | launcher (apps, calculator, `g`/`yt`/`w`/`gh`/`ddg` web search, `> settings`) |
-| `Ctrl+Alt+S` | control center (wifi, bluetooth, volume, brightness) |
-| `Ctrl+Alt+D` / `Ctrl+Alt+M` | dashboard / music |
-| `Ctrl+Alt+N` / `Ctrl+Alt+C` | notifications / calendar |
-| `Ctrl+Alt+F` / `Ctrl+Alt+T` | system usage / pomodoro |
-| `Ctrl+Alt+W` | wallpaper selector (also regenerates the theme) |
-| `Ctrl+Alt+X` | power menu |
-| `Super+V` | clipboard history |
-| `Super+Shift+S` | screenshot / recording |
-| `Super+S` | Minflair settings |
-| `Super+L` | lock screen |
-| `Super+R` | restart the shell |
-
-| Windows | |
-| :-- | :-- |
-| `Super+Q` | close |
-| `Super+W` | toggle floating |
-| `Super+F` / `Super+Shift+F` | maximize / fullscreen |
-| `Super+J` / `Super+P` | toggle split / pseudo-tile |
-| `Super+C` / `Super+Shift+P` | center floating / pin |
-| `Super+N` / `Super+Shift+N` | minimize / restore minimized |
-| `Super+G` / `Super+Tab` / `Super+Shift+G` | group / cycle group / lock group |
-| `Super+Shift+M` | exit Hyprland |
-
-| Bar style | |
-| :-- | :-- |
-| `Super+Alt+B` / `Super+Alt+Shift+B` | next / previous bar style |
-| `Super+Alt+1` / `2` / `3` | Convex / Island / Side bar |
-| `Super+Ctrl+S` | Shell settings: side bar, dashboard, GitHub |
-
-Shell command behind them: `qs ipc call bar cycle|prev|get|set <convex|island|side>`. The style is also in Settings > Bar.
-
-The **Side** style is modelled on Caelestia: a solid frame around the screen with rounded inner corners, thick on the
-bar's edge, and panels that grow out of it. The bar can sit on the left, right, top or bottom.
-
-- **Bar:** launcher, workspaces (five slots following the active one), focused window title, tray, status icons
-  (network, Bluetooth, volume, brightness, keyboard layout, lock keys, notifications), clock, power. No battery.
-  Each entry can be turned off.
-- **Hover panels:** the power panel opens on the right edge or the power button, the dashboard on the top edge, the
-  launcher (off by default) on the bottom edge. The Wi-Fi, Bluetooth, sound, calendar and notification panels open
-  from their bar icons.
-- **Scroll:** over the first half of the bar changes volume, over the second half brightness, over the workspaces
-  switches workspace. A vertical indicator on the right edge shows the change.
-- **Dashboard:** Dashboard / Media / Performance / Weather tabs with a sliding indicator; Left/Right, Tab and Home/End
-  switch tabs, Escape closes. The last tab you used is remembered.
-- **Settings:** `Super+Ctrl+S` opens the shell panel: bar entries and launcher button image, frame, hover panels,
-  dashboard and weather, wallpaper folders, GitHub, and **App Appearance** (GTK/Qt font and size, icon theme, cursor
-  theme and size). App Appearance is written to `~/.minflair` only, so it never changes your other desktops or the
-  shell's own font.
-- **Wallpapers:** `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders included) by default; the list is
-  editable in the panel. Arrow keys browse, Enter sets.
-- **Colours:** the side style derives its own palette from the theme accent, so light and dark mode both stay soft.
-
-| Navigation | |
-| :-- | :-- |
-| `Super+Arrows` | focus |
-| `Super+Shift+Arrows` | move window |
-| `Super+Alt+Arrows` | resize |
-| `Super+Alt+Shift+Arrows` | swap |
-| `Super+1..0` / `Super+Shift+1..0` | workspace / send window there |
-| `Super+Ctrl+Left/Right`, `Super+Scroll` | previous / next workspace |
-| `Super+Mouse left/right drag` | move / resize window |
-
-Media, volume, brightness, mic-mute, touchpad and Caps/Num-lock keys work with an on-screen display.
+## App Appearance (GTK / Qt, this shell only)
+GTK theme, app font and size, icon theme, cursor theme and size. Written to `~/.minflair` (an `XDG_CONFIG_HOME` overlay
+that links back to `~/.config`), never to `~/.config/gtk-*`, `qt*ct` or gsettings. Apps started afterwards use it; for a
+permanent effect add to hyprland.conf:
+```
+env = XDG_CONFIG_HOME,$HOME/.minflair/xdg
+env = QT_QPA_PLATFORMTHEME,qt6ct
+```
+The shell font is separate from the app font.
 
 ## Troubleshooting
-- Shell or a widget does not load, or `qs` crashes: run `./tools/doctor.sh` inside Hyprland and send the output.
-  Widgets open through `/tmp/quickshell_*` sockets, which exist only after the shell loaded without errors.
-  Crash reports are in `~/.cache/quickshell/crashes/`; the full log is `qs log`.
-- Login screen: read `/var/tmp/minflair-greeter/greeter.log` and `sudo journalctl -b -u greetd`.
-- Lock screen rejects the password: it authenticates through libpam; no extra Python package is needed.
-
-## Theme isolation
-Minflair never edits `~/.config/gtk-*`, `~/.config/qt*ct` or gsettings. The generated GTK (adw-gtk3) and Qt (qt6ct)
-theme is written to `~/.minflair/xdg`, which the Hyprland session uses as `XDG_CONFIG_HOME` (every other entry
-links back to `~/.config`). Only apps started from that session see it. To remove: `./uninstall.sh`, then delete `~/.minflair`.
-
-## Differences from the Arch version
-- apt/dpkg instead of pacman/yay; no Package Manager window; foot instead of kitty.
-- swaybg instead of awww (no wallpaper transitions).
-- Window rounding 12 (was 32); the lock screen is Quickshell's, hyprlock is not used.
-- Only GTK, Qt, Hyprland and greeter colours are generated.
-
-## Build
-`.github/workflows/debian-trixie.yml` builds Quickshell on trixie, packages the `.deb`, smoke-tests the config and
-publishes `minflair-quickshell-trixie.zip` (workflow artifact; release asset on `v*` tags).
+- Nothing loads: run `qs` in a terminal and read the errors; `qs log` shows the last run.
+- Keyboard does not work in the launcher/wallpaper picker: run `qs log | grep "side overlay focus"` and send the output.
+- Package updates are detected for pacman, AUR (paru/yay), apt and dnf.

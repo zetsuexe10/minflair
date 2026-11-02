@@ -27,7 +27,7 @@ Item {
     property bool clockShowDate: true
     property string cursorTheme: "Vimix-cursors"
     property int cursorSize: 16
-    property string barStyle: "convex"
+    property string barStyle: "island"
     // Side bar style (third style): its own placement and options
     property string sideBarPosition: "left"
     property bool sideBarPopouts: true
@@ -75,7 +75,7 @@ Item {
     // folders searched for wallpapers (recursively); ~ is expanded
     property var wallpaperDirs: ["~/Pictures/Wallpapers", "/usr/share/backgrounds"]
     property int sideDashTab: 0
-    readonly property var barStyles: ["convex", "island", "side"]
+    readonly property var barStyles: ["island", "side"]
     readonly property var barStyleNames: ({
         "convex": "Convex",
         "island": "Island",
@@ -524,7 +524,7 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                             if (settingsService.barStyles.indexOf(prefs.barStyle) !== -1)
                                 settingsService.barStyle = prefs.barStyle;
                             else
-                                settingsService.barStyle = "convex";
+                                settingsService.barStyle = "island";
                         }
                         if (["left", "right", "top", "bottom"].indexOf(prefs.sideBarPosition) !== -1)
                             settingsService.sideBarPosition = prefs.sideBarPosition;

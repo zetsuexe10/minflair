@@ -146,7 +146,7 @@ def hypr(*args):
 
 def session_env():
     """Make the Minflair overlay the config home of apps started from now on (no re-login)."""
-    script = os.path.join(HOME, ".config/hypr/scripts/minflair-env.sh")
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "minflair-env.sh")
     if os.path.exists(script):
         try:
             subprocess.run([script], capture_output=True, timeout=20)
