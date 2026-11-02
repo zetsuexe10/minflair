@@ -16,7 +16,12 @@ QtObject {
 
     // geometry shared by the bar, the frame and the panels
     readonly property string position: SettingsService.sideBarPosition
-    readonly property bool frame: SettingsService.sideCfg("frame")
+    // island: the bar is a floating capsule (any edge, start/centre/end + offset) instead of a frame
+    readonly property bool island: SettingsService.sideCfg("island")
+    readonly property string islandAlign: SettingsService.sideCfg("align")     // start, center, end
+    readonly property int islandOffset: SettingsService.sideCfg("offset")
+    readonly property int islandGap: 10
+    readonly property bool frame: SettingsService.sideCfg("frame") && !island
     readonly property int border: SettingsService.sideCfg("border")
     readonly property int rounding: SettingsService.sideCfg("rounding")
     readonly property int railSize: 36
@@ -68,7 +73,7 @@ QtObject {
     // thickness reserved on one screen edge: the bar's edge is thick, the others only carry the frame
     function inset(edge) {
         if (edge === position)
-            return barThickness;
+            return island ? railSize + islandGap * 2 : barThickness;
         return frame ? border : 0;
     }
 

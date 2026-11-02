@@ -444,7 +444,9 @@ PanelWindow {
 
         visible: opacity > 0.01
         opacity: (root.open && root.isCentered) ? 1 : 0
-        scale: (root.open && root.isCentered) ? 1 : 0.94
+        // island mode: widgets expand out of the capsule's side, like the Island bar
+        transformOrigin: SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center
+        scale: (root.open && root.isCentered) ? 1 : (SideState.island ? 0.5 : 0.94)
         width: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
         height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
         x: Math.round(root.insL + (root.freeW - width) / 2)
@@ -455,7 +457,7 @@ PanelWindow {
         border.color: SideState.outline
 
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
+        Behavior on scale { NumberAnimation { duration: SideState.island ? Constants.animSlow : Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: SideState.island ? 0.9 : 0.6 } }
 
         MouseArea {
             anchors.fill: parent

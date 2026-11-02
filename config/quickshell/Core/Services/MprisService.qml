@@ -200,7 +200,9 @@ Item {
     }
 
     function updatePlayer() {
-        let players = managedPlayers;
+        // always read the live model: never keep references to players that may already be gone
+        let players = Mpris.players && Mpris.players.values ? Mpris.players.values : [];
+        managedPlayers = players;
         let matchingPlaying = null;
         let matchingPaused = null;
         for (let i = 0; i < players.length; i++) {
@@ -228,21 +230,14 @@ Item {
     }
 
     function registerPlayer(p) {
-        let list = managedPlayers;
-        if (list.indexOf(p) === -1) {
-            list.push(p);
-            managedPlayers = list;
-            updatePlayer();
-        }
+        Qt.callLater(updatePlayer);
     }
 
     function unregisterPlayer(p) {
-        let list = managedPlayers, idx = list.indexOf(p);
-        if (idx !== -1) {
-            list.splice(idx, 1);
-            managedPlayers = list;
-            updatePlayer();
-        }
+        // the player object is being destroyed: drop it before anything touches it again
+        if (root.activePlayer === p)
+            root.activePlayer = null;
+        Qt.callLater(updatePlayer);
     }
 
     function formatTime(s) {
@@ -386,8 +381,8 @@ Item {
 
         delegate: QtObject {
             property var p: modelData
-            property var state: p.playbackState
-            property var title: p.trackTitle
+            property var state: p ? p.playbackState : 0
+            property var title: p ? p.trackTitle : ""
 
             onStateChanged: root.updatePlayer()
             onTitleChanged: root.updatePlayer()

@@ -27,18 +27,30 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-side-bar"
-    WlrLayershell.exclusiveZone: shown ? barWidth : 0
+    readonly property bool island: SideState.island
+    readonly property string align: SideState.islandAlign
+    readonly property real islandLen: (content.item ? (vertical ? content.item.implicitHeight : content.item.implicitWidth) : 0) + 16
+
+    WlrLayershell.exclusiveZone: shown ? (island ? 0 : barWidth) : 0
     color: "transparent"
     focusable: false
     visible: SettingsService.settingsLoaded
-    implicitWidth: vertical ? barWidth : 0
-    implicitHeight: vertical ? 0 : barWidth
+    implicitWidth: vertical ? barWidth : (island ? islandLen : 0)
+    implicitHeight: vertical ? (island ? islandLen : 0) : barWidth
 
     anchors {
-        top: root.position !== "bottom"
-        bottom: root.position !== "top"
-        left: root.position !== "right"
-        right: root.position !== "left"
+        top: root.vertical ? (!root.island || root.align === "start") : root.position === "top"
+        bottom: root.vertical ? (!root.island || root.align === "end") : root.position === "bottom"
+        left: root.vertical ? root.position === "left" : (!root.island || root.align === "start")
+        right: root.vertical ? root.position === "right" : (!root.island || root.align === "end")
+    }
+
+    // floating capsule: gap to the screen edge, offset along it
+    margins {
+        top: root.island ? (root.position === "top" ? SideState.islandGap - root.edge : (root.vertical && root.align === "start" ? SideState.islandOffset : 0)) : 0
+        bottom: root.island ? (root.position === "bottom" ? SideState.islandGap - root.edge : (root.vertical && root.align === "end" ? SideState.islandOffset : 0)) : 0
+        left: root.island ? (root.position === "left" ? SideState.islandGap - root.edge : (!root.vertical && root.align === "start" ? SideState.islandOffset : 0)) : 0
+        right: root.island ? (root.position === "right" ? SideState.islandGap - root.edge : (!root.vertical && root.align === "end" ? SideState.islandOffset : 0)) : 0
     }
 
     // only the rail itself takes input
@@ -85,16 +97,28 @@ PanelWindow {
             }
         }
 
+        // the island's own surface
+        Rectangle {
+            anchors.fill: parent
+            visible: root.island
+            radius: root.railSize / 2 + 2
+            color: SideState.surface
+            border.width: 1
+            border.color: SideState.outline
+        }
+
         Loader {
+            id: content
+
             anchors.fill: parent
             active: root.isActive
 
             sourceComponent: GridLayout {
                 anchors.fill: parent
-                anchors.topMargin: root.vertical ? 12 : 0
-                anchors.bottomMargin: root.vertical ? 12 : 0
-                anchors.leftMargin: root.vertical ? 0 : 12
-                anchors.rightMargin: root.vertical ? 0 : 12
+                anchors.topMargin: root.vertical ? (root.island ? 8 : 12) : 0
+                anchors.bottomMargin: root.vertical ? (root.island ? 8 : 12) : 0
+                anchors.leftMargin: root.vertical ? 0 : (root.island ? 8 : 12)
+                anchors.rightMargin: root.vertical ? 0 : (root.island ? 8 : 12)
                 flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
                 rows: root.vertical ? 99 : 1
                 columns: root.vertical ? 1 : 99
@@ -128,7 +152,7 @@ PanelWindow {
                 }
 
                 SideActiveWindow {
-                    visible: SettingsService.sideCfg("entries", "activeWindow")
+                    visible: SettingsService.sideCfg("entries", "activeWindow") && !root.island
                     vertical: root.vertical
                     Layout.alignment: Qt.AlignCenter
                     Layout.fillHeight: root.vertical

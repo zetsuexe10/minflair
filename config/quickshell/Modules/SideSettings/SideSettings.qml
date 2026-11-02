@@ -19,6 +19,7 @@ AppWindow {
 
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
+    readonly property var alignOptions: [{ "text": "Start", "value": "start" }, { "text": "Centre", "value": "center" }, { "text": "End", "value": "end" }]
     readonly property var modeOptions: [{ "text": "AMOLED", "value": "amoled" }, { "text": "Dark", "value": "dark" }, { "text": "Light", "value": "light" }, { "text": "Theme", "value": "auto" }]
     readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
 
@@ -49,6 +50,13 @@ AppWindow {
                 { "kind": "toggle", "label": "Scroll volume", "desc": "Scroll the first half of the bar", "cfg": ["scroll", "volume"] },
                 { "kind": "toggle", "label": "Scroll brightness", "desc": "Scroll the second half of the bar", "cfg": ["scroll", "brightness"] },
                 { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
+            ] }
+        ] },
+        { "title": "Layout", "icon": "bar", "sub": "Frame desktop or floating island, anywhere", "sections": [
+            { "name": "Island", "rows": [
+                { "kind": "toggle", "label": "Island mode", "desc": "Float the bar as a capsule instead of the screen frame", "cfg": ["island"] },
+                { "kind": "select", "label": "Alignment", "desc": "Where along the edge the island sits", "cfg": ["align"], "options": alignOptions },
+                { "kind": "stepper", "label": "Offset", "desc": "Distance from the start or end of the edge", "cfg": ["offset"], "from": 0, "to": 1200, "step": 10, "suffix": " px" }
             ] }
         ] },
         { "title": "Frame & Style", "icon": "layout-filled", "sub": "The screen frame the panels grow from", "sections": [
