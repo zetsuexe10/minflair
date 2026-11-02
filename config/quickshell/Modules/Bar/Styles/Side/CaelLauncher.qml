@@ -190,18 +190,30 @@ Item {
         model: root.results
         clip: true
         currentIndex: 0
-        highlightMoveDuration: 120
+        highlightFollowsCurrentItem: false
+        cacheBuffer: 400
+        reuseItems: true
         boundsBehavior: Flickable.StopAtBounds
         visible: root.shown > 0
 
         Behavior on height { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
         onCountChanged: currentIndex = 0
+        onCurrentIndexChanged: positionViewAtIndex(currentIndex, ListView.Contain)
 
         highlight: Rectangle {
+            width: list.width
+            height: root.itemHeight
             radius: 18
             color: SideState.cardHi
+            y: list.currentItem ? list.currentItem.y : 0
+            opacity: list.count > 0 ? 1 : 0
+
+            Behavior on y { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: 120 } }
         }
+
+        add: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 140 } }
 
         delegate: Item {
             id: row
@@ -225,6 +237,10 @@ Item {
                 fillMode: Image.PreserveAspectFit
                 visible: status === Image.Ready
                 asynchronous: true
+                cache: true
+                opacity: status === Image.Ready ? 1 : 0
+
+                Behavior on opacity { NumberAnimation { duration: 140 } }
             }
 
             SvgIcon {
@@ -266,7 +282,13 @@ Item {
                 onPointChanged: list.currentIndex = row.index
             }
 
+            scale: tap.pressed ? 0.985 : 1
+
+            Behavior on scale { NumberAnimation { duration: 80 } }
+
             TapHandler {
+                id: tap
+
                 onTapped: root.activate(row.index)
             }
         }
