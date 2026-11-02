@@ -19,6 +19,7 @@ AppWindow {
 
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
+    readonly property var wsStyleOptions: [{ "text": "Numbers", "value": "numbers" }, { "text": "Dots", "value": "dots" }]
     readonly property var alignOptions: [{ "text": "Start", "value": "start" }, { "text": "Centre", "value": "center" }, { "text": "End", "value": "end" }]
     readonly property var modeOptions: [{ "text": "AMOLED", "value": "amoled" }, { "text": "Dark", "value": "dark" }, { "text": "Light", "value": "light" }, { "text": "Theme", "value": "auto" }]
     readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
@@ -37,6 +38,7 @@ AppWindow {
             { "name": "Entries", "rows": [
                 { "kind": "toggle", "label": "Launcher button", "desc": "Opens the launcher", "cfg": ["entries", "logo"] },
                 { "kind": "toggle", "label": "Workspaces", "desc": "Workspace switcher", "cfg": ["entries", "workspaces"] },
+                { "kind": "select", "label": "Workspace style", "desc": "Numbers, or Caelestia-style dots", "cfg": ["workspaceStyle"], "options": wsStyleOptions },
                 { "kind": "toggle", "label": "Active window", "desc": "Title of the focused window", "cfg": ["entries", "activeWindow"] },
                 { "kind": "toggle", "label": "Window title text", "desc": "Show the title text on the bar", "prop": "sideBarWindowTitle" },
                 { "kind": "toggle", "label": "System tray", "desc": "Tray icons", "cfg": ["entries", "tray"] },
