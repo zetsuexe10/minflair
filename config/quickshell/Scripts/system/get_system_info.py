@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -359,18 +360,20 @@ def get_system_specs():
     data["wm"] = "Hyprland (Wayland)"
 
     # Installed Packages Count
-    n_dpkg = 0
-    try:
-        n_dpkg = int(
-            subprocess.check_output(
-                "dpkg-query -f '.\n' -W 2>/dev/null | wc -l", shell=True
-            )
-            .decode()
-            .strip()
-        )
-    except Exception:
-        pass
-    data["packages"] = f"{n_dpkg} (dpkg)"
+    pkg_count, pkg_mgr = 0, ""
+    for mgr, cmd in (
+        ("pacman", "pacman -Qq 2>/dev/null | wc -l"),
+        ("dpkg", "dpkg-query -f '.\n' -W 2>/dev/null | wc -l"),
+        ("rpm", "rpm -qa 2>/dev/null | wc -l"),
+    ):
+        if shutil.which(mgr if mgr != "dpkg" else "dpkg-query"):
+            try:
+                pkg_count = int(subprocess.check_output(cmd, shell=True).decode().strip())
+                pkg_mgr = mgr
+                break
+            except Exception:
+                pass
+    data["packages"] = f"{pkg_count} ({pkg_mgr or 'unknown'})"
 
     # Displays
     data["display"] = get_displays()

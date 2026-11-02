@@ -112,73 +112,128 @@ Item {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.margins: 18
+                        anchors.margins: 14
                         spacing: 16
 
-                        Rectangle {
-                            Layout.preferredWidth: 84
-                            Layout.preferredHeight: 84
+                        // avatar: photo from ~/.face, otherwise the initial on a ringed disc
+                        Item {
+                            Layout.preferredWidth: 80
+                            Layout.preferredHeight: 80
                             Layout.alignment: Qt.AlignVCenter
-                            radius: 42
-                            color: SideState.cardHi
-                            clip: true
 
-                            Image {
-                                id: face
-
+                            Rectangle {
                                 anchors.fill: parent
-                                source: "file://" + root.home + "/.face"
-                                fillMode: Image.PreserveAspectCrop
-                                sourceSize: Qt.size(168, 168)
-                                visible: status === Image.Ready
+                                radius: width / 2
+                                color: "transparent"
+                                border.width: 2
+                                border.color: SideState.primary
+                                opacity: 0.55
                             }
 
-                            SideText {
-                                anchors.centerIn: parent
-                                visible: face.status !== Image.Ready
-                                text: (SystemStats.username || "?").charAt(0).toUpperCase()
-                                customSize: 34
-                                font.bold: true
-                                color: SideState.primary
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 6
+                                radius: width / 2
+                                color: SideState.cardHi
+                                clip: true
+
+                                Image {
+                                    id: face
+
+                                    anchors.fill: parent
+                                    source: "file://" + root.home + "/.face"
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize: Qt.size(168, 168)
+                                    visible: status === Image.Ready
+                                }
+
+                                SideText {
+                                    anchors.centerIn: parent
+                                    visible: face.status !== Image.Ready
+                                    text: (SystemStats.username || "?").charAt(0).toUpperCase()
+                                    customSize: 32
+                                    font.bold: true
+                                    color: SideState.primary
+                                }
                             }
                         }
 
                         ColumnLayout {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignVCenter
-                            spacing: 6
+                            spacing: 5
 
-                            SideText {
-                                text: SystemStats.username
-                                customSize: 16
-                                font.bold: true
+                            Row {
+                                Layout.fillWidth: true
+                                spacing: 6
+
+                                SideText {
+                                    text: SystemStats.username
+                                    customSize: 16
+                                    font.bold: true
+                                }
+
+                                SideText {
+                                    width: Math.max(0, parent.width - x - 6)
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "@" + SystemStats.hostname
+                                    customSize: 11
+                                    color: SideState.muted
+                                    elide: Text.ElideRight
+                                }
                             }
 
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 1
+                                color: SideState.outline
+                            }
+
+                            // aligned facts: icon chip, label, value
                             Repeater {
-                                model: [
-                                    { "k": "os", "v": SystemInfoService.osName },
-                                    { "k": "wm", "v": "Hyprland" },
-                                    { "k": "up", "v": root.uptime }
-                                ]
+                                model: 3
 
                                 RowLayout {
-                                    required property var modelData
+                                    id: fact
 
+                                    required property int index
+                                    readonly property var info: [
+                                        { "icon": "monitor-filled", "k": "OS", "v": SystemInfoService.osName },
+                                        { "icon": "window-filled", "k": "WM", "v": "Hyprland" },
+                                        { "icon": "clock", "k": "Uptime", "v": root.uptime }
+                                    ][index]
+
+                                    Layout.fillWidth: true
                                     spacing: 8
 
+                                    Rectangle {
+                                        Layout.preferredWidth: 20
+                                        Layout.preferredHeight: 20
+                                        radius: 7
+                                        color: SideState.cardHi
+
+                                        SvgIcon {
+                                            anchors.centerIn: parent
+                                            icon: fact.info.icon
+                                            iconSize: 13
+                                            iconColor: SideState.primary
+                                            flat: true
+                                        }
+                                    }
+
                                     SideText {
-                                        Layout.preferredWidth: 22
-                                        text: parent.modelData.k
-                                        color: SideState.primary
-                                        customSize: 10
-                                        font.bold: true
+                                        Layout.preferredWidth: 48
+                                        text: fact.info.k
+                                        color: SideState.muted
+                                        customSize: 11
                                     }
 
                                     SideText {
                                         Layout.fillWidth: true
-                                        text: parent.modelData.v
+                                        text: fact.info.v
                                         elide: Text.ElideRight
-                                        color: SideState.muted
+                                        font.bold: true
+                                        customSize: 12
                                     }
                                 }
                             }

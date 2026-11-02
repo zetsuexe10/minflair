@@ -179,6 +179,7 @@ PanelWindow {
                 return ;
             const f = it.initialFocusItem ? (it.initialFocusItem.textField ? it.initialFocusItem.textField : it.initialFocusItem) : it;
             f.forceActiveFocus();
+            console.log("side overlay focus: item=" + f + " activeFocus=" + f.activeFocus + " widget=" + root.activeId);
         }
     }
 
