@@ -4,478 +4,440 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 import qs.Core.Windows
-import qs.Modules.Dashboard.Components
-import qs.Modules.Settings.Components
+import qs.Modules.Bar.Styles.Side
 
-// Shell panel with an icon rail on the left and pages that slide in, after Caelestia's settings.
-// Covers the Side bar, its dashboard, GitHub and the keyboard shortcuts.
+// Shell settings in the layout of Caelestia's settings app: search and a navigation list on the
+// left, the selected page on the right as rounded rows. Everything is driven by `pages` below, so
+// search can look through every row.
 AppWindow {
     id: root
 
     property int page: 0
-    property int previous: 0
+    property string query: ""
+    readonly property string q: query.trim().toLowerCase()
+
+    readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
+    readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
+    readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
+
     readonly property var pages: [
-        { "title": "Side Bar", "subtitle": "Placement, popouts and scrolling", "icon": "bar" },
-        { "title": "Dashboard", "subtitle": "Tabs and on-screen feedback", "icon": "layout-filled" },
-        { "title": "GitHub", "subtitle": "Account, token and repositories", "icon": "github" },
-        { "title": "Shortcuts", "subtitle": "Keys for bars and the shell", "icon": "keyboard-filled" }
+        { "title": "Bar", "icon": "bar", "sub": "Position, entries and scrolling", "sections": [
+            { "name": "Position", "rows": [
+                { "kind": "select", "label": "Position", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": positionOptions },
+                { "kind": "stepper", "label": "Workspaces", "desc": "Total number; the bar shows five at a time and follows the active one", "prop": "numberOfWorkspaces", "from": 1, "to": 20, "step": 1 }
+            ] },
+            { "name": "Entries", "rows": [
+                { "kind": "toggle", "label": "Launcher button", "desc": "Opens the launcher", "cfg": ["entries", "logo"] },
+                { "kind": "toggle", "label": "Workspaces", "desc": "Workspace switcher", "cfg": ["entries", "workspaces"] },
+                { "kind": "toggle", "label": "Active window", "desc": "Title of the focused window", "cfg": ["entries", "activeWindow"] },
+                { "kind": "toggle", "label": "Window title text", "desc": "Show the title text on the bar", "prop": "sideBarWindowTitle" },
+                { "kind": "toggle", "label": "System tray", "desc": "Tray icons", "cfg": ["entries", "tray"] },
+                { "kind": "toggle", "label": "Status icons", "desc": "Network, Bluetooth, volume, brightness, keyboard, notifications", "cfg": ["entries", "statusIcons"] },
+                { "kind": "toggle", "label": "Clock", "desc": "Date and time", "cfg": ["entries", "clock"] },
+                { "kind": "toggle", "label": "Power button", "desc": "Hover or click opens the power panel", "cfg": ["entries", "power"] }
+            ] },
+            { "name": "Popouts and scrolling", "rows": [
+                { "kind": "toggle", "label": "Hover popouts", "desc": "Open the Wi-Fi, Bluetooth, sound, calendar and notification panels from their icons", "prop": "sideBarPopouts" },
+                { "kind": "toggle", "label": "Scroll workspaces", "desc": "Scroll over the workspaces to switch", "cfg": ["scroll", "workspaces"] },
+                { "kind": "toggle", "label": "Scroll volume", "desc": "Scroll the first half of the bar", "cfg": ["scroll", "volume"] },
+                { "kind": "toggle", "label": "Scroll brightness", "desc": "Scroll the second half of the bar", "cfg": ["scroll", "brightness"] },
+                { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
+            ] }
+        ] },
+        { "title": "Frame & Style", "icon": "layout-filled", "sub": "The screen frame the panels grow from", "sections": [
+            { "name": "Frame", "rows": [
+                { "kind": "toggle", "label": "Screen frame", "desc": "A border around the screen with rounded corners", "cfg": ["frame"] },
+                { "kind": "stepper", "label": "Border thickness", "desc": "Width of the frame on the edges without the bar", "cfg": ["border"], "from": 4, "to": 24, "step": 1, "suffix": " px" },
+                { "kind": "stepper", "label": "Corner rounding", "desc": "Radius of the inner corners and of the panels", "cfg": ["rounding"], "from": 0, "to": 48, "step": 2, "suffix": " px" }
+            ] }
+        ] },
+        { "title": "Panels", "icon": "star", "sub": "Hover triggers, dashboard and feedback", "sections": [
+            { "name": "Hover panels", "rows": [
+                { "kind": "toggle", "label": "Power panel", "desc": "Hover the right edge or the power button", "cfg": ["hover", "session"] },
+                { "kind": "toggle", "label": "Dashboard", "desc": "Hover the top edge, centre", "cfg": ["hover", "dashboard"] },
+                { "kind": "toggle", "label": "Launcher", "desc": "Hover the bottom edge, centre", "cfg": ["hover", "launcher"] }
+            ] },
+            { "name": "Dashboard", "rows": [
+                { "kind": "select", "label": "Opens on", "desc": "Tab shown when the dashboard opens", "prop": "sideDashTab", "options": dashTabOptions },
+                { "kind": "toggle", "label": "On-screen feedback", "desc": "Indicator on the right edge for volume, brightness and microphone", "prop": "sideOsd" }
+            ] },
+            { "name": "Weather", "rows": [
+                { "kind": "text", "label": "City", "desc": "Leave empty to locate by IP address", "prop": "weatherCity", "placeholder": "Lisbon" },
+                { "kind": "select", "label": "Units", "desc": "Temperature and wind speed", "prop": "weatherFahrenheit", "options": unitOptions },
+                { "kind": "info", "label": "Status", "desc": "", "info": "weather" }
+            ] }
+        ] },
+        { "title": "GitHub", "icon": "github", "sub": "Account, token and repositories", "sections": [
+            { "name": "Account", "rows": [
+                { "kind": "text", "label": "Username", "desc": "Shown on the dashboard", "prop": "githubUsername", "placeholder": "octocat" },
+                { "kind": "text", "label": "Personal access token", "desc": "Adds private repositories, commits and open PRs", "prop": "githubToken", "placeholder": "ghp_...", "password": true },
+                { "kind": "info", "label": "Token", "desc": "", "info": "token" },
+                { "kind": "button", "label": "Refresh", "desc": "Fetch again now", "action": "githubRefresh", "value": "Refresh now" }
+            ] },
+            { "name": "Overview", "rows": [
+                { "kind": "info", "label": "Repositories", "desc": "", "info": "repos" },
+                { "kind": "info", "label": "Stars", "desc": "", "info": "stars" },
+                { "kind": "info", "label": "Forks", "desc": "", "info": "forks" },
+                { "kind": "info", "label": "Open PRs / issues", "desc": "Needs a token", "info": "open" },
+                { "kind": "info", "label": "Top language", "desc": "", "info": "lang" },
+                { "kind": "info", "label": "API requests left", "desc": "", "info": "rate" }
+            ] }
+        ] },
+        { "title": "Shortcuts", "icon": "keyboard-filled", "sub": "Keys and mouse for the shell", "sections": [
+            { "name": "Keys", "rows": [
+                { "kind": "info", "label": "Super + Alt + 1 / 2 / 3", "desc": "", "text": "Convex / Island / Side bar" },
+                { "kind": "info", "label": "Super + S", "desc": "", "text": "Settings" },
+                { "kind": "info", "label": "Super + Ctrl + S", "desc": "", "text": "This panel" },
+                { "kind": "info", "label": "Super + K", "desc": "", "text": "Keybinds cheat sheet" },
+                { "kind": "info", "label": "Ctrl + Alt + C", "desc": "", "text": "Calendar" }
+            ] },
+            { "name": "Mouse", "rows": [
+                { "kind": "info", "label": "Scroll on the bar", "desc": "", "text": "Volume (first half), brightness (second half)" },
+                { "kind": "info", "label": "Scroll on workspaces", "desc": "", "text": "Switch workspace" },
+                { "kind": "info", "label": "Middle click on volume", "desc": "", "text": "Mute" },
+                { "kind": "info", "label": "Launcher", "desc": "", "text": "> actions, = calculator" }
+            ] }
+        ] }
     ]
 
-    function go(i) {
-        if (i === page)
-            return ;
-        previous = page;
-        page = i;
+    readonly property var results: {
+        const out = [];
+        if (q === "")
+            return out;
+        for (let p = 0; p < pages.length; p++)
+            for (let s = 0; s < pages[p].sections.length; s++) {
+                const sec = pages[p].sections[s];
+                for (let r = 0; r < sec.rows.length; r++) {
+                    const row = sec.rows[r];
+                    const hay = (row.label + " " + (row.desc || "") + " " + sec.name + " " + pages[p].title).toLowerCase();
+                    if (hay.indexOf(q) !== -1)
+                        out.push(row);
+                }
+            }
+        return out;
+    }
+
+    function getValue(row) {
+        if (row.cfg)
+            return SettingsService.sideCfg(row.cfg[0], row.cfg[1]);
+        if (row.prop)
+            return SettingsService[row.prop];
+        if (row.text !== undefined)
+            return row.text;
+        if (row.action)
+            return row.value;
+        switch (row.info) {
+        case "weather": return WeatherService.loaded ? (WeatherService.city + ", " + WeatherService.temp + WeatherService.unit) : (WeatherService.errorText || "Loading...");
+        case "token": return GithubService.tokenMessage !== "" ? GithubService.tokenMessage : (GithubService.hasToken ? "Valid" : "None");
+        case "repos": return GithubService.repos.length + (GithubService.hasToken ? " (" + GithubService.privateRepos + " private)" : "");
+        case "stars": return GithubService.totalStars;
+        case "forks": return GithubService.totalForks;
+        case "open": return GithubService.hasToken ? GithubService.openPRs + " / " + GithubService.openIssues : "-";
+        case "lang": return GithubService.topLanguage;
+        case "rate": return GithubService.rateLimit > 0 ? GithubService.rateRemaining + " / " + GithubService.rateLimit : "-";
+        }
+        return "";
+    }
+
+    function setValue(row, v) {
+        if (row.cfg)
+            SettingsService.setSideCfg(row.cfg[0], row.cfg[1], v);
+        else if (row.prop)
+            SettingsService[row.prop] = v;
+    }
+
+    function act(row) {
+        if (row.action === "githubRefresh")
+            GithubService.fetchData();
     }
 
     widgetId: "minflair_side_settings"
     windowTitle: "Minflair Shell"
     contentPadding: 0
-    implicitWidth: 860
-    implicitHeight: 600
+    implicitWidth: 980
+    implicitHeight: 660
 
     RowLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         spacing: 0
 
-        // icon rail
-        Rectangle {
+        // ---- navigation ----
+        ColumnLayout {
             Layout.fillHeight: true
-            Layout.preferredWidth: 76
-            color: Theme.bg
+            Layout.preferredWidth: 270
+            Layout.minimumWidth: 270
+            Layout.maximumWidth: 270
+            Layout.margins: 18
+            spacing: 14
 
             Rectangle {
-                anchors.right: parent.right
-                width: 1
-                height: parent.height
-                color: Theme.border
-            }
+                Layout.fillWidth: true
+                implicitHeight: 44
+                radius: 22
+                color: SideState.card
+                border.width: searchInput.activeFocus ? 1 : 0
+                border.color: Theme.accent
 
-            Rectangle {
-                id: marker
+                SvgIcon {
+                    id: searchIcon
 
-                x: (parent.width - width) / 2
-                y: 24 + root.page * 64
-                width: 52
-                height: 52
-                radius: 18
-                color: Theme.bgAccent
+                    anchors.left: parent.left
+                    anchors.leftMargin: 16
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "search"
+                    iconSize: Constants.sizeMd
+                    iconColor: searchInput.activeFocus ? Theme.accent : Theme.muted
+                    flat: true
+                }
 
-                Behavior on y { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.9 } }
-            }
+                TextInput {
+                    id: searchInput
 
-            Column {
-                x: 0
-                y: 24
-                width: parent.width
-                spacing: 12
+                    anchors.left: searchIcon.right
+                    anchors.leftMargin: 10
+                    anchors.right: parent.right
+                    anchors.rightMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.fg
+                    selectionColor: Theme.accent
+                    selectedTextColor: Theme.opaqueBg
+                    font.family: Constants.fontFamily
+                    font.pixelSize: Math.round(13 * SettingsService.fontScale)
+                    clip: true
+                    onTextChanged: root.query = text
 
-                Repeater {
-                    model: root.pages
-
-                    Item {
-                        id: navItem
-
-                        required property var modelData
-                        required property int index
-
-                        width: 76
-                        height: 52
-
-                        SvgIcon {
-                            anchors.centerIn: parent
-                            icon: navItem.modelData.icon
-                            iconSize: Constants.sizeLg
-                            iconColor: root.page === navItem.index ? Theme.accent : (navHover.hovered ? Theme.fg : Theme.muted)
-                            flat: true
-                        }
-
-                        HoverHandler {
-                            id: navHover
-
-                            cursorShape: Qt.PointingHandCursor
-                        }
-
-                        TapHandler {
-                            onTapped: root.go(navItem.index)
-                        }
+                    Text {
+                        visible: searchInput.text === ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Search settings"
+                        color: Theme.muted
+                        font: searchInput.font
                     }
                 }
-            }
-        }
-
-        ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: 0
-
-            AppHeader {
-                title: root.pages[root.page].title
-                category: "SHELL"
-                subtitle: root.pages[root.page].subtitle
-                showDivider: true
             }
 
             Item {
-                id: stage
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                Rectangle {
+                    id: pill
+
+                    width: parent.width
+                    height: 48
+                    radius: 24
+                    color: Theme.bgAccent
+                    y: root.page * 54
+                    opacity: root.q === "" ? 1 : 0
+
+                    Behavior on y { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
+                    Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
+                }
+
+                Column {
+                    width: parent.width
+                    spacing: 6
+
+                    Repeater {
+                        model: root.pages
+
+                        Item {
+                            id: navItem
+
+                            required property var modelData
+                            required property int index
+                            readonly property bool current: root.page === index && root.q === ""
+
+                            width: parent.width
+                            height: 48
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 24
+                                color: Theme.fg
+                                opacity: (navHover.hovered && !navItem.current) ? 0.06 : 0
+
+                                Behavior on opacity { NumberAnimation { duration: Constants.animFast } }
+                            }
+
+                            SvgIcon {
+                                id: navIcon
+
+                                anchors.left: parent.left
+                                anchors.leftMargin: 18
+                                anchors.verticalCenter: parent.verticalCenter
+                                icon: navItem.modelData.icon
+                                iconSize: Constants.sizeMd
+                                iconColor: navItem.current ? Theme.accent : Theme.muted
+                                flat: true
+                            }
+
+                            ThemedText {
+                                anchors.left: navIcon.right
+                                anchors.leftMargin: 14
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: navItem.modelData.title
+                                customSize: 13
+                                font.bold: navItem.current
+                                color: navItem.current ? Theme.fg : Theme.muted
+                            }
+
+                            HoverHandler {
+                                id: navHover
+
+                                cursorShape: Qt.PointingHandCursor
+                            }
+
+                            TapHandler {
+                                onTapped: {
+                                    searchInput.text = "";
+                                    root.page = navItem.index;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillHeight: true
+            Layout.preferredWidth: 1
+            color: Theme.border
+        }
+
+        // ---- page ----
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 24
+            Layout.bottomMargin: 0
+            spacing: 4
+
+            ThemedText {
+                text: root.q !== "" ? "Search" : root.pages[root.page].title
+                customSize: 24
+                font.bold: true
+            }
+
+            ThemedText {
+                text: root.q !== "" ? root.results.length + " results" : root.pages[root.page].sub
+                color: Theme.muted
+            }
+
+            Flickable {
+                id: flick
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.topMargin: 14
+                contentWidth: width
+                contentHeight: pageCol.implicitHeight + 24
                 clip: true
+                boundsBehavior: Flickable.StopAtBounds
 
-                Repeater {
-                    model: 4
+                // slide the new page in
+                property real shift: 0
 
-                    Loader {
-                        id: pageLoader
+                Connections {
+                    target: root
 
-                        required property int index
+                    function onPageChanged() {
+                        flick.contentY = 0;
+                        fade.restart();
+                    }
+                }
 
-                        readonly property bool current: root.page === index
+                ParallelAnimation {
+                    id: fade
 
-                        width: stage.width
-                        height: stage.height
-                        // only the visited pages are built; the others stay off-screen and unloaded
-                        active: current || visited
-                        property bool visited: false
-                        onCurrentChanged: if (current) visited = true
-                        x: current ? 0 : (index < root.page ? -stage.width * 0.2 : stage.width * 0.2)
-                        opacity: current ? 1 : 0
-                        visible: opacity > 0.01
-                        sourceComponent: index === 0 ? sideComp : (index === 1 ? dashComp : (index === 2 ? githubComp : keysComp))
+                    NumberAnimation { target: pageCol; property: "opacity"; from: 0; to: 1; duration: Constants.animNormal }
+                    NumberAnimation { target: pageCol; property: "y"; from: 18; to: 0; duration: Constants.animSlow; easing.type: Easing.OutExpo }
+                }
 
-                        Behavior on x { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
-                        Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
+                Column {
+                    id: pageCol
+
+                    width: flick.width
+                    spacing: 8
+
+                    // search results
+                    Repeater {
+                        model: root.q !== "" ? root.results : []
+
+                        CaelRow {
+                            required property var modelData
+
+                            width: pageCol.width
+                            kind: modelData.kind
+                            label: modelData.label
+                            desc: modelData.desc || ""
+                            value: root.getValue(modelData)
+                            options: modelData.options || []
+                            from: modelData.from || 0
+                            to: modelData.to || 100
+                            step: modelData.step || 1
+                            suffix: modelData.suffix || ""
+                            password: modelData.password === true
+                            placeholder: modelData.placeholder || ""
+                            onEdited: (v) => root.setValue(modelData, v)
+                            onClicked: root.act(modelData)
+                        }
+                    }
+
+                    // sections of the current page
+                    Repeater {
+                        model: root.q === "" ? root.pages[root.page].sections : []
+
+                        Column {
+                            id: sec
+
+                            required property var modelData
+
+                            width: pageCol.width
+                            spacing: 8
+
+                            ThemedText {
+                                topPadding: 10
+                                text: sec.modelData.name
+                                color: Theme.accent
+                                customSize: 12
+                                font.bold: true
+                            }
+
+                            Repeater {
+                                model: sec.modelData.rows
+
+                                CaelRow {
+                                    required property var modelData
+
+                                    width: sec.width
+                                    kind: modelData.kind
+                                    label: modelData.label
+                                    desc: modelData.desc || ""
+                                    value: root.getValue(modelData)
+                                    options: modelData.options || []
+                                    from: modelData.from || 0
+                                    to: modelData.to || 100
+                                    step: modelData.step || 1
+                                    suffix: modelData.suffix || ""
+                                    password: modelData.password === true
+                                    placeholder: modelData.placeholder || ""
+                                    onEdited: (v) => root.setValue(modelData, v)
+                                    onClicked: root.act(modelData)
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    Component {
-        id: sideComp
-
-        AppContainer {
-            AppGroup {
-                title: "Placement"
-                icon: "bar"
-
-                SettingSegmented {
-                    label: "Position"
-                    description: "Which screen edge the bar sits on"
-                    model: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
-                    currentValue: SettingsService.sideBarPosition
-                    onActivated: (value) => SettingsService.sideBarPosition = value
-                }
-
-                SettingSpinBox {
-                    label: "Number of Workspaces"
-                    description: "The bar shows five at a time and follows the active one"
-                    value: SettingsService.numberOfWorkspaces
-                    from: 1
-                    to: 20
-                    stepSize: 1
-                    decimals: 0
-                    suffix: ""
-                    onMoved: (val) => SettingsService.numberOfWorkspaces = val
-                }
-
-                SettingToggle {
-                    label: "Window Title"
-                    description: "Show the focused window's title on the bar"
-                    checked: SettingsService.sideBarWindowTitle
-                    onCheckedChanged: SettingsService.sideBarWindowTitle = checked
-                }
-            }
-
-            AppGroup {
-                title: "Frame"
-                icon: "layout-filled"
-
-                SettingToggle {
-                    label: "Screen Frame"
-                    description: "A border around the whole screen with rounded corners; panels grow out of it like Caelestia"
-                    checked: SettingsService.sideCfg("frame")
-                    onCheckedChanged: SettingsService.setSideCfg("frame", undefined, checked)
-                }
-
-                SettingSpinBox {
-                    label: "Border Thickness"
-                    description: "Width of the frame on the edges without the bar"
-                    value: SettingsService.sideCfg("border")
-                    from: 4
-                    to: 24
-                    stepSize: 1
-                    decimals: 0
-                    suffix: " px"
-                    onMoved: (val) => SettingsService.setSideCfg("border", undefined, val)
-                }
-
-                SettingSpinBox {
-                    label: "Corner Rounding"
-                    description: "Radius of the frame's inner corners and of the panels"
-                    value: SettingsService.sideCfg("rounding")
-                    from: 0
-                    to: 48
-                    stepSize: 2
-                    decimals: 0
-                    suffix: " px"
-                    onMoved: (val) => SettingsService.setSideCfg("rounding", undefined, val)
-                }
-            }
-
-            AppGroup {
-                title: "Bar Entries"
-                icon: "bar"
-
-                Repeater {
-                    model: [
-                        { "key": "logo", "label": "Launcher button", "desc": "Opens the launcher" },
-                        { "key": "workspaces", "label": "Workspaces", "desc": "Five slots that follow the active workspace" },
-                        { "key": "activeWindow", "label": "Active window", "desc": "Title of the focused window" },
-                        { "key": "tray", "label": "System tray", "desc": "Tray icons" },
-                        { "key": "statusIcons", "label": "Status icons", "desc": "Network, Bluetooth, volume, brightness, keyboard, notifications" },
-                        { "key": "clock", "label": "Clock", "desc": "Date and time" },
-                        { "key": "power", "label": "Power button", "desc": "Hover or click opens the power panel" }
-                    ]
-
-                    SettingToggle {
-                        required property var modelData
-
-                        label: modelData.label
-                        description: modelData.desc
-                        checked: SettingsService.sideCfg("entries", modelData.key)
-                        onCheckedChanged: SettingsService.setSideCfg("entries", modelData.key, checked)
-                    }
-                }
-            }
-
-            AppGroup {
-                title: "Scroll Actions"
-                icon: "volume"
-
-                Repeater {
-                    model: [
-                        { "key": "workspaces", "label": "Workspaces", "desc": "Scroll over the workspaces to switch" },
-                        { "key": "volume", "label": "Volume", "desc": "Scroll the first half of the bar" },
-                        { "key": "brightness", "label": "Brightness", "desc": "Scroll the second half of the bar" }
-                    ]
-
-                    SettingToggle {
-                        required property var modelData
-
-                        label: modelData.label
-                        description: modelData.desc
-                        checked: SettingsService.sideCfg("scroll", modelData.key)
-                        onCheckedChanged: SettingsService.setSideCfg("scroll", modelData.key, checked)
-                    }
-                }
-            }
-
-            AppGroup {
-                title: "Hover Panels"
-                icon: "star"
-
-                Repeater {
-                    model: [
-                        { "key": "session", "label": "Power panel", "desc": "Hover the right edge or the power button" },
-                        { "key": "dashboard", "label": "Dashboard", "desc": "Hover the top edge, centre" },
-                        { "key": "launcher", "label": "Launcher", "desc": "Hover the bottom edge, centre" }
-                    ]
-
-                    SettingToggle {
-                        required property var modelData
-
-                        label: modelData.label
-                        description: modelData.desc
-                        checked: SettingsService.sideCfg("hover", modelData.key)
-                        onCheckedChanged: SettingsService.setSideCfg("hover", modelData.key, checked)
-                    }
-                }
-            }
-
-            AppGroup {
-                title: "Popouts & Scrolling"
-                icon: "volume"
-
-                SettingToggle {
-                    label: "Hover Popouts"
-                    description: "Open the Wi-Fi, Bluetooth and sound panels when hovering their icons"
-                    checked: SettingsService.sideBarPopouts
-                    onCheckedChanged: SettingsService.sideBarPopouts = checked
-                }
-
-                SettingSpinBox {
-                    label: "Scroll Step"
-                    description: "Percent per notch for brightness and volume"
-                    value: SettingsService.sideScrollStep
-                    from: 1
-                    to: 20
-                    stepSize: 1
-                    decimals: 0
-                    suffix: "%"
-                    onMoved: (val) => SettingsService.sideScrollStep = val
-                }
-            }
-        }
-    }
-
-    Component {
-        id: dashComp
-
-        AppContainer {
-            AppGroup {
-                title: "Dashboard"
-                icon: "layout-filled"
-
-                SettingSegmented {
-                    label: "Opens On"
-                    description: "Tab shown when the dashboard opens"
-                    model: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Calendar", "value": 3 }]
-                    currentValue: SettingsService.sideDashTab
-                    onActivated: (value) => SettingsService.sideDashTab = value
-                }
-
-                SettingToggle {
-                    label: "On-screen Feedback"
-                    description: "Show a pill when volume, brightness or the microphone changes"
-                    checked: SettingsService.sideOsd
-                    onCheckedChanged: SettingsService.sideOsd = checked
-                }
-            }
-        }
-    }
-
-    Component {
-        id: githubComp
-
-        AppContainer {
-            AppGroup {
-                title: "Account"
-                icon: "github"
-
-                ThemedText {
-                    text: "Username"
-                }
-
-                ThemedTextField {
-                    Layout.fillWidth: true
-                    placeholderText: "octocat"
-                    text: SettingsService.githubUsername
-                    onEditingFinished: SettingsService.githubUsername = text.trim()
-                }
-
-                ThemedText {
-                    Layout.topMargin: Constants.sizeSm
-                    text: "Personal Access Token"
-                }
-
-                ThemedTextField {
-                    Layout.fillWidth: true
-                    placeholderText: "ghp_xxxxxxxxxxxxxxxxxxxx"
-                    isPassword: true
-                    text: SettingsService.githubToken
-                    onEditingFinished: SettingsService.githubToken = text
-                }
-
-                ThemedText {
-                    visible: GithubService.tokenMessage !== ""
-                    text: GithubService.tokenMessage
-                    color: GithubService.tokenStatus === "valid" ? Theme.accent : "#e06b74"
-                }
-
-                ThemedText {
-                    visible: GithubService.errorMessage !== ""
-                    text: GithubService.errorMessage
-                    color: "#e06b74"
-                }
-            }
-
-            AppGroup {
-                title: "Overview"
-                icon: "star"
-                visible: GithubService.username !== ""
-
-                Repeater {
-                    model: [
-                        { "k": "Repositories", "v": String(GithubService.repos.length) },
-                        { "k": "Private", "v": GithubService.hasToken ? String(GithubService.privateRepos) : "needs token" },
-                        { "k": "Stars", "v": String(GithubService.totalStars) },
-                        { "k": "Forks", "v": String(GithubService.totalForks) },
-                        { "k": "Open PRs / Issues", "v": GithubService.hasToken ? GithubService.openPRs + " / " + GithubService.openIssues : "needs token" },
-                        { "k": "Top Language", "v": GithubService.topLanguage },
-                        { "k": "API Requests Left", "v": GithubService.rateLimit > 0 ? GithubService.rateRemaining + " / " + GithubService.rateLimit : "-" }
-                    ]
-
-                    RowLayout {
-                        required property var modelData
-
-                        Layout.fillWidth: true
-
-                        ThemedText {
-                            Layout.fillWidth: true
-                            text: parent.modelData.k
-                            color: Theme.muted
-                        }
-
-                        ThemedText {
-                            text: parent.modelData.v
-                            font.bold: true
-                        }
-                    }
-                }
-
-                ThemedButton {
-                    text: GithubService.isFetching ? "Refreshing..." : "Refresh Now"
-                    enabled: !GithubService.isFetching
-                    onClicked: GithubService.fetchData()
-                }
-            }
-        }
-    }
-
-    Component {
-        id: keysComp
-
-        AppContainer {
-            AppGroup {
-                title: "Bars"
-                icon: "keyboard-filled"
-
-                Repeater {
-                    model: [
-                        { "k": "Super + Alt + 1 / 2 / 3", "v": "Convex / Island / Side bar" },
-                        { "k": "Super + S", "v": "Settings" },
-                        { "k": "Super + Ctrl + S", "v": "Shell settings (this panel)" },
-                        { "k": "Super + K", "v": "Keybinds cheat sheet" },
-                        { "k": "Ctrl + Alt + C", "v": "Calendar" },
-                        { "k": "Ctrl + Alt + F", "v": "System usage" },
-                        { "k": "Scroll on the bar", "v": "Volume (first half) / brightness (second half)" },
-                        { "k": "Scroll on workspaces", "v": "Switch workspace" },
-                        { "k": "Middle click volume icon", "v": "Mute" }
-                    ]
-
-                    RowLayout {
-                        required property var modelData
-
-                        Layout.fillWidth: true
-
-                        ThemedText {
-                            Layout.preferredWidth: 220
-                            text: parent.modelData.k
-                            font.bold: true
-                        }
-
-                        ThemedText {
-                            Layout.fillWidth: true
-                            text: parent.modelData.v
-                            color: Theme.muted
-                            wrapMode: Text.WordWrap
-                        }
-                    }
-                }
-            }
-        }
+    Shortcut {
+        sequence: "Ctrl+F"
+        enabled: root.isOpen
+        onActivated: searchInput.forceActiveFocus()
     }
 }

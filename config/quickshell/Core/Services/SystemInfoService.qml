@@ -12,7 +12,10 @@ Item {
     property bool hasPerformanceProfile: true
     property date currentTime: systemClock.date
     property string osId: "arch"
+    property string osPretty: ""
     readonly property string osName: {
+        if (osPretty !== "")
+            return osPretty;
         switch (osId) {
         case "endeavouros":
             return "EndeavourOS";
@@ -104,13 +107,16 @@ Item {
     Process {
         id: osReleaseProc
 
-        command: ["sh", "-c", "grep '^ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '\"'"]
+        command: ["sh", "-c", ". /etc/os-release 2>/dev/null; printf '%s\\n%s\\n' \"$ID\" \"${PRETTY_NAME:-$NAME}\""]
         running: true
         onExited: (exitCode) => {
             if (exitCode === 0) {
-                let id = osOutput.text.trim();
+                let lines = osOutput.text.split("\n");
+                let id = (lines[0] || "").trim();
                 if (id !== "")
                     systemInfoService.osId = id;
+
+                systemInfoService.osPretty = (lines[1] || "").trim();
 
             }
         }

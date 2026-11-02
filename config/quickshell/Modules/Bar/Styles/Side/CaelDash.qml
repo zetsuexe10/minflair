@@ -409,6 +409,8 @@ Item {
                             ]
 
                             CaelGauge {
+                                id: gauge
+
                                 required property var modelData
 
                                 width: 58
@@ -419,9 +421,9 @@ Item {
 
                                 SvgIcon {
                                     anchors.centerIn: parent
-                                    icon: parent.modelData.icon
+                                    icon: gauge.modelData.icon
                                     iconSize: 18
-                                    iconColor: parent.fg
+                                    iconColor: gauge.fg
                                     flat: true
                                 }
                             }
