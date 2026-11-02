@@ -68,6 +68,8 @@ Item {
     }
 
     property int sideScrollStep: 5
+    // folders searched for wallpapers (recursively); ~ is expanded
+    property var wallpaperDirs: ["~/Pictures/Wallpapers", "/usr/share/backgrounds"]
     property int sideDashTab: 0
     readonly property var barStyles: ["convex", "island", "side"]
     readonly property var barStyleNames: ({
@@ -355,6 +357,7 @@ Item {
                 "weatherFahrenheit": settingsService.weatherFahrenheit,
                 "sideBarConfig": settingsService.sideBarConfig,
                 "sideScrollStep": settingsService.sideScrollStep,
+                "wallpaperDirs": settingsService.wallpaperDirs,
                 "sideDashTab": settingsService.sideDashTab,
                 "islandRightMode": settingsService.islandRightMode,
                 "islandShowWorkspaces": settingsService.islandShowWorkspaces,
@@ -540,6 +543,8 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                         if (prefs.sideOsd !== undefined)
                             settingsService.sideOsd = prefs.sideOsd;
 
+                        if (Array.isArray(prefs.wallpaperDirs))
+                            settingsService.wallpaperDirs = prefs.wallpaperDirs;
                         if (prefs.sideScrollStep !== undefined)
                             settingsService.sideScrollStep = Math.max(1, Math.min(20, prefs.sideScrollStep));
 

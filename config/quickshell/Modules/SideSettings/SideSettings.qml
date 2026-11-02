@@ -57,6 +57,12 @@ AppWindow {
                 { "kind": "stepper", "label": "Corner rounding", "desc": "Radius of the inner corners and of the panels", "cfg": ["rounding"], "from": 0, "to": 48, "step": 2, "suffix": " px" }
             ] }
         ] },
+        { "title": "Wallpapers", "icon": "picture", "sub": "Where wallpapers are picked from", "sections": [
+            { "name": "Folders", "rows": [
+                { "kind": "text", "label": "Wallpaper folders", "desc": "Comma separated; subfolders are searched too. Choose with Super+W, arrow keys to browse, Enter to set", "prop": "wallpaperDirs", "list": true, "placeholder": "~/Pictures/Wallpapers, /usr/share/backgrounds" },
+                { "kind": "button", "label": "Random wallpaper", "desc": "Pick one from the folders now", "action": "randomWall", "value": "Shuffle" }
+            ] }
+        ] },
         { "title": "Panels", "icon": "star", "sub": "Hover triggers, dashboard and feedback", "sections": [
             { "name": "Hover panels", "rows": [
                 { "kind": "toggle", "label": "Power panel", "desc": "Hover the right edge or the power button", "cfg": ["hover", "session"] },
@@ -127,7 +133,7 @@ AppWindow {
         if (row.cfg)
             return SettingsService.sideCfg(row.cfg[0], row.cfg[1]);
         if (row.prop)
-            return SettingsService[row.prop];
+            return row.list ? SettingsService[row.prop].join(", ") : SettingsService[row.prop];
         if (row.text !== undefined)
             return row.text;
         if (row.action)
@@ -149,12 +155,14 @@ AppWindow {
         if (row.cfg)
             SettingsService.setSideCfg(row.cfg[0], row.cfg[1], v);
         else if (row.prop)
-            SettingsService[row.prop] = v;
+            SettingsService[row.prop] = row.list ? String(v).split(",").map(s => s.trim()).filter(s => s !== "") : v;
     }
 
     function act(row) {
         if (row.action === "githubRefresh")
             GithubService.fetchData();
+        else if (row.action === "randomWall")
+            WallpaperManager.shuffle();
         else if (row.action === "resetLogo")
             SettingsService.setSideCfg("logoImage", undefined, "");
         else if (row.action === "browseLogo")

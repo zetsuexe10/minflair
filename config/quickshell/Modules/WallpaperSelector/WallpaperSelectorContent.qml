@@ -106,7 +106,7 @@ Item {
         }
         if (WallpaperManager.currentWallpaper) {
             for (let j = 0; j < filteredModel.count; j++) {
-                if (filteredModel.get(j).name === WallpaperManager.currentWallpaper) {
+                if (filteredModel.get(j).rawPath === WallpaperManager.currentWallpaperPath || filteredModel.get(j).name === WallpaperManager.currentWallpaper) {
                     wallView.currentIndex = j;
                     let spacing = Constants.sizeLg;
                     let step = root.cardItemWidth + spacing;
@@ -128,9 +128,7 @@ Item {
         if (!targetPath)
             return ;
 
-        let parts = targetPath.split('/');
-        let wallName = parts[parts.length - 1];
-        WallpaperManager.applyWallpaperWithSync(wallName, targetPath);
+        WallpaperManager.applyWallpaperWithSync(WallpaperManager.storedName(targetPath), targetPath);
         if (root.widget && root.widget.close !== undefined)
             root.widget.close();
         else if (root.widget && root.widget.isOpen !== undefined)
@@ -186,7 +184,7 @@ Item {
 
         property var lines: []
 
-        command: ["bash", "-c", "find ~/Pictures/Wallpapers -maxdepth 2 -type f 2>/dev/null | grep -iE '\\.(jpg|jpeg|png|webp|gif)$'"]
+        command: WallpaperManager.listCommand
         onExited: function(exitCode) {
             let sortedLines = lines.sort(function(a, b) {
                 return a.name.localeCompare(b.name);
@@ -252,7 +250,7 @@ Item {
             GhostEmptyState {
                 anchors.centerIn: parent
                 visible: filteredModel.count === 0 && !loadWallpapersProc.running
-                text: searchField.text === "" ? "No wallpapers in ~/Pictures/Wallpapers" : "No wallpapers found"
+                text: searchField.text === "" ? "No wallpapers found in the configured folders" : "No wallpapers found"
                 isAnimating: visible
             }
 

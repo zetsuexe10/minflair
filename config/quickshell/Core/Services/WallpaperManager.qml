@@ -27,6 +27,18 @@ QtObject {
     property Process randomWallpaperProc
     property Timer shuffleTimer
 
+    readonly property string homeWallDir: Quickshell.env("HOME") + "/Pictures/Wallpapers/"
+
+    // shell command listing every image in the configured folders (subfolders included)
+    readonly property var listCommand: ["bash", "-c", "for d in \"$@\"; do case \"$d\" in '~'*) d=\"$HOME${d#'~'}\";; esac; [ -d \"$d\" ] && find -L \"$d\" -maxdepth 5 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' \\) 2>/dev/null; done | awk '!s[$0]++'", "minflair-walls"].concat(SettingsService.wallpaperDirs)
+
+    // what gets saved: just the file name for the classic folder, the full path for everything else
+    function storedName(path) {
+        if (path.startsWith(homeWallDir) && path.indexOf("/", homeWallDir.length) === -1)
+            return path.substring(homeWallDir.length);
+        return path;
+    }
+
     function applyWallpaperWithSync(wallpaperName, rawPath) {
         currentWallpaper = wallpaperName;
         currentWallpaperPath = rawPath;
@@ -111,14 +123,13 @@ QtObject {
     }
 
     randomWallpaperProc: Process {
-        command: ["bash", "-c", "find ~/Pictures/Wallpapers -maxdepth 2 -type f 2>/dev/null | grep -iE '\\.(jpg|jpeg|png|webp|gif)$' | shuf -n 1"]
+        command: root.listCommand.concat([])
         onExited: function(exitCode) {
             if (exitCode === 0) {
-                let path = randomWallOutput.text.trim();
+                const all = randomWallOutput.text.split("\n").map(s => s.trim()).filter(s => s !== "");
+                const path = all.length > 0 ? all[Math.floor(Math.random() * all.length)] : "";
                 if (path) {
-                    let parts = path.split('/');
-                    let wallName = parts[parts.length - 1];
-                    root.applyWallpaperWithSync(wallName, path);
+                    root.applyWallpaperWithSync(root.storedName(path), path);
                 }
             }
         }
@@ -136,7 +147,7 @@ QtObject {
                 let name = wallpaperLoaderOutput.text.trim();
                 if (name) {
                     root.currentWallpaper = name;
-                    root.currentWallpaperPath = name.startsWith("/") ? name : (Quickshell.env("HOME") + "/Pictures/Wallpapers/" + name);
+                    root.currentWallpaperPath = name.startsWith("/") ? name : (root.homeWallDir + name);
                     if (!root.wallpaperRestored) {
                         root.wallpaperRestored = true;
                         root.reapplyCurrentWallpaper();
