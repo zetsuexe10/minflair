@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Hyprland
 import qs.Core
 import qs.Core.Components
@@ -25,6 +26,24 @@ SidePill {
         const r = [];
         for (let i = 0; i < shown; i++)
             r.push(occupied(first + i));
+        return r;
+    }
+
+    // app class of the first window on each shown workspace (for the icons style)
+    readonly property var classes: {
+        const r = [];
+        const list = Hyprland.workspaces ? Hyprland.workspaces.values : [];
+        for (let i = 0; i < shown; i++) {
+            let cls = "";
+            for (let k = 0; k < list.length; k++) {
+                const ws = list[k];
+                if (ws && ws.id === first + i && ws.toplevels && ws.toplevels.values.length > 0) {
+                    const tl = ws.toplevels.values[0];
+                    cls = (tl && tl.lastIpcObject && tl.lastIpcObject.class) ? String(tl.lastIpcObject.class) : "";
+                }
+            }
+            r.push(cls);
+        }
         return r;
     }
 
@@ -126,10 +145,25 @@ SidePill {
                 width: root.slot
                 height: root.slot
 
+                readonly property string appIcon: root.display === "icons" && it.isOcc ? Quickshell.iconPath(root.classes[index].toLowerCase(), true) : ""
+
+                // app icon of the workspace's first window (falls back to the number)
+                Image {
+                    anchors.centerIn: parent
+                    visible: it.appIcon !== ""
+                    width: 17
+                    height: 17
+                    source: it.appIcon
+                    sourceSize: Qt.size(34, 34)
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    smooth: true
+                }
+
                 // numbers
                 SideText {
                     anchors.centerIn: parent
-                    visible: root.display === "numbers" && (it.isActive || it.isOcc || lab.inverted)
+                    visible: (root.display === "numbers" || root.display === "icons") && it.appIcon === "" && (it.isActive || it.isOcc || lab.inverted)
                     text: it.wsId
                     customSize: 13
                     font.bold: true
@@ -138,7 +172,7 @@ SidePill {
 
                 Rectangle {
                     anchors.centerIn: parent
-                    visible: root.display === "numbers" && !(it.isActive || it.isOcc || lab.inverted)
+                    visible: (root.display === "numbers" || root.display === "icons") && it.appIcon === "" && !(it.isActive || it.isOcc || lab.inverted)
                     width: 6
                     height: 6
                     radius: 3
