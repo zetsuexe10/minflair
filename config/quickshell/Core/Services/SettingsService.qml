@@ -42,7 +42,7 @@ Item {
             "rounding": 24,
             "logoImage": "",
             "mode": "amoled",
-            "workspaceStyle": "numbers",
+            "workspaceStyle": "icons",
             "island": false,
             "align": "center",
             "offset": 0,

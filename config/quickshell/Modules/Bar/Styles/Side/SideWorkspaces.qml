@@ -39,7 +39,7 @@ SidePill {
                 const ws = list[k];
                 if (ws && ws.id === first + i && ws.toplevels && ws.toplevels.values.length > 0) {
                     const tl = ws.toplevels.values[0];
-                    cls = (tl && tl.lastIpcObject && tl.lastIpcObject.class) ? String(tl.lastIpcObject.class) : "";
+                    cls = (tl && tl.lastIpcObject && tl.lastIpcObject.class) ? String(tl.lastIpcObject.class) : ((tl && tl.wayland && tl.wayland.appId) ? String(tl.wayland.appId) : "");
                 }
             }
             r.push(cls);
@@ -51,6 +51,24 @@ SidePill {
     readonly property var spatial: [0.38, 1.21, 0.22, 1.0, 1.0, 1.0]
     readonly property int leadMs: 320
     readonly property int trailMs: Math.round(leadMs * 1.5)
+
+    // icon file for an app class: icon theme by name first, then through its desktop entry
+    function iconFor(cls) {
+        if (!cls)
+            return "";
+        let p = Quickshell.iconPath(cls.toLowerCase(), true);
+        if (p !== "")
+            return p;
+        const e = DesktopEntries.heuristicLookup(cls);
+        if (e && e.icon) {
+            p = Quickshell.iconPath(e.icon, true);
+            if (p !== "")
+                return p;
+            if (e.icon.indexOf("/") === 0)
+                return "file://" + e.icon;
+        }
+        return "";
+    }
 
     function occupied(id) {
         const list = Hyprland.workspaces ? Hyprland.workspaces.values : [];
@@ -145,7 +163,7 @@ SidePill {
                 width: root.slot
                 height: root.slot
 
-                readonly property string appIcon: root.display === "icons" && it.isOcc ? Quickshell.iconPath(root.classes[index].toLowerCase(), true) : ""
+                readonly property string appIcon: root.display === "icons" && it.isOcc ? root.iconFor(root.classes[index]) : ""
 
                 // app icon of the workspace's first window (falls back to the number)
                 Image {
