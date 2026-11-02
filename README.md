@@ -105,8 +105,15 @@ bar's edge, and panels that grow out of it. The bar can sit on the left, right, 
   from their bar icons.
 - **Scroll:** over the first half of the bar changes volume, over the second half brightness, over the workspaces
   switches workspace. A vertical indicator on the right edge shows the change.
-- **Dashboard:** Dashboard / Media / Performance / Calendar tabs with a sliding indicator.
-- **Settings:** `Super+Ctrl+S` opens the shell panel (frame, entries, scroll actions, hover panels, GitHub).
+- **Dashboard:** Dashboard / Media / Performance / Weather tabs with a sliding indicator; Left/Right, Tab and Home/End
+  switch tabs, Escape closes. The last tab you used is remembered.
+- **Settings:** `Super+Ctrl+S` opens the shell panel: bar entries and launcher button image, frame, hover panels,
+  dashboard and weather, wallpaper folders, GitHub, and **App Appearance** (GTK/Qt font and size, icon theme, cursor
+  theme and size). App Appearance is written to `~/.minflair` only, so it never changes your other desktops or the
+  shell's own font.
+- **Wallpapers:** `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders included) by default; the list is
+  editable in the panel. Arrow keys browse, Enter sets.
+- **Colours:** the side style derives its own palette from the theme accent, so light and dark mode both stay soft.
 
 | Navigation | |
 | :-- | :-- |

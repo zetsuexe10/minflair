@@ -15,8 +15,8 @@ def main():
     cache_file = os.path.join(home, ".cache", "quickshell", "colorscheme.json")
 
     if not os.path.exists(cache_file):
-        print("Colorscheme cache not found.")
-        return
+        print("Colorscheme cache not found.", file=sys.stderr)
+        sys.exit(1)
 
     with open(cache_file, "r") as f:
         data = json.load(f)

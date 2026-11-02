@@ -57,6 +57,16 @@ $muted_alpha = {hypr_color(muted, "aa")}
         f2.write(hypr_content)
     with open(os.path.join(hypr_dir, "colors.conf"), "w") as f2:
         f2.write(hypr_conf_content)
+    # new GTK clients read these from the session environment (a reload does not rebuild it)
+    gtk_dark = colors.get("is_dark", True)
+    for k, v in (
+        ("GTK_THEME", "adw-gtk3-dark" if gtk_dark else "adw-gtk3"),
+        ("ADW_DEBUG_COLOR_SCHEME", "prefer-dark" if gtk_dark else "prefer-light"),
+    ):
+        try:
+            subprocess.run(["hyprctl", "setenv", k, v], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        except FileNotFoundError:
+            break
     try:
         subprocess.run(
             ["hyprctl", "reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL

@@ -109,11 +109,7 @@ AppContainer {
             onCheckedChanged: {
                 if (checked !== Theme.generateFromWallpaper) {
                     Theme.generateFromWallpaper = checked;
-                    if (checked) {
-                        if (WallpaperManager.currentWallpaperPath !== "")
-                            Theme.generateTheme(WallpaperManager.currentWallpaperPath);
-
-                    } else {
+                    if (!checked) {
                         let t = Theme.themes[0];
                         let baseName = Theme.currentScheme.replace(" Light", "");
                         for (let i = 0; i < Theme.themes.length; i++) {
@@ -132,6 +128,7 @@ AppContainer {
         ThemedSelect {
             label: "Static Theme"
             description: "Color scheme when dynamic colors are off"
+            visible: Theme.themes.length > 1
             enabled: !Theme.generateFromWallpaper
             opacity: enabled ? 1 : 0.5
             model: {

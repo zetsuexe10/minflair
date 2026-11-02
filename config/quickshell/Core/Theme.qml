@@ -51,6 +51,9 @@ QtObject {
     property var wallpaperLightScheme: null
     property bool wallpaperDarkLoaded: false
     property bool wallpaperLightLoaded: false
+    readonly property bool wallpaperPaletteReady: !!(wallpaperColors && wallpaperColors.dark && wallpaperColors.light)
+    property bool _loading: true
+    property bool _applyPending: false
     property Process saver
     property Process loader
     property Process wallpaperDarkLoader
@@ -60,6 +63,14 @@ QtObject {
     property Connections wpConn
 
     signal themeApplied()
+
+    onGenerateFromWallpaperChanged: {
+        if (_loading)
+            return ;
+        saveScheme();
+        if (generateFromWallpaper && WallpaperManager.currentWallpaperPath !== "")
+            generateTheme(WallpaperManager.currentWallpaperPath);
+    }
 
     function applyScheme(scheme) {
         currentScheme = scheme.name;
@@ -71,8 +82,14 @@ QtObject {
     }
 
     function applyWallpaperTheme(isDark) {
-        if (!wallpaperColors || !wallpaperColors.dark || !wallpaperColors.light)
+        if (!wallpaperPaletteReady) {
+            // no wallpaper palette yet: flip to the static scheme now, regenerate in the background
+            wallpaperIsDark = isDark;
+            applyScheme(isDark ? themes[0].dark : themes[0].light);
+            if (WallpaperManager.currentWallpaperPath !== "")
+                generateTheme(WallpaperManager.currentWallpaperPath);
             return ;
+        }
 
         wallpaperIsDark = isDark;
         let activeScheme = isDark ? wallpaperColors.dark : wallpaperColors.light;
@@ -88,7 +105,26 @@ QtObject {
         });
     }
 
+    // one apply at a time: a request that arrives while one runs is replayed afterwards
+    function runApply() {
+        if (applyThemeProc.running) {
+            _applyPending = true;
+            return ;
+        }
+        applyThemeProc.command = ["python3", Quickshell.shellDir + "/Scripts/theme/apply_theme.py"];
+        applyThemeProc.running = true;
+    }
+
+    property Timer saveDebounce: Timer {
+        interval: 200
+        onTriggered: root.writeScheme()
+    }
+
     function saveScheme() {
+        saveDebounce.restart();
+    }
+
+    function writeScheme() {
         let obj = {
             "name": currentScheme,
             "generateFromWallpaper": generateFromWallpaper,
@@ -155,12 +191,19 @@ QtObject {
             wallpaperLightScheme = scheme;
             wallpaperLightLoaded = true;
         }
-        if (wallpaperDarkLoaded && wallpaperLightLoaded)
-            wallpaperColors = {
-            "dark": wallpaperDarkScheme,
-            "light": wallpaperLightScheme
-        };
-
+        if (wallpaperDarkLoaded && wallpaperLightLoaded) {
+            if (wallpaperDarkScheme && wallpaperLightScheme) {
+                wallpaperColors = {
+                    "dark": wallpaperDarkScheme,
+                    "light": wallpaperLightScheme
+                };
+            } else {
+                wallpaperColors = null;
+                // TH-11: dynamic colors on but the variants are missing: rebuild them
+                if (generateFromWallpaper && WallpaperManager.currentWallpaperPath !== "")
+                    generateTheme(WallpaperManager.currentWallpaperPath);
+            }
+        }
     }
 
     Component.onCompleted: loadScheme()
@@ -220,11 +263,8 @@ QtObject {
 
     saver: Process {
         onExited: function(exitCode) {
-            if (exitCode === 0) {
-                applyThemeProc.running = false;
-                applyThemeProc.command = ["python3", Quickshell.shellDir + "/Scripts/theme/apply_theme.py"];
-                applyThemeProc.running = true;
-            }
+            if (exitCode === 0)
+                root.runApply();
         }
     }
 
@@ -258,13 +298,14 @@ QtObject {
                     if (colors.accentComplementary)
                         root.accentComplementary = colors.accentComplementary;
 
-                    applyThemeProc.running = false;
-                    applyThemeProc.command = ["python3", Quickshell.shellDir + "/Scripts/theme/apply_theme.py"];
-                    applyThemeProc.running = true;
+                    root._loading = false;
+                    root.runApply();
                 } catch (e) {
+                    root._loading = false;
                     root.applyScheme(root.themes[0].dark);
                 }
             } else {
+                root._loading = false;
                 root.applyScheme(root.themes[0].dark);
             }
         }
@@ -300,10 +341,19 @@ QtObject {
     }
 
     applyThemeProc: Process {
+        stderr: StdioCollector {
+            id: applyError
+        }
+
         onExited: function(exitCode) {
             if (exitCode === 0)
                 root.themeApplied();
-
+            else
+                console.warn("apply_theme.py failed (" + exitCode + "): " + applyError.text.trim());
+            if (root._applyPending) {
+                root._applyPending = false;
+                root.runApply();
+            }
         }
     }
 

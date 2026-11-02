@@ -72,8 +72,19 @@ def main():
         json.dump(active_generated, f, indent=2)
 
     if should_write_active:
+        # merge: keep user keys (bgOpacity, ...) and only replace the generated colours
+        try:
+            with open(active_file) as f:
+                merged = json.load(f)
+        except Exception:
+            merged = {}
+        merged.update(active_generated)
+        for derived in ("opaqueBg", "muted", "border", "shadow", "overlayBase",
+                        "bgSecondary", "bgTertiary", "bgAccent", "bgAccentComplementary"):
+            merged.pop(derived, None)   # re-derived by the shell from the new colours
+        merged["opaqueBg"] = merged["bg"]
         with open(active_file, "w") as f:
-            json.dump(active_generated, f, indent=2)
+            json.dump(merged, f, indent=2)
         print("Success: Generated colorscheme.json and wallpaper variants")
     else:
         print("Success: Generated wallpaper variants (active colorscheme preserved)")
