@@ -62,7 +62,7 @@ Rectangle {
 
         Loader {
             Layout.alignment: Qt.AlignVCenter
-            sourceComponent: root.kind === "toggle" ? toggleC : (root.kind === "stepper" ? stepperC : (root.kind === "select" ? selectC : (root.kind === "text" ? textC : (root.kind === "button" ? buttonC : infoC))))
+            sourceComponent: root.kind === "toggle" ? toggleC : (root.kind === "stepper" ? stepperC : (root.kind === "select" ? selectC : (root.kind === "text" ? textC : (root.kind === "button" ? buttonC : (root.kind === "picker" ? pickerC : infoC)))))
         }
     }
 
@@ -184,6 +184,107 @@ Rectangle {
                         onTapped: root.edited(parent.modelData.value)
                     }
                 }
+            }
+        }
+    }
+
+    // picker: type a name or step through the installed ones with the arrows (options: [string])
+    Component {
+        id: pickerC
+
+        Row {
+            id: pk
+
+            readonly property int idx: root.options.indexOf(String(root.value))
+
+            function move(d) {
+                const n = root.options.length;
+                if (n === 0)
+                    return;
+                const i = idx < 0 ? (d > 0 ? 0 : n - 1) : (idx + d + n) % n;
+                root.edited(root.options[i]);
+            }
+
+            spacing: 6
+
+            Repeater {
+                model: ["‹", "›"]
+
+                Rectangle {
+                    id: arrow
+
+                    required property string modelData
+                    required property int index
+
+                    visible: arrow.index === 0
+                    width: 32
+                    height: 34
+                    radius: 17
+                    color: ah.hovered ? SideState.cardHi : SideState.card
+
+                    SideText {
+                        anchors.centerIn: parent
+                        text: arrow.modelData
+                        customSize: 16
+                        font.bold: true
+                    }
+
+                    HoverHandler { id: ah; cursorShape: Qt.PointingHandCursor }
+                    TapHandler { onTapped: pk.move(-1) }
+                }
+            }
+
+            Rectangle {
+                width: 200
+                height: 34
+                radius: 17
+                color: SideState.cardHi
+                border.width: pin.activeFocus ? 1 : 0
+                border.color: SideState.primary
+
+                TextInput {
+                    id: pin
+
+                    anchors.fill: parent
+                    anchors.leftMargin: 14
+                    anchors.rightMargin: 14
+                    verticalAlignment: TextInput.AlignVCenter
+                    text: root.value === null ? "" : String(root.value)
+                    color: SideState.fg
+                    selectionColor: SideState.primary
+                    selectedTextColor: SideState.surface
+                    font.family: Constants.fontFamily
+                    font.pixelSize: Math.round(12 * SettingsService.fontScale)
+                    clip: true
+                    onEditingFinished: root.edited(text.trim())
+                }
+
+                Text {
+                    visible: pin.text === ""
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 14
+                    text: root.placeholder
+                    color: SideState.muted
+                    font: pin.font
+                }
+            }
+
+            Rectangle {
+                width: 32
+                height: 34
+                radius: 17
+                color: bh2.hovered ? SideState.cardHi : SideState.card
+
+                SideText {
+                    anchors.centerIn: parent
+                    text: "›"
+                    customSize: 16
+                    font.bold: true
+                }
+
+                HoverHandler { id: bh2; cursorShape: Qt.PointingHandCursor }
+                TapHandler { onTapped: pk.move(1) }
             }
         }
     }

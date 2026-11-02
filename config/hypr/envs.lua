@@ -50,3 +50,22 @@ hl.env("XCURSOR_SIZE", "16")
 hl.env("HYPRCURSOR_SIZE", "16")
 hl.env("XCURSOR_THEME", cursor)
 hl.env("HYPRCURSOR_THEME", cursor)
+
+-- cursor theme/size chosen in Shell Settings > App Appearance (kept in ~/.minflair/theme.json)
+do
+	local sf = io.open(home .. "/.minflair/theme.json", "r")
+	if sf then
+		local s = sf:read("a") or ""
+		sf:close()
+		local c = s:match('"cursor"%s*:%s*"([^"]+)"')
+		local z = s:match('"cursor_size"%s*:%s*(%d+)')
+		if c then
+			hl.env("XCURSOR_THEME", c)
+			hl.env("HYPRCURSOR_THEME", c)
+		end
+		if z then
+			hl.env("XCURSOR_SIZE", z)
+			hl.env("HYPRCURSOR_SIZE", z)
+		end
+	end
+end

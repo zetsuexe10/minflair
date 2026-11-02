@@ -31,6 +31,10 @@ def main():
     Path(ROOT).mkdir(parents=True, exist_ok=True)
     Path(STATE).write_text(json.dumps(st, indent=2))
 
+    if st.get("gtk_font"):
+        # an app font was chosen in Appearance: the shell font no longer drives GTK/Qt
+        return
+
     for gtk_ver in ["gtk-3.0", "gtk-4.0"]:
         ini_path = Path(XDG) / gtk_ver / "settings.ini"
         if ini_path.is_file():

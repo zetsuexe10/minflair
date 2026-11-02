@@ -23,6 +23,10 @@ def _settings_ini(path, theme, extra):
         keys["gtk-font-name"] = extra["font"]
     if extra.get("cursor"):
         keys["gtk-cursor-theme-name"] = extra["cursor"]
+    if extra.get("icon"):
+        keys["gtk-icon-theme-name"] = extra["icon"]
+    if extra.get("cursor_size"):
+        keys["gtk-cursor-theme-size"] = extra["cursor_size"]
     lines, seen = [], set()
     if os.path.exists(path):
         with open(path) as f:
@@ -79,8 +83,10 @@ def apply(home, colors):
         pass
     extra = {
         "dark": "1" if is_dark else "0",
-        "font": prev.get("font"),
+        "font": (f'{prev["gtk_font"]} {prev.get("gtk_font_size", 11)}' if prev.get("gtk_font") else prev.get("font")),
         "cursor": prev.get("cursor"),
+        "icon": prev.get("icon_theme"),
+        "cursor_size": prev.get("cursor_size"),
     }
     for d in ("gtk-3.0", "gtk-4.0"):
         _write(os.path.join(XDG, d, "gtk.css"), css)

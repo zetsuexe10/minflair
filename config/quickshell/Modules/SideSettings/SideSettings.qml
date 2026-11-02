@@ -57,6 +57,22 @@ AppWindow {
                 { "kind": "stepper", "label": "Corner rounding", "desc": "Radius of the inner corners and of the panels", "cfg": ["rounding"], "from": 0, "to": 48, "step": 2, "suffix": " px" }
             ] }
         ] },
+        { "title": "App Appearance", "icon": "font", "sub": "GTK / Qt apps in this session only", "sections": [
+            { "name": "Font", "rows": [
+                { "kind": "picker", "label": "App font", "desc": "Font for GTK and Qt apps. The shell font is not affected", "app": "gtk_font", "list": "fonts", "placeholder": "Font family" },
+                { "kind": "stepper", "label": "App font size", "desc": "Point size for GTK and Qt apps", "app": "gtk_font_size", "from": 6, "to": 32, "step": 1, "suffix": " pt" }
+            ] },
+            { "name": "Icons", "rows": [
+                { "kind": "picker", "label": "Icon theme", "desc": "Icons in GTK and Qt apps", "app": "icon_theme", "list": "iconThemes", "placeholder": "Icon theme" }
+            ] },
+            { "name": "Cursor", "rows": [
+                { "kind": "picker", "label": "Cursor theme", "desc": "Mouse pointer of this session", "app": "cursor", "list": "cursorThemes", "placeholder": "Cursor theme" },
+                { "kind": "stepper", "label": "Cursor size", "desc": "Pointer size in pixels", "app": "cursor_size", "from": 12, "to": 96, "step": 4, "suffix": " px" }
+            ] },
+            { "name": "Scope", "rows": [
+                { "kind": "info", "label": "Where this applies", "desc": "Written to ~/.minflair only: your ~/.config GTK/Qt files and gsettings are never touched. Running apps need a restart; new ones pick it up." , "text": "This session" }
+            ] }
+        ] },
         { "title": "Wallpapers", "icon": "picture", "sub": "Where wallpapers are picked from", "sections": [
             { "name": "Folders", "rows": [
                 { "kind": "text", "label": "Wallpaper folders", "desc": "Comma separated; subfolders are searched too. Choose with Super+W, arrow keys to browse, Enter to set", "prop": "wallpaperDirs", "list": true, "placeholder": "~/Pictures/Wallpapers, /usr/share/backgrounds" },
@@ -130,6 +146,8 @@ AppWindow {
     }
 
     function getValue(row) {
+        if (row.app)
+            return AppearanceService.values[row.app];
         if (row.cfg)
             return SettingsService.sideCfg(row.cfg[0], row.cfg[1]);
         if (row.prop)
@@ -152,7 +170,9 @@ AppWindow {
     }
 
     function setValue(row, v) {
-        if (row.cfg)
+        if (row.app)
+            AppearanceService.set(row.app, v);
+        else if (row.cfg)
             SettingsService.setSideCfg(row.cfg[0], row.cfg[1], v);
         else if (row.prop)
             SettingsService[row.prop] = row.list ? String(v).split(",").map(s => s.trim()).filter(s => s !== "") : v;
@@ -405,7 +425,7 @@ AppWindow {
                             label: modelData.label
                             desc: modelData.desc || ""
                             value: root.getValue(modelData)
-                            options: modelData.options || []
+                            options: modelData.list ? AppearanceService[modelData.list] : (modelData.options || [])
                             from: modelData.from || 0
                             to: modelData.to || 100
                             step: modelData.step || 1
@@ -448,7 +468,7 @@ AppWindow {
                                     label: modelData.label
                                     desc: modelData.desc || ""
                                     value: root.getValue(modelData)
-                                    options: modelData.options || []
+                                    options: modelData.list ? AppearanceService[modelData.list] : (modelData.options || [])
                                     from: modelData.from || 0
                                     to: modelData.to || 100
                                     step: modelData.step || 1

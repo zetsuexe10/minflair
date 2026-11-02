@@ -70,6 +70,12 @@ def apply(home, colors):
         config["Appearance"]["color_scheme_path"] = scheme_path
         config["Appearance"]["custom_palette"] = "true"
         config["Appearance"].setdefault("style", "Fusion")
-        config["Appearance"]["icon_theme"] = "Papirus-Dark" if is_dark else "Papirus-Light"
+        try:
+            import json as _json
+            from minflair_paths import STATE as _STATE
+            chosen = _json.load(open(_STATE)).get("icon_theme")
+        except Exception:
+            chosen = None
+        config["Appearance"]["icon_theme"] = chosen or ("Papirus-Dark" if is_dark else "Papirus-Light")
         with open(qtct_conf, "w") as configfile:
             config.write(configfile)
