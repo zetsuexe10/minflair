@@ -69,7 +69,9 @@ $muted_alpha = {hypr_color(muted, "aa")}
         f2.write(hypr_conf_content)
     # new GTK clients read these from the session environment (a reload does not rebuild it)
     gtk_dark = colors.get("is_dark", True)
+    from minflair_paths import XDG as _XDG
     for k, v in (
+        ("XDG_CONFIG_HOME", _XDG),
         ("GTK_THEME", _gtk_theme(gtk_dark)),
         ("ADW_DEBUG_COLOR_SCHEME", "prefer-dark" if gtk_dark else "prefer-light"),
     ):

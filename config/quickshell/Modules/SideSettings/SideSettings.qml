@@ -76,6 +76,9 @@ AppWindow {
                 { "kind": "picker", "label": "Cursor theme", "desc": "Mouse pointer of this session", "app": "cursor", "list": "cursorThemes", "placeholder": "Cursor theme" },
                 { "kind": "stepper", "label": "Cursor size", "desc": "Pointer size in pixels", "app": "cursor_size", "from": 12, "to": 96, "step": 4, "suffix": " px" }
             ] },
+            { "name": "Status", "rows": [
+                { "kind": "info", "label": "Session overlay", "desc": "Apps read these settings through ~/.minflair. If this says no, log out and in once with the Minflair Hyprland config.", "info": "overlay" }
+            ] },
             { "name": "Scope", "rows": [
                 { "kind": "info", "label": "Where this applies", "desc": "Written to ~/.minflair only: your ~/.config GTK/Qt files and gsettings are never touched. Running apps need a restart; new ones pick it up." , "text": "This session" }
             ] }
@@ -164,6 +167,7 @@ AppWindow {
         if (row.action)
             return row.value;
         switch (row.info) {
+        case "overlay": return AppearanceService.lastError !== "" ? ("Error: " + AppearanceService.lastError) : (AppearanceService.overlayActive ? "Active" : "Not active in this session (new apps still get it)");
         case "weather": return WeatherService.loaded ? (WeatherService.city + ", " + WeatherService.temp + WeatherService.unit) : (WeatherService.errorText || "Loading...");
         case "token": return GithubService.tokenMessage !== "" ? GithubService.tokenMessage : (GithubService.hasToken ? "Valid" : "None");
         case "repos": return GithubService.repos.length + (GithubService.hasToken ? " (" + GithubService.privateRepos + " private)" : "");

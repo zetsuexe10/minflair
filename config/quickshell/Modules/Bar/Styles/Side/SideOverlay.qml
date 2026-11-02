@@ -110,6 +110,7 @@ PanelWindow {
             if (typeof item[resets[i]] === "function")
                 item[resets[i]]();
         if (needsFocus) {
+            refocus.restart();
             _pendingFocusItem = item.initialFocusItem ? (item.initialFocusItem.textField ? item.initialFocusItem.textField : item.initialFocusItem) : item;
             _focusAttempts = 0;
             focusTimer.restart();
@@ -166,6 +167,19 @@ PanelWindow {
 
         interval: Constants.animSlow + 80
         onTriggered: root.shownId = ""
+    }
+
+    Timer {
+        id: refocus
+
+        interval: 120
+        onTriggered: {
+            const it = keySink.activeItem;
+            if (!root.needsFocus || !it)
+                return ;
+            const f = it.initialFocusItem ? (it.initialFocusItem.textField ? it.initialFocusItem.textField : it.initialFocusItem) : it;
+            f.forceActiveFocus();
+        }
     }
 
     Timer {
@@ -261,6 +275,20 @@ PanelWindow {
 
     // ---- stage: the screen minus the frame, panels live in here ---------------------------------
 
+    // keyboard sink: forwards every key to the open widget's input like the island does, so
+    // navigation works even before the compositor reports the window as active
+    Item {
+        id: keySink
+
+        readonly property var activeItem: root.isCentered ? centerLoader.item : panelLoader.item
+        readonly property var target: (activeItem && activeItem.initialFocusItem) ? activeItem.initialFocusItem : null
+
+        focus: root.needsFocus
+        Keys.enabled: root.needsFocus
+        Keys.forwardTo: target ? (target.textField ? [target.textField, target] : [target]) : (activeItem ? [activeItem] : [])
+        Keys.onEscapePressed: AppState.closeAllWidgets()
+    }
+
     // click outside closes, Escape closes
     MouseArea {
         x: root.insL
@@ -268,8 +296,6 @@ PanelWindow {
         width: root.freeW
         height: root.freeH
         enabled: root.open
-        focus: root.needsFocus
-        Keys.onEscapePressed: AppState.closeAllWidgets()
         onClicked: AppState.closeAllWidgets()
     }
 

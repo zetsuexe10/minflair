@@ -144,7 +144,21 @@ def hypr(*args):
         pass
 
 
+def session_env():
+    """Make the Minflair overlay the config home of apps started from now on (no re-login)."""
+    script = os.path.join(HOME, ".config/hypr/scripts/minflair-env.sh")
+    if os.path.exists(script):
+        try:
+            subprocess.run([script], capture_output=True, timeout=20)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    if os.path.isdir(os.path.join(XDG, "gtk-3.0")):
+        hypr("setenv", "XDG_CONFIG_HOME", XDG)
+        hypr("setenv", "QT_QPA_PLATFORMTHEME", "qt6ct")
+
+
 def apply(cur, is_dark=True):
+    session_env()
     keys = {}
     chosen = cur["gtk_theme"] or ("adw-gtk3-dark" if is_dark else "adw-gtk3")
     keys["gtk-theme-name"] = chosen

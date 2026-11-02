@@ -15,6 +15,9 @@ QtObject {
     property var iconThemes: []
     property var cursorThemes: []
     property bool loaded: false
+    // true when this shell was started inside the Minflair overlay, i.e. apps already read ~/.minflair
+    readonly property bool overlayActive: Quickshell.env("XDG_CONFIG_HOME") === Quickshell.env("HOME") + "/.minflair/xdg"
+    property string lastError: ""
     property bool busy: setProc.running
     readonly property string script: Quickshell.shellDir + "/Scripts/theme/appearance.py"
 
@@ -75,6 +78,9 @@ QtObject {
     }
 
     readonly property Process setProc: Process {
+        stderr: StdioCollector {
+            onStreamFinished: root.lastError = text.trim()
+        }
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
