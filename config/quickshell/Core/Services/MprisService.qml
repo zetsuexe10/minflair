@@ -15,6 +15,29 @@ Item {
     property var playerDisplayNames: ({
     })
     property var activePlayer: null
+    property string selectedBus: ""
+    // every player the Media tab can switch between
+    readonly property var selectable: {
+        const out = [];
+        const list = managedPlayers || [];
+        for (let i = 0; i < list.length; i++) {
+            if (list[i] && matchesConfiguredPlayer(list[i]))
+                out.push(list[i]);
+        }
+        return out;
+    }
+
+    function selectPlayer(p) {
+        root.selectedBus = p ? (p.dbusName || "") : "";
+        updatePlayer();
+    }
+
+    function playerLabel(p) {
+        if (!p)
+            return "";
+        const id = (p.identity || "").trim();
+        return id !== "" ? id : String(p.dbusName || "").replace("org.mpris.MediaPlayer2.", "");
+    }
     readonly property bool isPlaying: root.activePlayer !== null && (root.activePlayer.playbackState === 1 || root.activePlayer.playbackState === Mpris.Playing || String(root.activePlayer.playbackState).toLowerCase().includes("playing"))
     readonly property string activePlayerName: {
         if (!root.activePlayer)
@@ -121,7 +144,7 @@ Item {
 
         let pref = (SettingsService.musicPlayer || "").toLowerCase().trim();
         if (!pref || pref === "none")
-            return false;
+            return SettingsService.sideFamily;   // Side and Pill follow whatever is playing, like Caelestia
 
         let id = (p.identity || "").toLowerCase();
         let desktop = (p.desktopEntry || "").toLowerCase();
@@ -224,6 +247,18 @@ Item {
             }
         }
         let chosen = matchingPlaying || matchingPaused || null;
+        // a player picked by hand in the Media tab wins while it still exists
+        if (root.selectedBus !== "") {
+            let picked = null;
+            for (let k = 0; k < players.length; k++) {
+                if (players[k] && players[k].dbusName === root.selectedBus && matchesConfiguredPlayer(players[k]))
+                    picked = players[k];
+            }
+            if (picked)
+                chosen = picked;
+            else
+                root.selectedBus = "";
+        }
         if (root.activePlayer !== chosen)
             root.activePlayer = chosen;
 

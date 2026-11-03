@@ -1,57 +1,42 @@
+pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Core.Services
-pragma Singleton
 
+// Audio levels for the media visualiser, from `cava` when it is installed. Consumers raise `users`
+// while they are on screen; the process only runs while someone is watching.
 Item {
     id: root
 
-    property var cavaData: []
-    readonly property bool isCavaActive: MprisService.isPlaying && SystemInfoService.powerProfile !== "power-saver"
-
-    Timer {
-        id: watchdog
-
-        interval: 1000
-        repeat: true
-        running: root.isCavaActive
-        onTriggered: {
-            if (root.isCavaActive && !cavaProc.running)
-                cavaProc.running = true;
-
-        }
-    }
+    readonly property int bars: 28
+    property int users: 0
+    property var values: new Array(bars).fill(0)
+    property bool available: true
+    readonly property bool wanted: users > 0
 
     Process {
-        id: cavaProc
+        id: proc
 
-        command: ["sh", "-c", "exec cava -p \"$1\"", "minflair-cava", Quickshell.shellDir + "/Modules/Music/cava.conf"]
-        running: root.isCavaActive
-        onRunningChanged: {
-            if (!running)
-                root.cavaData = [];
-
+        running: root.wanted && root.available
+        command: ["bash", "-c", "command -v cava >/dev/null || exit 127; exec cava -p <(printf '[general]\\nbars=" + root.bars + "\\nframerate=30\\nsleep_timer=3\\n[output]\\nmethod=raw\\nraw_target=/dev/stdout\\ndata_format=ascii\\nascii_max_value=100\\nbar_delimiter=59\\n[smoothing]\\nnoise_reduction=70\\n')"]
+        onExited: (code) => {
+            if (code === 127)
+                root.available = false;
         }
 
         stdout: SplitParser {
-            onRead: (data) => {
-                let trimmed = data.trim();
-                if (!trimmed)
-                    return ;
-
-                let parts = trimmed.split(";");
-                let vals = [];
-                for (let i = 0; i < 36 && i < parts.length; i++) {
-                    let val = parseInt(parts[i]);
-                    vals.push(isNaN(val) ? 0 : val);
-                }
-                if (vals.length > 0)
-                    root.cavaData = vals;
-
+            onRead: (line) => {
+                const parts = line.split(";");
+                const out = new Array(root.bars);
+                for (let i = 0; i < root.bars; i++)
+                    out[i] = Math.max(0, Math.min(1, (parseInt(parts[i]) || 0) / 100));
+                root.values = out;
             }
         }
-
     }
 
+    onWantedChanged: {
+        if (!wanted)
+            values = new Array(bars).fill(0);
+    }
 }
