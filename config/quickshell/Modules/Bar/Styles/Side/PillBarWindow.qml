@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
@@ -147,9 +148,12 @@ PanelWindow {
             id: slot
 
             // time | workspaces | window; workspaces take over for a moment when you switch
-            readonly property string view: root.peek ? "workspaces" : root.idleView
+            readonly property string view: (SettingsService.sideOsd && OsdService.isOpen) ? "osd" : (root.peekView !== "" ? root.peekView : root.idleView)
             readonly property real viewLen: view === "workspaces" ? (root.vertical ? ws.implicitHeight : ws.implicitWidth)
-                : view === "window" ? (root.vertical ? 120 : 190) : (root.vertical ? clk.implicitHeight : clk.implicitWidth)
+                : view === "window" ? (root.vertical ? 120 : 190)
+                : view === "media" ? (root.vertical ? root.railSize : 220)
+                : view === "osd" ? (root.vertical ? 150 : 210)
+                : (root.vertical ? clk.implicitHeight : clk.implicitWidth)
 
             anchors.centerIn: parent
             width: root.vertical ? root.railSize : viewLen
@@ -187,6 +191,126 @@ PanelWindow {
 
                 Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
                 Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack } }
+            }
+
+            // song change: cover and title pop in for a moment
+            Item {
+                anchors.fill: parent
+                opacity: slot.view === "media" ? 1 : 0
+                scale: slot.view === "media" ? 1 : 0.85
+                visible: opacity > 0.01
+
+                Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
+                Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack } }
+
+                Rectangle {
+                    id: miniArt
+
+                    anchors.verticalCenter: root.vertical ? undefined : parent.verticalCenter
+                    anchors.horizontalCenter: root.vertical ? parent.horizontalCenter : undefined
+                    x: root.vertical ? 0 : 2
+                    width: 26
+                    height: 26
+                    radius: 13
+                    color: SideState.cardHi
+
+                    Item {
+                        id: artMask
+
+                        anchors.fill: parent
+                        visible: false
+                        layer.enabled: true
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: width / 2
+                        }
+                    }
+
+                    Image {
+                        anchors.fill: parent
+                        source: MprisService.activePlayer ? (MprisService.activePlayer.trackArtUrl || "") : ""
+                        fillMode: Image.PreserveAspectCrop
+                        sourceSize: Qt.size(64, 64)
+                        asynchronous: true
+                        layer.enabled: true
+                        layer.effect: MultiEffect {
+                            maskEnabled: true
+                            maskSource: artMask
+                        }
+                    }
+                }
+
+                SideText {
+                    visible: !root.vertical
+                    anchors.left: miniArt.right
+                    anchors.leftMargin: 10
+                    anchors.right: parent.right
+                    anchors.rightMargin: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: MprisService.activePlayer ? ((MprisService.activePlayer.trackTitle || "") + (MprisService.activePlayer.trackArtist ? "  ·  " + MprisService.activePlayer.trackArtist : "")) : ""
+                    customSize: 12
+                    elide: Text.ElideRight
+                }
+            }
+
+            // volume / brightness / mic, shown inside the capsule instead of a separate panel
+            Item {
+                anchors.fill: parent
+                opacity: slot.view === "osd" ? 1 : 0
+                scale: slot.view === "osd" ? 1 : 0.85
+                visible: opacity > 0.01
+
+                Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
+                Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack } }
+
+                GridLayout {
+                    anchors.centerIn: parent
+                    flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+                    rows: root.vertical ? 99 : 1
+                    columns: root.vertical ? 1 : 99
+                    rowSpacing: 8
+                    columnSpacing: 10
+
+                    SvgIcon {
+                        Layout.alignment: Qt.AlignCenter
+                        icon: OsdService.icon
+                        iconSize: 18
+                        iconColor: OsdService.isMuted ? SideState.muted : SideState.primary
+                        flat: true
+                    }
+
+                    Rectangle {
+                        visible: OsdService.showProgress
+                        Layout.alignment: Qt.AlignCenter
+                        Layout.preferredWidth: root.vertical ? 8 : 100
+                        Layout.preferredHeight: root.vertical ? 56 : 8
+                        radius: 4
+                        color: SideState.card
+
+                        Rectangle {
+                            x: 0
+                            y: root.vertical ? parent.height * (1 - OsdService.level) : 0
+                            width: root.vertical ? parent.width : parent.width * OsdService.level
+                            height: root.vertical ? parent.height * OsdService.level : parent.height
+                            radius: 4
+                            color: OsdService.isMuted ? SideState.muted : SideState.primary
+
+                            Behavior on width { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
+                            Behavior on height { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
+                            Behavior on y { NumberAnimation { duration: 90; easing.type: Easing.OutCubic } }
+                        }
+                    }
+
+                    SideText {
+                        Layout.alignment: Qt.AlignCenter
+                        Layout.preferredWidth: root.vertical ? -1 : 40
+                        horizontalAlignment: Text.AlignRight
+                        text: OsdService.valueText
+                        customSize: 11
+                        font.bold: true
+                    }
+                }
             }
 
             SideActiveWindow {
@@ -300,14 +424,28 @@ PanelWindow {
 
     // hovered or busy: stays open while a panel or popout belongs to the bar
     property bool keepOpen: false
-    // workspaces pop in for a moment after a switch, then the capsule goes back to its idle view
-    property bool peek: false
+    // workspaces / the new song pop in for a moment, then the capsule goes back to its idle view
+    property string peekView: ""
     readonly property int activeWs: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
 
     onActiveWsChanged: {
         if (root.shown && root.idleView !== "workspaces") {
-            root.peek = true;
+            root.peekView = "workspaces";
+            transientTimer.interval = 2200;
             transientTimer.restart();
+        }
+    }
+
+    Connections {
+        target: MprisService.activePlayer
+        ignoreUnknownSignals: true
+
+        function onTrackTitleChanged() {
+            if (root.shown && MprisService.isPlaying && MprisService.activePlayer && MprisService.activePlayer.trackTitle) {
+                root.peekView = "media";
+                transientTimer.interval = 3600;
+                transientTimer.restart();
+            }
         }
     }
 
@@ -315,6 +453,9 @@ PanelWindow {
         id: transientTimer
 
         interval: 2200
-        onTriggered: root.peek = false
+        onTriggered: {
+            root.peekView = "";
+            interval = 2200;
+        }
     }
 }
