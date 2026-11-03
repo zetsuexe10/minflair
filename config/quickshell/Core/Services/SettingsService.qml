@@ -46,6 +46,7 @@ Item {
             "workspaceStyle": "shapes",
                         "align": "center",
             "pinned": false,
+            "reserve": true,
             "idle": "time",
             "offset": 0,
             "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},

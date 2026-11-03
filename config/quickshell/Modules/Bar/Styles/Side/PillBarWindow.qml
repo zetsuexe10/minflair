@@ -31,7 +31,8 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-pill-bar"
-    WlrLayershell.exclusiveZone: 0
+    // tiled windows stop below/beside the pill unless "Reserve space" is off in Shell settings > Pill
+    WlrLayershell.exclusiveZone: (shown && SettingsService.sideCfg("reserve") !== false) ? thickMax + gapEdge + 4 : 0
     color: "transparent"
     focusable: false
     visible: SettingsService.settingsLoaded
@@ -148,7 +149,8 @@ PanelWindow {
             id: slot
 
             // time | workspaces | window; workspaces take over for a moment when you switch
-            readonly property string view: (SettingsService.sideOsd && OsdService.isOpen) ? "osd" : (root.peekView !== "" ? root.peekView : root.idleView)
+            readonly property string wanted: root.peekView !== "" ? root.peekView : root.idleView
+            readonly property string view: (SettingsService.sideOsd && OsdService.isOpen) ? "osd" : ((wanted === "window" && compactWindow.title === "") ? "time" : wanted)
             readonly property real viewLen: view === "workspaces" ? (root.vertical ? ws.implicitHeight : ws.implicitWidth)
                 : view === "window" ? (root.vertical ? 120 : 190)
                 : view === "media" ? (root.vertical ? root.railSize : 220)
@@ -314,6 +316,8 @@ PanelWindow {
             }
 
             SideActiveWindow {
+                id: compactWindow
+
                 anchors.centerIn: parent
                 width: root.vertical ? root.railSize : parent.width
                 height: root.vertical ? parent.height : root.railSize

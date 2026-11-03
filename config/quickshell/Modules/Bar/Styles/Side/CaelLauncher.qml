@@ -53,7 +53,7 @@ Item {
 
     // apps started from the launcher get the Minflair GTK/Qt overlay (theme, font, icons, cursor)
     function withEnv(cmd) {
-        return ". \"$HOME/.minflair/launch.env\" 2>/dev/null; " + cmd;
+        return "[ -r \"$HOME/.minflair/launch.env\" ] && . \"$HOME/.minflair/launch.env\"; " + cmd;
     }
 
     function quote(t) {
