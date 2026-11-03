@@ -13,7 +13,24 @@ Item {
     property date currentTime: systemClock.date
     property string osId: "arch"
     property string osPretty: ""
+    property string osLike: ""
+    property string osLogoName: ""
+    property string osIssue: ""
+    // branding shown to the user: the override from settings, then /etc/issue when a derivative
+    // brands itself there (os-release often still says Debian/Arch), then os-release itself
+    readonly property string issueBrand: {
+        const s = osIssue.replace(/\\[a-zA-Z]/g, "").replace(/\s+/g, " ").trim();
+        if (s === "")
+            return "";
+        const base = ([osId, osPretty.split(" ")[0]].concat(osLike.split(" "))).filter(w => w !== "").map(w => w.toLowerCase());
+        const low = s.toLowerCase();
+        return base.some(w => low.indexOf(w) === 0) ? "" : s;
+    }
     readonly property string osName: {
+        if (SettingsService.osNameOverride !== "")
+            return SettingsService.osNameOverride;
+        if (issueBrand !== "")
+            return issueBrand;
         if (osPretty !== "")
             return osPretty;
         switch (osId) {
@@ -107,7 +124,7 @@ Item {
     Process {
         id: osReleaseProc
 
-        command: ["sh", "-c", ". /etc/os-release 2>/dev/null; printf '%s\\n%s\\n' \"$ID\" \"${PRETTY_NAME:-$NAME}\""]
+        command: ["sh", "-c", ". /etc/os-release 2>/dev/null; printf '%s\\n%s\\n%s\\n%s\\n%s\\n' \"$ID\" \"${PRETTY_NAME:-$NAME}\" \"$ID_LIKE\" \"$LOGO\" \"$(head -n1 /etc/issue 2>/dev/null)\""]
         running: true
         onExited: (exitCode) => {
             if (exitCode === 0) {
@@ -117,6 +134,9 @@ Item {
                     systemInfoService.osId = id;
 
                 systemInfoService.osPretty = (lines[1] || "").trim();
+                systemInfoService.osLike = (lines[2] || "").trim();
+                systemInfoService.osLogoName = (lines[3] || "").trim();
+                systemInfoService.osIssue = (lines[4] || "").trim();
 
             }
         }

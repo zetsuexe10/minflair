@@ -47,8 +47,13 @@ Item {
 
     function shell(cmd) {
         AppState.closeAllWidgets();
-        const request = Hyprland.usingLua ? "hl.dsp.exec_cmd(" + JSON.stringify("sh -c " + quote(cmd)) + ")" : "exec sh -c " + quote(cmd);
+        const request = Hyprland.usingLua ? "hl.dsp.exec_cmd(" + JSON.stringify("sh -c " + quote(withEnv(cmd))) + ")" : "exec sh -c " + quote(cmd);
         Hyprland.dispatch(request);
+    }
+
+    // apps started from the launcher get the Minflair GTK/Qt overlay (theme, font, icons, cursor)
+    function withEnv(cmd) {
+        return ". \"$HOME/.minflair/launch.env\" 2>/dev/null; " + cmd;
     }
 
     function quote(t) {
@@ -139,7 +144,7 @@ Item {
             let cmd = String(r.exec).trim();
             if (r.terminal)
                 cmd = "foot " + cmd;
-            Hyprland.dispatch(Hyprland.usingLua ? "hl.dsp.exec_cmd(" + JSON.stringify(cmd) + ")" : "exec " + cmd);
+            Hyprland.dispatch(Hyprland.usingLua ? "hl.dsp.exec_cmd(" + JSON.stringify("sh -c " + quote(withEnv(cmd))) + ")" : "exec sh -c " + quote(withEnv(cmd)));
         } else if (r.kind === "calc") {
             Quickshell.execDetached(["wl-copy", r.name]);
             AppState.closeAllWidgets();

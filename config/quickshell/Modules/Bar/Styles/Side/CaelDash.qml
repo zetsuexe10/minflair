@@ -137,19 +137,44 @@ Item {
                                 color: SideState.cardHi
                                 clip: true
 
+                                // 1. the logo set in Shell Settings, 2. ~/.face, 3. the distro's own logo, 4. the initial
+                                Image {
+                                    id: logoImg
+
+                                    anchors.fill: parent
+                                    anchors.margins: 14
+                                    source: SideState.logoSource
+                                    fillMode: Image.PreserveAspectFit
+                                    sourceSize: Qt.size(160, 160)
+                                    smooth: true
+                                    visible: status === Image.Ready
+                                }
+
                                 Image {
                                     id: face
 
                                     anchors.fill: parent
-                                    source: "file://" + root.home + "/.face"
+                                    source: logoImg.visible ? "" : "file://" + root.home + "/.face"
                                     fillMode: Image.PreserveAspectCrop
                                     sourceSize: Qt.size(168, 168)
-                                    visible: status === Image.Ready
+                                    visible: status === Image.Ready && !logoImg.visible
+                                }
+
+                                Image {
+                                    id: osImg
+
+                                    anchors.fill: parent
+                                    anchors.margins: 16
+                                    source: (logoImg.visible || face.visible) ? "" : Quickshell.iconPath(SystemInfoService.osLogoName !== "" ? SystemInfoService.osLogoName : ("distributor-logo-" + SystemInfoService.osId), true)
+                                    fillMode: Image.PreserveAspectFit
+                                    sourceSize: Qt.size(160, 160)
+                                    smooth: true
+                                    visible: status === Image.Ready && !logoImg.visible && !face.visible
                                 }
 
                                 SideText {
                                     anchors.centerIn: parent
-                                    visible: face.status !== Image.Ready
+                                    visible: !logoImg.visible && !face.visible && !osImg.visible
                                     text: (SystemStats.username || "?").charAt(0).toUpperCase()
                                     customSize: 32
                                     font.bold: true

@@ -33,6 +33,7 @@ Item {
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
     property bool sideOsd: true
+    property string osNameOverride: ""         // dashboard OS name; empty = detect
     property string weatherCity: ""            // empty: locate by IP
     property bool weatherFahrenheit: false
     // Caelestia-style desktop for the side bar: frame, bar entries, scroll actions, hover panels
@@ -42,7 +43,7 @@ Item {
             "rounding": 24,
             "logoImage": "",
             "mode": "amoled",
-            "workspaceStyle": "icons",
+            "workspaceStyle": "shapes",
             "island": false,
             "align": "center",
             "offset": 0,
@@ -247,6 +248,10 @@ Item {
         if (settingsLoaded)
             saveSettings();
     }
+    onOsNameOverrideChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onWeatherCityChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -359,6 +364,7 @@ Item {
                 "sideBarWindowTitle": settingsService.sideBarWindowTitle,
                 "sideOsd": settingsService.sideOsd,
                 "weatherCity": settingsService.weatherCity,
+                "osNameOverride": settingsService.osNameOverride,
                 "weatherFahrenheit": settingsService.weatherFahrenheit,
                 "sideBarConfig": settingsService.sideBarConfig,
                 "sideScrollStep": settingsService.sideScrollStep,
@@ -538,6 +544,9 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.sideBarConfig && typeof prefs.sideBarConfig === "object")
                             settingsService.sideBarConfig = prefs.sideBarConfig;
+
+                        if (typeof prefs.osNameOverride === "string")
+                            settingsService.osNameOverride = prefs.osNameOverride;
 
                         if (typeof prefs.weatherCity === "string")
                             settingsService.weatherCity = prefs.weatherCity;

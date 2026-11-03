@@ -19,7 +19,7 @@ AppWindow {
 
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
-    readonly property var wsStyleOptions: [{ "text": "Numbers", "value": "numbers" }, { "text": "Dots", "value": "dots" }, { "text": "App icons", "value": "icons" }]
+    readonly property var wsStyleOptions: [{ "text": "Numbers", "value": "numbers" }, { "text": "Shapes", "value": "shapes" }, { "text": "App icons", "value": "icons" }]
     readonly property var alignOptions: [{ "text": "Start", "value": "start" }, { "text": "Centre", "value": "center" }, { "text": "End", "value": "end" }]
     readonly property var modeOptions: [{ "text": "AMOLED", "value": "amoled" }, { "text": "Dark", "value": "dark" }, { "text": "Light", "value": "light" }, { "text": "Theme", "value": "auto" }]
     readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
@@ -30,15 +30,16 @@ AppWindow {
                 { "kind": "select", "label": "Position", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": positionOptions },
                 { "kind": "stepper", "label": "Workspaces", "desc": "Total number; the bar shows five at a time and follows the active one", "prop": "numberOfWorkspaces", "from": 1, "to": 20, "step": 1 }
             ] },
-            { "name": "Launcher button", "rows": [
-                { "kind": "text", "label": "Button image", "desc": "PNG, SVG or JPG path (e.g. ~/Pictures/logo.png). Leave empty for the default icon", "cfg": ["logoImage"], "placeholder": "~/Pictures/logo.png" },
-                { "kind": "button", "label": "Choose image", "desc": "Pick a file from a dialog", "action": "browseLogo", "value": "Browse" },
-                { "kind": "button", "label": "Reset image", "desc": "Go back to the built-in icon", "action": "resetLogo", "value": "Reset" }
+            { "name": "Dashboard logo and OS", "rows": [
+                { "kind": "text", "label": "OS name", "desc": "Shown on the dashboard. Leave empty to detect it (FlickOS, Arch Linux, ...)", "prop": "osNameOverride", "placeholder": "FlickOS" },
+                { "kind": "text", "label": "Dashboard logo", "desc": "PNG, SVG or JPG path shown in the dashboard's round avatar (e.g. ~/Pictures/flickos.png). Empty uses ~/.face, then your distro's logo", "cfg": ["logoImage"], "placeholder": "~/Pictures/logo.png" },
+                { "kind": "button", "label": "Choose logo", "desc": "Pick a file from a dialog", "action": "browseLogo", "value": "Browse" },
+                { "kind": "button", "label": "Reset logo", "desc": "Back to ~/.face or the distro logo", "action": "resetLogo", "value": "Reset" }
             ] },
             { "name": "Entries", "rows": [
                 { "kind": "toggle", "label": "Launcher button", "desc": "Opens the launcher", "cfg": ["entries", "logo"] },
                 { "kind": "toggle", "label": "Workspaces", "desc": "Workspace switcher", "cfg": ["entries", "workspaces"] },
-                { "kind": "select", "label": "Workspace style", "desc": "Numbers, Caelestia-style dots, or the app icon of each workspace", "cfg": ["workspaceStyle"], "options": wsStyleOptions },
+                { "kind": "select", "label": "Workspace style", "desc": "Shapes (Caelestia-style), numbers, or the app icons of each workspace listed under it", "cfg": ["workspaceStyle"], "options": wsStyleOptions },
                 { "kind": "toggle", "label": "Active window", "desc": "Title of the focused window", "cfg": ["entries", "activeWindow"] },
                 { "kind": "toggle", "label": "Window title text", "desc": "Show the title text on the bar", "prop": "sideBarWindowTitle" },
                 { "kind": "toggle", "label": "System tray", "desc": "Tray icons", "cfg": ["entries", "tray"] },

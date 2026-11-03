@@ -191,8 +191,7 @@ PanelWindow {
                         Layout.preferredHeight: root.railSize
                         size: root.railSize
                         icon: "apps-filled"
-                        imageSource: SideState.logoSource
-                        iconColor: SideState.primary
+                            iconColor: SideState.primary
                         iconSize: Constants.sizeXl
                         active: AppState.isWidgetOpen("launcher")
                         onClicked: AppState.toggleWidget("launcher")

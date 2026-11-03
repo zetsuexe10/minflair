@@ -157,6 +157,21 @@ def session_env():
         hypr("setenv", "QT_QPA_PLATFORMTHEME", "qt6ct")
 
 
+def write_launch_env(cur, gtk_theme):
+    """~/.minflair/launch.env: sourced by the shell launcher so apps it starts always get the overlay,
+    even when `hyprctl setenv` did not reach the compositor."""
+    lines = [f'export XDG_CONFIG_HOME="{XDG}"', "export QT_QPA_PLATFORMTHEME=qt6ct",
+             f'export GTK_THEME="{gtk_theme}"']
+    if cur["cursor"]:
+        lines += [f'export XCURSOR_THEME="{cur["cursor"]}"', f'export XCURSOR_SIZE="{cur["cursor_size"]}"']
+    try:
+        os.makedirs(os.path.dirname(XDG), exist_ok=True)
+        with open(os.path.join(os.path.dirname(XDG), "launch.env"), "w") as f:
+            f.write("\n".join(lines) + "\n")
+    except OSError:
+        pass
+
+
 def apply(cur, is_dark=True):
     session_env()
     keys = {}
@@ -172,6 +187,7 @@ def apply(cur, is_dark=True):
     keys["gtk-cursor-theme-size"] = cur["cursor_size"]
     for v in ("gtk-3.0", "gtk-4.0"):
         set_ini(os.path.join(XDG, v, "settings.ini"), keys)
+    write_launch_env(cur, chosen)
 
     for qtct in ("qt5ct", "qt6ct"):
         path = os.path.join(XDG, qtct, f"{qtct}.conf")
