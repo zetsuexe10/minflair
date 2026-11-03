@@ -10,6 +10,7 @@ import qs.Core.Services
 QtObject {
     id: root
 
+    property real pillCenter: 0         // centre of the Pill capsule along its edge, in screen pixels (panels line up with it)
     property string popout: ""          // "", "network", "bluetooth", "audio"
     property real popoutCenter: 0       // position of the hovered icon along the bar, in screen pixels
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts

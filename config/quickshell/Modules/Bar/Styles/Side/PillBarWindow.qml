@@ -291,6 +291,13 @@ PanelWindow {
         }
     }
 
+    // panels line up with the capsule
+    Binding {
+        target: SideState
+        property: "pillCenter"
+        value: root.shown ? (root.vertical ? pill.y + pill.height / 2 : pill.x + pill.width / 2) : 0
+    }
+
     // hovered or busy: stays open while a panel or popout belongs to the bar
     property bool keepOpen: false
     // workspaces pop in for a moment after a switch, then the capsule goes back to its idle view

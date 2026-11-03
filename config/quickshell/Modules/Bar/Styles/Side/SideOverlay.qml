@@ -85,6 +85,11 @@ PanelWindow {
         }
     }
 
+    // Pill: panels come out of the pill's own edge, centred on it; other styles keep their fixed edges
+    readonly property bool island: SideState.island
+    readonly property real pillAlong: SideState.pillCenter - (vertical ? insT : insL)
+    readonly property string opposite: position === "left" ? "right" : (position === "right" ? "left" : (position === "top" ? "bottom" : "top"))
+
     function componentFor(id) {
         switch (id) {
         case "dashboard": return dashboardComp;
@@ -247,7 +252,7 @@ PanelWindow {
     HotZone {
         id: hotDash
 
-        enabled: root.hoverDashboard && root.position !== "top"
+        enabled: root.hoverDashboard && root.position !== "top" && !root.island
         x: root.insL + (root.freeW - width) / 2
         y: 0
         width: 360
@@ -257,7 +262,7 @@ PanelWindow {
     HotZone {
         id: hotSession
 
-        enabled: root.hoverSession && root.position !== "right"
+        enabled: root.hoverSession && root.position !== "right" && !root.island
         x: root.width - width
         y: root.insT + (root.freeH - height) / 2
         width: root.zoneThickness
@@ -267,7 +272,7 @@ PanelWindow {
     HotZone {
         id: hotLauncher
 
-        enabled: root.hoverLauncher && root.position !== "bottom"
+        enabled: root.hoverLauncher && root.position !== "bottom" && !root.island
         x: root.insL + (root.freeW - width) / 2
         y: root.height - height
         width: 360
@@ -317,8 +322,9 @@ PanelWindow {
             readonly property bool isLauncher: root.shownId === "launcher"
             property bool hovered: panelHover.hovered
 
-            edge: isDash ? "top" : (isLauncher ? "bottom" : root.position)
-            align: (isDash || isLauncher) ? "center" : "end"
+            edge: root.island ? root.position : (isDash ? "top" : (isLauncher ? "bottom" : root.position))
+            align: (!root.island && (isDash || isLauncher)) ? "center" : ((root.island && (root.shownId === "controlCenter" || root.shownId === "notificationsCenter")) ? "end" : (root.island ? "center" : "end"))
+            center: (root.island && root.shownId !== "controlCenter" && root.shownId !== "notificationsCenter") ? root.pillAlong : -1
             open: root.open && !root.isCentered
             attached: root.attached
             rounding: SideState.rounding
@@ -393,8 +399,9 @@ PanelWindow {
 
             property bool hovered: sessionHover.hovered
 
-            edge: "right"
+            edge: root.island ? root.position : (root.position === "right" ? "left" : "right")
             align: "center"
+            center: root.island ? root.pillAlong : -1
             padding: 14
             open: root.isActive && sessionLatch.on
             attached: root.attached
@@ -419,7 +426,7 @@ PanelWindow {
         SideDock {
             id: osdDock
 
-            edge: "right"
+            edge: root.opposite === "left" && root.position === "right" ? "left" : (root.position === "right" ? "left" : "right")
             align: "center"
             padding: 14
             open: root.isActive && SettingsService.sideOsd && OsdService.isOpen && !root.open && !sessionLatch.on
@@ -448,12 +455,16 @@ PanelWindow {
         // wallpaper and screenshot drop from the top edge like the Island bar's panels; the rest float in the middle
         readonly property bool dropDown: root.shownId === "wallpaper" || root.shownId === "screenshot"
 
-        transformOrigin: dropDown ? Item.Top : (SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center)
+        transformOrigin: dropDown ? (root.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "bottom" ? Item.Bottom : Item.Top) : Item.Top) : (SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center)
         scale: (root.open && root.isCentered) ? 1 : (dropDown ? 0.7 : (SideState.island ? 0.5 : 0.94))
         width: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
         height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
-        x: Math.round(root.insL + (root.freeW - width) / 2)
-        y: dropDown ? Math.round(root.insT + 12) : Math.round(root.insT + (root.freeH - height) / 2)
+        readonly property bool vert: root.vertical
+        readonly property real alongX: Math.max(root.insL + 12, Math.min(root.insL + root.freeW - width - 12, root.insL + root.pillAlong - width / 2))
+        readonly property real alongY: Math.max(root.insT + 12, Math.min(root.insT + root.freeH - height - 12, root.insT + root.pillAlong - height / 2))
+
+        x: Math.round(dropDown && root.island ? (vert ? (root.position === "left" ? root.insL + 12 : root.insL + root.freeW - width - 12) : alongX) : root.insL + (root.freeW - width) / 2)
+        y: Math.round(dropDown ? (root.island ? (vert ? alongY : (root.position === "bottom" ? root.insT + root.freeH - height - 12 : root.insT + 12)) : root.insT + 12) : root.insT + (root.freeH - height) / 2)
         color: SideState.surface
         radius: Constants.size3Xl - 4
         border.width: 1
