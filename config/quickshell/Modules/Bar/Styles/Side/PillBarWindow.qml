@@ -19,7 +19,8 @@ PanelWindow {
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
     readonly property int railSize: SideState.railSize
-    readonly property int thick: railSize + 6                       // capsule thickness
+    readonly property int thickMax: railSize + 8                    // capsule thickness when open
+    readonly property int thickMin: railSize + 2                    // ...and at rest
     readonly property int gapEdge: SideState.islandGap
     readonly property string align: SideState.islandAlign
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "pill" && !DisplayProfileService.gameModeActive
@@ -33,8 +34,8 @@ PanelWindow {
     color: "transparent"
     focusable: false
     visible: SettingsService.settingsLoaded
-    implicitWidth: vertical ? thick + gapEdge * 2 : 0
-    implicitHeight: vertical ? 0 : thick + gapEdge * 2
+    implicitWidth: vertical ? thickMax + gapEdge * 2 : 0
+    implicitHeight: vertical ? 0 : thickMax + gapEdge * 2
 
     anchors {
         top: root.vertical || root.position === "top"
@@ -57,9 +58,10 @@ PanelWindow {
         readonly property real total: root.vertical ? root.height : root.width
         readonly property bool wide: root.pinned || hover.hovered || root.keepOpen
         // the small capsule hugs whatever it currently shows
-        readonly property real compactLen: Math.max(root.thick * 2, slot.viewLen + 26)
+        readonly property real compactLen: Math.max(root.thickMax * 2, slot.viewLen + 28)
         readonly property real fullLen: Math.min(total - 24, (full.implicitWidth > 0 ? (root.vertical ? full.implicitHeight : full.implicitWidth) : 0) + 24)
         property real len: wide ? Math.max(fullLen, compactLen) : compactLen
+        property real thick: wide ? root.thickMax : root.thickMin
 
         function along() {
             const m = SideState.islandOffset;
@@ -71,14 +73,17 @@ PanelWindow {
         }
 
         // the capsule stays put along the edge while its length springs
-        x: root.vertical ? (root.position === "left" ? root.gapEdge : root.width - root.gapEdge - root.thick) : along()
-        y: root.vertical ? along() : (root.position === "top" ? root.gapEdge : root.height - root.gapEdge - root.thick)
-        width: root.vertical ? root.thick : len
-        height: root.vertical ? len : root.thick
+        // thickness grows a little when it opens, centred in the band so the edge gap stays even
+        readonly property real band: root.thickMax + root.gapEdge * 2
+
+        x: root.vertical ? (root.position === "left" ? root.gapEdge : root.width - root.gapEdge - root.thickMax) + (root.thickMax - thick) / 2 : along()
+        y: root.vertical ? along() : (root.position === "top" ? root.gapEdge : root.height - root.gapEdge - root.thickMax) + (root.thickMax - thick) / 2
+        width: root.vertical ? thick : len
+        height: root.vertical ? len : thick
         opacity: root.shown ? 1 : 0
         visible: opacity > 0.01
         transform: Translate {
-            readonly property real hidden: root.shown ? 0 : -(root.thick + root.gapEdge)
+            readonly property real hidden: root.shown ? 0 : -(root.thickMax + root.gapEdge)
             x: root.vertical ? (root.position === "left" ? hidden : -hidden) : 0
             y: root.vertical ? 0 : (root.position === "top" ? hidden : -hidden)
 
@@ -87,7 +92,8 @@ PanelWindow {
         }
 
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
-        Behavior on len { SpringAnimation { spring: 3.2; damping: 0.42; epsilon: 0.4 } }
+        Behavior on len { SpringAnimation { spring: 3.4; damping: 0.5; epsilon: 0.3 } }
+        Behavior on thick { SpringAnimation { spring: 4; damping: 0.55; epsilon: 0.2 } }
 
         HoverHandler {
             id: hover
@@ -161,6 +167,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 vertical: root.vertical
                 color: "transparent"
+                border.width: 0
                 opacity: slot.view === "time" ? 1 : 0
                 scale: slot.view === "time" ? 1 : 0.85
 
@@ -173,6 +180,8 @@ PanelWindow {
 
                 anchors.centerIn: parent
                 vertical: root.vertical
+                color: "transparent"
+                border.width: 0
                 opacity: slot.view === "workspaces" ? 1 : 0
                 scale: slot.view === "workspaces" ? 1 : 0.85
 
