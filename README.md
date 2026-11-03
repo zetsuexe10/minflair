@@ -1,12 +1,13 @@
-# Minflair Quickshell: Side + Island
+# Minflair Quickshell: Island, Side and Pill
 
-The Quickshell configuration of Minflair with two bar styles, for **Arch Linux** (and anything else with
+The Quickshell configuration of Minflair with three bar styles, for **Arch Linux** (and anything else with
 Hyprland and Quickshell 0.3 or newer):
 
-- **Side**: a Caelestia-style desktop. A frame around the screen (or a floating round *island* capsule that
-  grows when hovered), hover panels, a Caelestia dashboard (Dashboard / Media / Performance / Weather), a bottom
+- **Side**: a Caelestia-style desktop. A frame around the screen, hover panels, a Caelestia dashboard (Dashboard / Media / Performance / Weather), a bottom
   launcher, power panel, volume/brightness OSD, Wi-Fi / Bluetooth / sound popouts and its own settings panel. AMOLED by default.
 - **Island**: the dynamic-island bar, with widgets expanding out of it.
+- **Pill**: a floating dynamic island on any edge. A small capsule that morphs between the time, the workspaces
+  (they pop in when you switch) and the active window; hover grows it into the whole bar, or keep it expanded in settings.
 
 Only the Quickshell config is in this branch: no compositor config, greeter or installer.
 
@@ -33,16 +34,17 @@ bind = SUPER SHIFT, S, exec, socat - UNIX-CONNECT:/tmp/quickshell_screenshot
 bind = SUPER CTRL, S, exec, socat - UNIX-CONNECT:/tmp/quickshell_minflair_side_settings
 bind = SUPER ALT, 1,  exec, qs ipc call bar set island
 bind = SUPER ALT, 2,  exec, qs ipc call bar set side
+bind = SUPER ALT, 3,  exec, qs ipc call bar set pill
 ```
 With Hyprland's Lua config use `hl.bind(mod .. " + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_launcher"))`.
 
 ## Side style
-- **Settings** (`Super+Ctrl+S`): bar position and entries, launcher button image, layout (frame or island, alignment, offset),
+- **Settings** (`Super+Ctrl+S`): bar position and entries, launcher button image, the Pill page (keep expanded, idle view, alignment, offset),
   colours (AMOLED / Dark / Light / follow theme), hover panels, dashboard and weather, wallpaper folders, GitHub,
   and **App Appearance**.
-- **Island layout**: Settings > Layout > Island mode. A round capsule with the launcher and workspaces; hover it and it grows to
-  the whole bar. Put it on any edge, at the start, centre or end, with an offset.
-- **Wallpapers**: `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders too). Arrow keys browse, Enter sets.
+- **Pill** (`Super+Alt+4` style): Settings > Pill. Idle view (time, workspaces or window), keep expanded, edge (Bar > Position),
+  alignment and offset.
+- **Wallpapers** (and screenshot) drop from the top edge: `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders too). Arrow keys browse, Enter sets.
 - **Scroll** the first half of the bar for volume, the second half for brightness, the workspaces to switch.
 
 ## App Appearance (GTK / Qt, this shell only)

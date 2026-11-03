@@ -9,7 +9,7 @@ import qs.Core.Services
 Scope {
     id: root
 
-    readonly property bool active: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && SideState.frame && !DisplayProfileService.gameModeActive && !HyprlandService.isTrueFullscreen
+    readonly property bool active: SettingsService.settingsLoaded && SettingsService.sideFamily && SideState.frame && !DisplayProfileService.gameModeActive && !HyprlandService.isTrueFullscreen
 
     Variants {
         // fixed set of windows (never created or destroyed on a position change)

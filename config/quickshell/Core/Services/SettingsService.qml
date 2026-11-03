@@ -44,8 +44,9 @@ Item {
             "logoImage": "",
             "mode": "amoled",
             "workspaceStyle": "shapes",
-            "island": false,
-            "align": "center",
+                        "align": "center",
+            "pinned": false,
+            "idle": "time",
             "offset": 0,
             "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
             "scroll": {"workspaces": true, "volume": true, "brightness": true},
@@ -77,12 +78,15 @@ Item {
     // folders searched for wallpapers (recursively); ~ is expanded
     property var wallpaperDirs: ["~/Pictures/Wallpapers", "/usr/share/backgrounds"]
     property int sideDashTab: 0
-    readonly property var barStyles: ["island", "side"]
+    readonly property var barStyles: ["island", "side", "pill"]
     readonly property var barStyleNames: ({
         "convex": "Convex",
         "island": "Island",
-        "side": "Side"
+        "side": "Side",
+        "pill": "Pill"
     })
+    // Side (bar 3) and Pill (bar 4) share the overlay, panels, dashboard and palette
+    readonly property bool sideFamily: barStyle === "side" || barStyle === "pill"
     property bool barIslandMode: barStyle === "island"
     property bool barConvexMode: barStyle === "convex"
     property string islandRightMode: "auto"

@@ -35,7 +35,7 @@ PanelWindow {
     readonly property real freeW: width - insL - insR
     readonly property real freeH: height - insT - insB
     readonly property bool attached: SideState.frame
-    readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
+    readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.sideFamily && !DisplayProfileService.gameModeActive
     readonly property bool fullscreen: HyprlandService.isTrueFullscreen
     readonly property var centered: ["clipboard", "wallpaper", "powerMenu", "screenshot"]
     readonly property var keyboardWidgets: centered.concat(["launcher"])
@@ -445,13 +445,15 @@ PanelWindow {
 
         visible: opacity > 0.01
         opacity: (root.open && root.isCentered) ? 1 : 0
-        // island mode: widgets expand out of the capsule's side, like the Island bar
-        transformOrigin: SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center
-        scale: (root.open && root.isCentered) ? 1 : (SideState.island ? 0.5 : 0.94)
+        // wallpaper and screenshot drop from the top edge like the Island bar's panels; the rest float in the middle
+        readonly property bool dropDown: root.shownId === "wallpaper" || root.shownId === "screenshot"
+
+        transformOrigin: dropDown ? Item.Top : (SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center)
+        scale: (root.open && root.isCentered) ? 1 : (dropDown ? 0.7 : (SideState.island ? 0.5 : 0.94))
         width: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
         height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
         x: Math.round(root.insL + (root.freeW - width) / 2)
-        y: Math.round(root.insT + (root.freeH - height) / 2)
+        y: dropDown ? Math.round(root.insT + 12) : Math.round(root.insT + (root.freeH - height) / 2)
         color: SideState.surface
         radius: Constants.size3Xl - 4
         border.width: 1

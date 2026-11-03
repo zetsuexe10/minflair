@@ -10,7 +10,7 @@ import qs.Core.Services
 PanelWindow {
     id: root
 
-    readonly property bool shown: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && SideState.frame && !DisplayProfileService.gameModeActive && !HyprlandService.isTrueFullscreen
+    readonly property bool shown: SettingsService.settingsLoaded && SettingsService.sideFamily && SideState.frame && !DisplayProfileService.gameModeActive && !HyprlandService.isTrueFullscreen
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-side-frame"

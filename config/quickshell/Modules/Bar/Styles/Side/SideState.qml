@@ -17,7 +17,7 @@ QtObject {
     // geometry shared by the bar, the frame and the panels
     readonly property string position: SettingsService.sideBarPosition
     // island: the bar is a floating capsule (any edge, start/centre/end + offset) instead of a frame
-    readonly property bool island: SettingsService.sideCfg("island")
+    readonly property bool island: SettingsService.barStyle === "pill"
     readonly property string islandAlign: SettingsService.sideCfg("align")     // start, center, end
     readonly property int islandOffset: SettingsService.sideCfg("offset")
     readonly property int islandGap: 10
@@ -39,7 +39,7 @@ QtObject {
 
     // keep the whole shell in step with the chosen mode (widgets outside the side style use Theme)
     function enforceMode() {
-        if (SettingsService.barStyle !== "side" || mode === "auto")
+        if (!SettingsService.sideFamily || mode === "auto")
             return ;
         Theme.setDarkMode(mode !== "light");
     }

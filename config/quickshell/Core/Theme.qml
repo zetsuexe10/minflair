@@ -29,7 +29,7 @@ QtObject {
     property real bgOpacity: 1
     property color _rawBg: themes[0].dark.bg
     // the side style's AMOLED mode paints dark themes pure black everywhere
-    readonly property bool amoled: SettingsService.barStyle === "side" && SettingsService.sideCfg("mode") === "amoled"
+    readonly property bool amoled: SettingsService.sideFamily && SettingsService.sideCfg("mode") === "amoled"
     property bool isDark: ColorUtils.isDark(_rawBg)
     property color opaqueBg: (amoled && isDark) ? "#000000" : _rawBg
     property color bg: (amoled && isDark) ? Qt.rgba(0, 0, 0, bgOpacity) : Qt.rgba(_rawBg.r, _rawBg.g, _rawBg.b, bgOpacity)

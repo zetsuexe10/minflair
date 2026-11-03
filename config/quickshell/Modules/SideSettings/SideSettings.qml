@@ -55,10 +55,13 @@ AppWindow {
                 { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
             ] }
         ] },
-        { "title": "Layout", "icon": "bar", "sub": "Frame desktop or floating island, anywhere", "sections": [
-            { "name": "Island", "rows": [
-                { "kind": "toggle", "label": "Island mode", "desc": "Float the bar as a capsule instead of the screen frame", "cfg": ["island"] },
-                { "kind": "select", "label": "Alignment", "desc": "Where along the edge the island sits", "cfg": ["align"], "options": alignOptions },
+        { "title": "Pill (bar 4)", "icon": "bar", "sub": "The floating dynamic island", "sections": [
+            { "name": "Behaviour", "rows": [
+                { "kind": "toggle", "label": "Keep expanded", "desc": "Show the whole bar all the time instead of only on hover", "cfg": ["pinned"] },
+                { "kind": "select", "label": "Idle view", "desc": "What the small pill shows when nothing changes", "cfg": ["idle"], "options": [{ "text": "Time", "value": "time" }, { "text": "Workspaces", "value": "workspaces" }, { "text": "Active window", "value": "window" }] }
+            ] },
+            { "name": "Position", "rows": [
+                { "kind": "select", "label": "Alignment", "desc": "Where along the edge the pill sits (the edge is set in Bar > Position)", "cfg": ["align"], "options": alignOptions },
                 { "kind": "stepper", "label": "Offset", "desc": "Distance from the start or end of the edge", "cfg": ["offset"], "from": 0, "to": 1200, "step": 10, "suffix": " px" }
             ] }
         ] },
@@ -134,7 +137,7 @@ AppWindow {
         ] },
         { "title": "Shortcuts", "icon": "keyboard-filled", "sub": "Keys and mouse for the shell", "sections": [
             { "name": "Keys", "rows": [
-                { "kind": "info", "label": "Super + Alt + 1 / 2 / 3", "desc": "", "text": "Convex / Island / Side bar" },
+                { "kind": "info", "label": "Super + Alt + 1 / 2 / 3 / 4", "desc": "", "text": "Convex / Island / Side / Pill bar" },
                 { "kind": "info", "label": "Super + S", "desc": "", "text": "Settings" },
                 { "kind": "info", "label": "Super + Ctrl + S", "desc": "", "text": "This panel" },
                 { "kind": "info", "label": "Super + K", "desc": "", "text": "Keybinds cheat sheet" },

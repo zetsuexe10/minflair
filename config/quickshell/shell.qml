@@ -176,6 +176,12 @@ ShellRoot {
         notificationService: globalNotificationService
     }
 
+    PillBarWindow {
+        id: pillBarSurface
+
+        notificationService: globalNotificationService
+    }
+
     SideOverlay {
         notificationService: globalNotificationService
     }

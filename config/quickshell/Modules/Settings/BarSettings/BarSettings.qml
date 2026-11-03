@@ -16,16 +16,16 @@ AppContainer {
 
         SettingSegmented {
             label: "Style"
-            description: "Convex or Island (top bar), or Side (vertical bar on the left). Super+Alt+B cycles the styles."
+            description: "Island (top bar), Side (frame bar) or Pill (floating dynamic island). Super+Alt+B cycles the styles."
             model: [{
-                "text": "Convex",
-                "value": "convex"
-            }, {
                 "text": "Island",
                 "value": "island"
             }, {
                 "text": "Side",
                 "value": "side"
+            }, {
+                "text": "Pill",
+                "value": "pill"
             }]
             currentValue: SettingsService.barStyle
             onActivated: (value) => {
@@ -39,7 +39,7 @@ AppContainer {
     AppGroup {
         title: "Side Bar"
         icon: "bar"
-        visible: SettingsService.barStyle === "side"
+        visible: SettingsService.sideFamily
 
         SettingSegmented {
             label: "Position"
