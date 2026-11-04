@@ -6,10 +6,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Workspace switcher in Caelestia's manner: a pill that stretches while it slides (the leading edge
-// moves first, the trailing edge 1.5x slower), labels that invert inside the pill, capsules behind
-// occupied workspaces that merge with occupied neighbours, and in "icons" style the app icons of each
-// workspace's windows listed under it, the workspace expanding smoothly to make room.
 SidePill {
     id: root
 
@@ -19,24 +15,20 @@ SidePill {
     readonly property int pad: 5
     readonly property int maxIcons: 3
     readonly property int iconSize: 16
-    readonly property string display: SettingsService.sideCfg("workspaceStyle") === "numbers" ? "numbers" : (SettingsService.sideCfg("workspaceStyle") === "icons" ? "icons" : "shapes")   // shapes | numbers | icons
+    readonly property string display: SettingsService.sideCfg("workspaceStyle") === "numbers" ? "numbers" : (SettingsService.sideCfg("workspaceStyle") === "icons" ? "icons" : "shapes")
     readonly property bool shapes: display === "shapes"
-    // the focused workspace takes a new random shape each time, like Caelestia's Material shapes
     readonly property var shapeSet: [{ "n": 6, "a": 0.14 }, { "n": 9, "a": 0.08 }, { "n": 4, "a": 0.22 }, { "n": 3, "a": 0.2 }, { "n": 8, "a": 0.17 }, { "n": 5, "a": 0.13 }, { "n": 2, "a": 0.16 }, { "n": 7, "a": 0.1 }, { "n": 0, "a": 0 }]
     property int shapeIdx: 0
     readonly property bool withIcons: display === "icons"
     readonly property int activeWsId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
-    // fixed number of slots: scrolling never changes the id window size, it just follows the active one
     readonly property int shown: Math.min(SettingsService.numberOfWorkspaces, 5)
     readonly property int first: Math.max(1, Math.min(SettingsService.numberOfWorkspaces - shown + 1, activeWsId - Math.floor(shown / 2)))
     readonly property int activeIdx: Math.max(0, Math.min(shown - 1, activeWsId - first))
 
-    // Caelestia's expressive spatial curve (slight overshoot)
     readonly property var spatial: [0.38, 1.21, 0.22, 1.0, 1.0, 1.0]
     readonly property int leadMs: 320
     readonly property int trailMs: Math.round(leadMs * 1.5)
 
-    // ---- data: occupancy and the windows' app classes per shown workspace -------------------
     readonly property var wins: {
         const r = [];
         const list = Hyprland.workspaces ? Hyprland.workspaces.values : [];
@@ -59,7 +51,6 @@ SidePill {
     }
     readonly property var occ: wins.map(w => w.length > 0)
 
-    // icon file for an app class: icon theme by name first, then through its desktop entry
     function iconFor(cls) {
         if (!cls)
             return "";
@@ -82,7 +73,6 @@ SidePill {
             Hyprland.dispatch('hl.dsp.focus({workspace=' + id + '})');
     }
 
-    // ---- per-slot extent (number + window icons), animated ----------------------------------
     function wantedExt(i) {
         const n = (withIcons && i < shown) ? Math.min(maxIcons, wins[i].length) : 0;
         return slot + (n > 0 ? n * (iconSize + 2) + 2 : 0);
@@ -116,7 +106,6 @@ SidePill {
     implicitWidth: vertical ? SideState.railSize : along
     implicitHeight: vertical ? along : SideState.railSize
 
-    // ---- sliding pill edges ------------------------------------------------------------------
     readonly property real tA: off(activeIdx)
     readonly property real tB: tA + ext(activeIdx)
     property real edgeA: tA
@@ -127,7 +116,6 @@ SidePill {
     Behavior on edgeA { enabled: root.sliding; NumberAnimation { duration: root.edgeA > root.tA ? root.leadMs : root.trailMs; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
     Behavior on edgeB { enabled: root.sliding; NumberAnimation { duration: root.edgeB > root.tB ? root.trailMs : root.leadMs; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
 
-    // a workspace change slides (stretches) the pill; layout growth only drags it along
     function follow() {
         if (activeIdx !== lastIdx) {
             lastIdx = activeIdx;
@@ -147,7 +135,6 @@ SidePill {
         onTriggered: root.sliding = false
     }
 
-    // window classes only exist once Hyprland has been asked for them
     Timer {
         interval: 1500
         running: root.withIcons
@@ -162,7 +149,6 @@ SidePill {
             Hyprland.refreshToplevels();
     }
 
-    // an n-lobed rounded shape (flower, cookie, clover, gem...) drawn as a closed polyline
     component Glyph: Item {
         id: gl
 
@@ -207,7 +193,6 @@ SidePill {
         }
     }
 
-    // ---- occupied backgrounds (merge with occupied neighbours) ----------------------------
     Item {
         x: root.vertical ? (root.width - root.slot) / 2 : 0
         y: root.vertical ? 0 : (root.height - root.slot) / 2
@@ -249,7 +234,6 @@ SidePill {
         }
     }
 
-    // ---- labels: one layer in the normal colour, one inverted inside the pill -------------
     component Labels: Item {
         id: lab
 
@@ -278,7 +262,6 @@ SidePill {
 
                 Behavior on col { ColorAnimation { duration: 200 } }
 
-                // the workspace mark sits at the start of the slot
                 Item {
                     width: root.slot
                     height: root.slot
@@ -301,7 +284,6 @@ SidePill {
                         color: it.col
                     }
 
-                    // shapes: empty = small circle, occupied = rounded square, focused = a random lobed shape
                     Rectangle {
                         anchors.centerIn: parent
                         visible: root.shapes && !it.isActive
@@ -324,7 +306,6 @@ SidePill {
                     }
                 }
 
-                // app icons of the workspace's windows, listed after the mark
                 Repeater {
                     model: it.shownWins
 
@@ -353,7 +334,6 @@ SidePill {
                             smooth: true
                         }
 
-                        // no icon found: a small dot for the window
                         Rectangle {
                             anchors.centerIn: parent
                             visible: wi.src === ""
@@ -378,7 +358,6 @@ SidePill {
 
         Labels {}
 
-        // hover + click targets cover the whole slot, icons included
         Repeater {
             model: root.shown
 
@@ -414,7 +393,6 @@ SidePill {
         }
     }
 
-    // the pill: clips an inverted copy of the labels so the glyph under it flips colour while it slides
     Item {
         id: ind
 

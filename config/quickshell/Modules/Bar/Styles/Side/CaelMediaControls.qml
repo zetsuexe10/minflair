@@ -3,8 +3,6 @@ import QtQuick.Layouts
 import qs.Core
 import qs.Core.Services
 
-// Caelestia's button row. Compact (dashboard): previous, play/pause (fills the row), next.
-// Full (media tab): shuffle, previous, play/pause, next, repeat.
 RowLayout {
     id: root
 

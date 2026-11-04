@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Io
 import qs.Core.Services
 
-// Lyrics of the active track from lrclib.net (synced when available), fetched once per track.
 Item {
     id: root
 
@@ -14,10 +13,10 @@ Item {
     readonly property string album: player ? (player.trackAlbum || "") : ""
     readonly property real duration: player && player.length > 0 && player.length < 100000 ? Math.round(player.length) : 0
     readonly property string key: title + "|" + artist
-    property var lines: []              // [{ t: seconds, text }]
+    property var lines: []
     property bool synced: false
     property bool loading: false
-    property string state: "idle"       // idle | loading | ok | none
+    property string state: "idle"
     property int users: 0
     property var cache: ({})
 

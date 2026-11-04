@@ -1,12 +1,10 @@
 import QtQuick
 import qs.Core
 
-// Caelestia-style seek bar: a wavy filled part while playing, a straight remainder and a handle that
-// grows on hover. Seeks on release.
 Item {
     id: root
 
-    property real value: 0              // 0..1, from the player
+    property real value: 0
     property bool seekable: true
     property bool playing: false
     signal seek(real fraction)

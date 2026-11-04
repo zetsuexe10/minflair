@@ -8,8 +8,6 @@ import qs.Core.Components
 import qs.Core.Services
 import qs.Modules.Launcher.Components
 
-// Caelestia-style launcher: the app list grows above a rounded search bar at the bottom edge.
-// `>` lists actions, `=` or a plain sum calculates, everything else filters the applications.
 Item {
     id: root
 
@@ -51,7 +49,6 @@ Item {
         Hyprland.dispatch(request);
     }
 
-    // apps started from the launcher get the Minflair GTK/Qt overlay (theme, font, icons, cursor)
     function withEnv(cmd) {
         return "[ -r \"$HOME/.minflair/launch.env\" ] && . \"$HOME/.minflair/launch.env\"; " + cmd;
     }
@@ -62,7 +59,6 @@ Item {
 
     function open(id) {
         AppState.closeAllWidgets();
-        // let the launcher finish closing before the next window asks for focus
         Qt.callLater(() => AppState.openWidget(id));
     }
 
@@ -112,7 +108,6 @@ Item {
         apps.sort((x, y) => y.score - x.score);
         for (let i = 0; i < apps.length && out.length < 60; i++)
             out.push(apps[i].item);
-        // shell commands such as "settings" also match the Minflair entries
         if (n !== "") {
             const extra = commands.items.filter(c => c.name.toLowerCase().indexOf(n) !== -1 || (c.keywords || []).some(k => k.indexOf(n) !== -1));
             for (let i = 0; i < extra.length; i++)

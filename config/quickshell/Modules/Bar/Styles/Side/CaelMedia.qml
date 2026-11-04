@@ -4,9 +4,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Media tab, after Caelestia's modules/dashboard/Media: cookie cover with an audio-reactive ring on the
-// left; title, artist, album, a wavy seek bar and the button row on the right, with lyrics and the
-// player selector under them.
 Item {
     id: root
 
@@ -26,7 +23,6 @@ Item {
 
     implicitHeight: Math.round(410 * Math.max(1, SettingsService.fontScale))
 
-    // the visualiser and lyrics only run while this tab is on screen
     Component.onCompleted: {
         CavaService.users++;
         LyricsService.users++;
@@ -63,7 +59,6 @@ Item {
                 visible: root.player !== null
             }
 
-            // nothing playing
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -167,7 +162,6 @@ Item {
                     Layout.topMargin: 10
                 }
 
-                // lyrics
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -267,7 +261,6 @@ Item {
                         color: SideState.muted
                     }
 
-                    // player selector: a pill with the player's name, opens a list upwards
                     Rectangle {
                         id: selector
 

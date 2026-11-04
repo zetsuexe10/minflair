@@ -6,20 +6,17 @@ import Quickshell.Services.Pipewire
 import qs.Core
 import qs.Core.Services
 
-// Shared state between the side bar window and its overlay (hover popouts).
 QtObject {
     id: root
 
-    property real pillCenter: 0         // centre of the Pill capsule along its edge, in screen pixels (panels line up with it)
+    property real pillCenter: 0
     property string popout: ""          // "", "network", "bluetooth", "audio"
-    property real popoutCenter: 0       // position of the hovered icon along the bar, in screen pixels
+    property real popoutCenter: 0
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts
 
-    // geometry shared by the bar, the frame and the panels
     readonly property string position: SettingsService.sideBarPosition
-    // island: the bar is a floating capsule (any edge, start/centre/end + offset) instead of a frame
     readonly property bool island: SettingsService.barStyle === "pill"
-    readonly property string islandAlign: SettingsService.sideCfg("align")     // start, center, end
+    readonly property string islandAlign: SettingsService.sideCfg("align")
     readonly property int islandOffset: SettingsService.sideCfg("offset")
     readonly property int islandGap: 10
     readonly property bool frame: SettingsService.sideCfg("frame") && !island
@@ -28,7 +25,6 @@ QtObject {
     readonly property int railSize: 36
     readonly property int barThickness: 44
 
-    // custom launcher button image (absolute path or ~/..., empty = built-in icon)
     readonly property string logoSource: {
         let p = String(SettingsService.sideCfg("logoImage") || "").trim();
         if (p === "")
@@ -38,7 +34,6 @@ QtObject {
         return p.indexOf("file://") === 0 || p.indexOf("/") !== 0 ? p : "file://" + p;
     }
 
-    // keep the whole shell in step with the chosen mode (widgets outside the side style use Theme)
     function enforceMode() {
         if (!SettingsService.sideFamily || mode === "auto")
             return ;
@@ -53,10 +48,8 @@ QtObject {
         onTriggered: root.enforceMode()
     }
 
-    // Caelestia-like Material palette for the whole side desktop, derived from the accent hue so
-    // it follows light/dark mode and the wallpaper theme but keeps its own softer personality.
     readonly property real hue: Theme.accent.hslHue >= 0 ? Theme.accent.hslHue : Theme.bg.hslHue >= 0 ? Theme.bg.hslHue : 0.72
-    readonly property string mode: SettingsService.sideCfg("mode")          // amoled, dark, light, auto
+    readonly property string mode: SettingsService.sideCfg("mode")
     readonly property bool amoled: mode === "amoled"
     readonly property bool dark: mode === "auto" ? Theme.isDark : mode !== "light"
     readonly property color surface: amoled ? "#000000" : Qt.hsla(hue, dark ? 0.14 : 0.30, dark ? 0.10 : 0.965, 1)
@@ -71,16 +64,15 @@ QtObject {
     readonly property color selected: Qt.tint(card, Qt.rgba(primary.r, primary.g, primary.b, dark ? 0.22 : 0.18))
     readonly property color outline: Qt.rgba(fg.r, fg.g, fg.b, dark ? 0.16 : 0.14)
 
-    // thickness reserved on one screen edge: the bar's edge is thick, the others only carry the frame
     function inset(edge) {
         if (edge === position)
             return island ? railSize + islandGap * 2 : barThickness;
         return frame ? border : 0;
     }
 
-    property bool sessionHover: false   // power button hovered: opens the power panel
-    property int netTick: 0             // bumped when the network changed, so the bar icon refreshes now
-    property real brightness: 0         // 0..100
+    property bool sessionHover: false
+    property int netTick: 0
+    property real brightness: 0
     property bool brightnessAvailable: false
 
     function setBrightness(pct) {

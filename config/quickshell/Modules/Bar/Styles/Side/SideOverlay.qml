@@ -17,10 +17,6 @@ import qs.Modules.ScreenCapture
 import qs.Modules.SystemUsage as SystemUsageModule
 import qs.Modules.WallpaperSelector
 
-// Hosts every widget (control center, dashboard, calendar, launcher, ...), the hover popouts, the
-// power panel, the volume/brightness indicator and the notification toasts of the "side" style.
-// Panels grow out of the frame ("docks"); focus widgets such as the launcher open centred.
-// Mapped for the whole session, inert for the other styles.
 PanelWindow {
     id: root
 
@@ -42,7 +38,6 @@ PanelWindow {
     readonly property var handled: ["dashboard", "controlCenter", "notificationsCenter", "music", "calendar", "systemUsage", "launcher"].concat(centered)
     readonly property string activeId: (isActive && handled.indexOf(AppState.activeWidget) !== -1) ? AppState.activeWidget : ""
     readonly property bool open: activeId !== ""
-    // the dashboard only takes the keyboard when it was opened on purpose (not by hovering the edge)
     readonly property bool needsFocus: open && (keyboardWidgets.indexOf(activeId) !== -1 || (activeId === "dashboard" && !dashByHover))
     property string shownId: ""
     readonly property bool panelVisible: shownId !== ""
@@ -55,7 +50,6 @@ PanelWindow {
     readonly property bool hoverLauncher: SettingsService.sideCfg("hover", "launcher")
     readonly property real zoneThickness: Math.max(4, attached ? SideState.border : 4)
 
-    // a flag that turns on at once and off after a short delay, so moving between a trigger and its panel does not flicker
     component Latch: QtObject {
         id: latch
 
@@ -85,7 +79,6 @@ PanelWindow {
         }
     }
 
-    // Pill: panels come out of the pill's own edge, centred on it; other styles keep their fixed edges
     readonly property bool island: SideState.island
     readonly property real pillAlong: SideState.pillCenter - (vertical ? insT : insL)
     readonly property string opposite: position === "left" ? "right" : (position === "right" ? "left" : (position === "top" ? "bottom" : "top"))
@@ -148,7 +141,6 @@ PanelWindow {
         right: true
     }
 
-    // without a grab Hyprland keeps the keyboard on the previous window
     HyprlandFocusGrab {
         active: root.needsFocus
         windows: [root]
@@ -203,8 +195,6 @@ PanelWindow {
         }
     }
 
-    // ---- hover triggers on the frame ----------------------------------------------------------
-
     Latch {
         id: sessionLatch
 
@@ -228,7 +218,6 @@ PanelWindow {
         }
     }
 
-    // pointer still in the zone when another widget closed: open the dashboard then
     Connections {
         target: AppState
 
@@ -279,10 +268,6 @@ PanelWindow {
         height: root.zoneThickness
     }
 
-    // ---- stage: the screen minus the frame, panels live in here ---------------------------------
-
-    // keyboard sink: forwards every key to the open widget's input like the island does, so
-    // navigation works even before the compositor reports the window as active
     Item {
         id: keySink
 
@@ -295,7 +280,6 @@ PanelWindow {
         Keys.onEscapePressed: AppState.closeAllWidgets()
     }
 
-    // click outside closes, Escape closes
     MouseArea {
         x: root.insL
         y: root.insT
@@ -314,7 +298,6 @@ PanelWindow {
         height: root.freeH
         clip: true
 
-        // widgets, attached to the bar's edge (the dashboard hangs from the top edge)
         SideDock {
             id: panelDock
 
@@ -351,7 +334,6 @@ PanelWindow {
             }
         }
 
-        // hover popouts (Wi-Fi, Bluetooth, sound, calendar, notifications) beside the icon that opened them
         SideDock {
             id: popDock
 
@@ -393,7 +375,6 @@ PanelWindow {
             }
         }
 
-        // power panel on the right edge
         SideDock {
             id: sessionDock
 
@@ -422,7 +403,6 @@ PanelWindow {
             }
         }
 
-        // volume / brightness / microphone feedback on the right edge
         SideDock {
             id: osdDock
 
@@ -444,7 +424,6 @@ PanelWindow {
         }
     }
 
-    // focus widgets (launcher, clipboard, ...) float in the middle
     Rectangle {
         id: centerPanel
 
@@ -452,7 +431,6 @@ PanelWindow {
 
         visible: opacity > 0.01
         opacity: (root.open && root.isCentered) ? 1 : 0
-        // wallpaper and screenshot drop from the top edge like the Island bar's panels; the rest float in the middle
         readonly property bool dropDown: root.shownId === "wallpaper" || root.shownId === "screenshot"
 
         transformOrigin: dropDown ? (root.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "bottom" ? Item.Bottom : Item.Top) : Item.Top) : (SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center)
@@ -489,7 +467,6 @@ PanelWindow {
         }
     }
 
-    // notification toast, top right under the frame
     Rectangle {
         id: toastBox
 

@@ -5,8 +5,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Cover art in a nine-sided "cookie" that turns slowly while playing. With `visualiser` a ring of
-// bars (from cava) grows out from its edge, like Caelestia's media tab.
 Item {
     id: root
 
@@ -31,7 +29,6 @@ Item {
         loops: Animation.Infinite
     }
 
-    // ring of bars
     Canvas {
         id: ring
 
@@ -88,7 +85,6 @@ Item {
             visible: false
         }
 
-        // the cookie outline as a mask; it turns, the picture stays upright
         Item {
             id: maskSrc
 

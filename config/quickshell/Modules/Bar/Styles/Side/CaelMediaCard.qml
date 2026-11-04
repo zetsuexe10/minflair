@@ -5,8 +5,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Dashboard media card, laid out like Caelestia's dash/Media: a wavy progress arc over the cover,
-// title (primary), album (outline), artist (secondary) and three round buttons.
 Item {
     id: root
 
@@ -19,7 +17,6 @@ Item {
     implicitWidth: 230
     implicitHeight: 410
 
-    // wavy progress arc, centred on the top of the cover
     Shape {
         id: arc
 

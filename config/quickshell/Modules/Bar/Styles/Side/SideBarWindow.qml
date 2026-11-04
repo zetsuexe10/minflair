@@ -6,9 +6,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Floating bar on the left, right, top or bottom edge (Settings > Bar): launcher, workspaces, window title, tray, status,
-// clock and power. The window stays mapped for the whole session and only activates for the
-// "side" style (destroying layer surfaces on a style switch can crash Quickshell).
 PanelWindow {
     id: root
 
@@ -17,12 +14,11 @@ PanelWindow {
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
     readonly property int railSize: SideState.railSize
-    readonly property int barWidth: SideState.barThickness     // thickness of the bar strip, whichever the edge
+    readonly property int barWidth: SideState.barThickness
     readonly property int edge: Math.round((barWidth - railSize) / 2)
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "side" && !DisplayProfileService.gameModeActive
     readonly property bool fullscreen: HyprlandService.isTrueFullscreen
     readonly property bool shown: isActive && !fullscreen
-    // how far the rail is pushed off-screen while hidden
     readonly property real hideShift: shown ? 0 : -(barWidth)
 
     WlrLayershell.layer: WlrLayer.Top
@@ -42,7 +38,6 @@ PanelWindow {
         right: !root.vertical || root.position === "right"
     }
 
-    // only the rail itself takes input
     mask: Region {
         x: root.position === "right" ? root.width - root.barWidth + root.edge : (root.vertical ? root.edge : 0)
         y: root.position === "bottom" ? root.height - root.barWidth + root.edge : (root.vertical ? 0 : root.edge)
@@ -53,7 +48,6 @@ PanelWindow {
     Item {
         id: rail
 
-        // slide towards the screen edge when hidden
         property real slide: root.shown ? 0 : root.hideShift
 
         x: root.vertical ? (root.position === "left" ? root.edge + slide : root.width - root.edge - root.railSize - slide) : 0
@@ -66,15 +60,12 @@ PanelWindow {
         Behavior on slide { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
 
-        // Like Caelestia: scrolling anywhere on the bar changes volume on the first half and
-        // brightness on the second. Items that handle wheel themselves (workspaces, icons) win.
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.NoButton
             onWheel: (wheel) => {
                 const frac = root.vertical ? wheel.y / height : wheel.x / width;
                 const dir = wheel.angleDelta.y > 0 ? 1 : -1;
-                // first half: volume, second half: brightness (as in Caelestia)
                 if (frac < 0.5) {
                     if (SettingsService.sideCfg("scroll", "volume"))
                         SideState.nudgeVolume(dir);
@@ -156,7 +147,6 @@ PanelWindow {
                     Layout.alignment: Qt.AlignCenter
                 }
 
-                // pushes the sections above to the start when the window title is turned off
                 Item {
                     visible: !SettingsService.sideCfg("entries", "activeWindow")
                     Layout.fillHeight: root.vertical

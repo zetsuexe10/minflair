@@ -3,8 +3,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Audio levels for the media visualiser, from `cava` when it is installed. Consumers raise `users`
-// while they are on screen; the process only runs while someone is watching.
 Item {
     id: root
 

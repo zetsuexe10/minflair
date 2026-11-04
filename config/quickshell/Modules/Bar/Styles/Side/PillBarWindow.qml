@@ -8,10 +8,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// Bar 4: a floating dynamic island on any edge. At rest it is a small capsule that morphs between
-// the time, the workspaces and the active window (workspaces pop in whenever you switch). Hovering
-// grows it into the full bar; Shell settings > Pill can keep it expanded. Only the capsule takes
-// input: the surface itself is transparent and reserves no space.
 PanelWindow {
     id: root
 
@@ -20,8 +16,8 @@ PanelWindow {
     readonly property string position: SettingsService.sideBarPosition
     readonly property bool vertical: position === "left" || position === "right"
     readonly property int railSize: SideState.railSize
-    readonly property int thickMax: railSize + 8                    // capsule thickness when open
-    readonly property int thickMin: railSize + 2                    // ...and at rest
+    readonly property int thickMax: railSize + 8
+    readonly property int thickMin: railSize + 2
     readonly property int gapEdge: SideState.islandGap
     readonly property string align: SideState.islandAlign
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "pill" && !DisplayProfileService.gameModeActive
@@ -31,7 +27,6 @@ PanelWindow {
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-pill-bar"
-    // tiled windows stop below/beside the pill unless "Reserve space" is off in Shell settings > Pill
     WlrLayershell.exclusiveZone: (shown && SettingsService.sideCfg("reserve") !== false) ? thickMax + gapEdge + 4 : 0
     color: "transparent"
     focusable: false
@@ -46,7 +41,6 @@ PanelWindow {
         right: !root.vertical || root.position === "right"
     }
 
-    // only the capsule takes input
     mask: Region {
         x: root.shown ? pill.x : 0
         y: root.shown ? pill.y : 0
@@ -59,7 +53,6 @@ PanelWindow {
 
         readonly property real total: root.vertical ? root.height : root.width
         readonly property bool wide: root.pinned || hover.hovered || root.keepOpen
-        // the small capsule hugs whatever it currently shows
         readonly property real compactLen: Math.max(root.thickMax * 2, slot.viewLen + 28)
         readonly property real fullLen: Math.min(total - 24, (full.implicitWidth > 0 ? (root.vertical ? full.implicitHeight : full.implicitWidth) : 0) + 24)
         property real len: wide ? Math.max(fullLen, compactLen) : compactLen
@@ -74,8 +67,6 @@ PanelWindow {
             return (total - len) / 2;
         }
 
-        // the capsule stays put along the edge while its length springs
-        // thickness grows a little when it opens, centred in the band so the edge gap stays even
         readonly property real band: root.thickMax + root.gapEdge * 2
 
         x: root.vertical ? (root.position === "left" ? root.gapEdge : root.width - root.gapEdge - root.thickMax) + (root.thickMax - thick) / 2 : along()
@@ -128,7 +119,6 @@ PanelWindow {
             border.color: SideState.outline
         }
 
-        // volume on the first half, brightness on the second, like the side bar
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.NoButton
@@ -144,11 +134,9 @@ PanelWindow {
             }
         }
 
-        // ---- small capsule: one view at a time, crossfading --------------------------------------
         Item {
             id: slot
 
-            // time | workspaces | window; workspaces take over for a moment when you switch
             readonly property string wanted: root.peekView !== "" ? root.peekView : root.idleView
             readonly property string view: (SettingsService.sideOsd && OsdService.isOpen) ? "osd" : ((wanted === "window" && compactWindow.title === "") ? "time" : wanted)
             readonly property real viewLen: view === "workspaces" ? (root.vertical ? ws.implicitHeight : ws.implicitWidth)
@@ -174,6 +162,7 @@ PanelWindow {
                 vertical: root.vertical
                 color: "transparent"
                 border.width: 0
+                visible: opacity > 0.01
                 opacity: slot.view === "time" ? 1 : 0
                 scale: slot.view === "time" ? 1 : 0.85
 
@@ -188,6 +177,7 @@ PanelWindow {
                 vertical: root.vertical
                 color: "transparent"
                 border.width: 0
+                visible: opacity > 0.01
                 opacity: slot.view === "workspaces" ? 1 : 0
                 scale: slot.view === "workspaces" ? 1 : 0.85
 
@@ -195,7 +185,6 @@ PanelWindow {
                 Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack } }
             }
 
-            // song change: cover and title pop in for a moment
             Item {
                 anchors.fill: parent
                 opacity: slot.view === "media" ? 1 : 0
@@ -256,7 +245,6 @@ PanelWindow {
                 }
             }
 
-            // volume / brightness / mic, shown inside the capsule instead of a separate panel
             Item {
                 anchors.fill: parent
                 opacity: slot.view === "osd" ? 1 : 0
@@ -322,6 +310,7 @@ PanelWindow {
                 width: root.vertical ? root.railSize : parent.width
                 height: root.vertical ? parent.height : root.railSize
                 vertical: root.vertical
+                visible: opacity > 0.01
                 opacity: slot.view === "window" ? 1 : 0
                 scale: slot.view === "window" ? 1 : 0.85
 
@@ -330,7 +319,6 @@ PanelWindow {
             }
         }
 
-        // ---- full bar ----------------------------------------------------------------------------
         GridLayout {
             id: full
 
@@ -419,16 +407,13 @@ PanelWindow {
         }
     }
 
-    // panels line up with the capsule
     Binding {
         target: SideState
         property: "pillCenter"
         value: root.shown ? (root.vertical ? pill.y + pill.height / 2 : pill.x + pill.width / 2) : 0
     }
 
-    // hovered or busy: stays open while a panel or popout belongs to the bar
     property bool keepOpen: false
-    // workspaces / the new song pop in for a moment, then the capsule goes back to its idle view
     property string peekView: ""
     readonly property int activeWs: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
 

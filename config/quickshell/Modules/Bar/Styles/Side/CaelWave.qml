@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Shapes
 import qs.Core
 
-// A sine wave that travels while playing. Straight (amplitude 0) when paused. Draws from x=0 to `length`.
 Shape {
     id: root
 

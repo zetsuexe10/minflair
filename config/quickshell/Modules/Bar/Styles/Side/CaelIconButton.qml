@@ -3,12 +3,11 @@ import QtQuick.Layouts
 import qs.Core
 import qs.Core.Components
 
-// Round media button that morphs its shape: pill -> squircle when checked, tighter while pressed.
 Rectangle {
     id: root
 
     property string icon
-    property bool tonal: true           // false = primary (filled accent)
+    property bool tonal: true
     property bool checked: false
     property bool fill: false
     property bool disabled: false

@@ -6,8 +6,6 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 
-// The Dashboard tab, laid out like Caelestia's: weather and user on top, date, calendar and
-// resource rings below, the media player on the right.
 Item {
     id: root
 
@@ -49,7 +47,6 @@ Item {
                 Layout.maximumHeight: 132
                 spacing: 10
 
-                // ---- weather ----
                 CaelCard {
                     Layout.preferredWidth: 190
                     Layout.fillHeight: true
@@ -105,7 +102,6 @@ Item {
                     }
                 }
 
-                // ---- user ----
                 CaelCard {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -115,7 +111,6 @@ Item {
                         anchors.margins: 14
                         spacing: 16
 
-                        // avatar: photo from ~/.face, otherwise the initial on a ringed disc
                         Item {
                             Layout.preferredWidth: 80
                             Layout.preferredHeight: 80
@@ -137,7 +132,6 @@ Item {
                                 color: SideState.cardHi
                                 clip: true
 
-                                // 1. the logo set in Shell Settings, 2. ~/.face, 3. the distro's own logo, 4. the initial
                                 Image {
                                     id: logoImg
 
@@ -214,7 +208,6 @@ Item {
                                 color: SideState.outline
                             }
 
-                            // aligned facts: icon chip, label, value
                             Repeater {
                                 model: 3
 
@@ -272,7 +265,6 @@ Item {
                 Layout.fillHeight: true
                 spacing: 10
 
-                // ---- date / time ----
                 CaelCard {
                     Layout.preferredWidth: 74
                     Layout.fillHeight: true
@@ -334,7 +326,6 @@ Item {
                     }
                 }
 
-                // ---- calendar ----
                 CaelCard {
                     id: calCard
 
@@ -481,7 +472,6 @@ Item {
                     }
                 }
 
-                // ---- resources ----
                 CaelCard {
                     Layout.preferredWidth: 84
                     Layout.fillHeight: true
