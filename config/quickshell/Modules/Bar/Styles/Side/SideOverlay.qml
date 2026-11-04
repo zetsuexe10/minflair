@@ -45,6 +45,8 @@ PanelWindow {
     property var _pendingFocusItem: null
     property int _focusAttempts: 0
     property bool dashByHover: false
+    property bool musicByHover: false
+    readonly property bool hoverMusic: SettingsService.sideCfg("hover", "music")
     readonly property bool hoverDashboard: SettingsService.sideCfg("hover", "dashboard")
     readonly property bool hoverSession: SettingsService.sideCfg("hover", "session")
     readonly property bool hoverLauncher: SettingsService.sideCfg("hover", "launcher")
@@ -124,6 +126,8 @@ PanelWindow {
         }
         if (activeId !== "dashboard")
             dashByHover = false;
+        if (activeId !== "music")
+            musicByHover = false;
     }
 
     WlrLayershell.layer: WlrLayer.Top
@@ -218,6 +222,23 @@ PanelWindow {
         }
     }
 
+    Latch {
+        id: musicLatch
+
+        delay: 350
+        wanted: root.isActive && !root.fullscreen && !root.island && root.hoverMusic && (SideState.musicHover || (root.musicByHover && panelDock.hovered))
+        onOnChanged: {
+            if (on && AppState.activeWidget === "") {
+                root.musicByHover = true;
+                AppState.openWidget("music");
+            } else if (!on && root.musicByHover) {
+                root.musicByHover = false;
+                if (AppState.activeWidget === "music")
+                    AppState.closeWidget("music");
+            }
+        }
+    }
+
     Connections {
         target: AppState
 
@@ -307,7 +328,7 @@ PanelWindow {
 
             edge: isLauncher ? "bottom" : (root.island ? root.position : (isDash ? "top" : root.position))
             align: (isLauncher || (!root.island && isDash)) ? "center" : ((root.island && (root.shownId === "controlCenter" || root.shownId === "notificationsCenter")) ? "end" : (root.island ? "center" : "end"))
-            center: (root.island && !isLauncher && root.shownId !== "controlCenter" && root.shownId !== "notificationsCenter") ? root.pillAlong : -1
+            center: (!root.island && root.shownId === "music" && SideState.musicCenter >= 0) ? SideState.musicCenter - (root.vertical ? root.insT : root.insL) : (root.island && !isLauncher && root.shownId !== "controlCenter" && root.shownId !== "notificationsCenter") ? root.pillAlong : -1
             open: root.open && !root.isCentered
             attached: root.attached
             rounding: SideState.rounding
@@ -612,7 +633,7 @@ PanelWindow {
 
     Component {
         id: musicComp
-        MiniMusicWidget { widget: widgetProxy }
+        CaelMediaMini { widget: widgetProxy }
     }
 
     Component {

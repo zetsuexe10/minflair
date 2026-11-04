@@ -21,11 +21,28 @@ PanelWindow {
     readonly property bool shown: isActive && !fullscreen
     readonly property real hideShift: shown ? 0 : -(barWidth)
 
+    readonly property bool dynamic: SettingsService.sideCfg("dynamic")
+    readonly property bool hoverExpand: SettingsService.sideCfg("hover", "dynamic")
+    readonly property bool expanded: !dynamic || SettingsService.sideCfg("pinned") || hold
+    property bool hold: false
     property bool relayouting: false
+    property int healed: 0
 
     function relayout() {
         relayouting = true;
         settle.restart();
+    }
+
+    Timer {
+        id: release
+
+        interval: 700
+        onTriggered: root.hold = false
+    }
+
+    onDynamicChanged: {
+        hold = false;
+        relayout();
     }
 
     Timer {
@@ -69,10 +86,10 @@ PanelWindow {
     }
 
     mask: Region {
-        x: root.position === "right" ? root.width - root.barWidth + root.edge : (root.vertical ? root.edge : 0)
-        y: root.position === "bottom" ? root.height - root.barWidth + root.edge : (root.vertical ? 0 : root.edge)
-        width: !root.shown ? 0 : (root.vertical ? root.railSize : root.width)
-        height: !root.shown ? 0 : (root.vertical ? root.height : root.railSize)
+        x: (root.position === "right" ? root.width - root.barWidth + root.edge : (root.vertical ? root.edge : 0)) + (!root.expanded && !root.vertical ? dyn.x : 0)
+        y: (root.position === "bottom" ? root.height - root.barWidth + root.edge : (root.vertical ? 0 : root.edge)) + (!root.expanded && root.vertical ? dyn.y : 0)
+        width: !root.shown ? 0 : (root.expanded ? (root.vertical ? root.railSize : root.width) : (root.vertical ? root.railSize : dyn.width))
+        height: !root.shown ? 0 : (root.expanded ? (root.vertical ? root.height : root.railSize) : (root.vertical ? dyn.height : root.railSize))
     }
 
     Item {
@@ -89,6 +106,18 @@ PanelWindow {
 
         Behavior on slide { NumberAnimation { duration: Constants.animSlow; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal } }
+
+        HoverHandler {
+            onHoveredChanged: {
+                if (hovered) {
+                    release.stop();
+                    if (root.hoverExpand)
+                        root.hold = true;
+                } else {
+                    release.restart();
+                }
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
@@ -110,8 +139,21 @@ PanelWindow {
 
             anchors.fill: parent
             active: root.isActive && !root.relayouting
+            opacity: root.expanded ? 1 : 0
+            visible: opacity > 0.01
+
+            Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
             sourceComponent: GridLayout {
+                id: grid
+
+                function overflow() {
+                    const r = root.vertical ? childrenRect.y + childrenRect.height : childrenRect.x + childrenRect.width;
+                    const limit = root.vertical ? height : width;
+                    const screenW = root.screen ? root.screen.width : root.width;
+                    return r > limit + 1 || (!root.vertical && root.width > screenW + 1);
+                }
+
                 anchors.fill: parent
                 anchors.topMargin: root.vertical ? 12 : 0
                 anchors.bottomMargin: root.vertical ? 12 : 0
@@ -122,6 +164,22 @@ PanelWindow {
                 columns: root.vertical ? 1 : 99
                 rowSpacing: 6
                 columnSpacing: 6
+
+                Timer {
+                    interval: 250
+                    repeat: true
+                    running: root.shown
+                    onTriggered: {
+                        if (grid.overflow()) {
+                            if (root.healed < 8) {
+                                root.healed++;
+                                root.relayout();
+                            }
+                        } else {
+                            root.healed = 0;
+                        }
+                    }
+                }
 
                 SideButton {
                     visible: SettingsService.sideCfg("entries", "logo")
@@ -202,6 +260,65 @@ PanelWindow {
                         radius: width / 2
                     }
                 }
+            }
+        }
+
+        MouseArea {
+            x: dyn.x
+            y: dyn.y
+            width: dyn.width
+            height: dyn.height
+            enabled: root.dynamic && !root.expanded
+            onClicked: {
+                release.restart();
+                root.hold = true;
+            }
+        }
+
+        GridLayout {
+            id: dyn
+
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
+            flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+            rows: root.vertical ? 99 : 1
+            columns: root.vertical ? 1 : 99
+            rowSpacing: 6
+            columnSpacing: 6
+            leftPadding: 6
+            rightPadding: 6
+            topPadding: 6
+            bottomPadding: 6
+            opacity: root.expanded ? 0 : 1
+            scale: root.expanded ? 0.94 : 1
+            visible: root.dynamic && opacity > 0.01
+
+            Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
+            Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
+
+            SideWorkspaces {
+                vertical: root.vertical
+                Layout.alignment: Qt.AlignCenter
+            }
+
+            SideClock {
+                vertical: root.vertical
+                Layout.alignment: Qt.AlignCenter
+            }
+
+            SideMusicChip {
+                id: chip
+
+                visible: active
+                vertical: root.vertical
+                Layout.alignment: Qt.AlignCenter
+                onHoverChanged: (on) => SideState.musicHover = on
+            }
+
+            Binding {
+                target: SideState
+                property: "musicCenter"
+                value: chip.visible ? (root.vertical ? rail.y + dyn.y + chip.y + chip.height / 2 : rail.x + dyn.x + chip.x + chip.width / 2) : -1
             }
         }
     }

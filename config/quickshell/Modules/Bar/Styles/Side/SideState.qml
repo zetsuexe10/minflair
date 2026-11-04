@@ -16,6 +16,8 @@ QtObject {
     property real pillEdgeGap: 10
     property string popout: ""          // "", "network", "bluetooth", "audio"
     property real popoutCenter: 0
+    property bool musicHover: false
+    property real musicCenter: -1
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts
 
     readonly property string position: SettingsService.sideBarPosition

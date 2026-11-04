@@ -46,12 +46,13 @@ Item {
             "workspaceStyle": "shapes",
                         "align": "center",
             "pinned": false,
+            "dynamic": false,
             "reserve": true,
             "idle": "time",
             "offset": 0,
             "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
             "scroll": {"workspaces": true, "volume": true, "brightness": true},
-            "hover": {"dashboard": true, "session": true, "launcher": false}
+            "hover": {"dashboard": true, "session": true, "launcher": false, "dynamic": true, "music": true}
         })
     property var sideBarConfig: sideBarDefaults
 

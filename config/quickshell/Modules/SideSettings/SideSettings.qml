@@ -36,6 +36,12 @@ AppWindow {
                 { "kind": "button", "label": "Choose logo", "desc": "Pick a file from a dialog", "action": "browseLogo", "value": "Browse" },
                 { "kind": "button", "label": "Reset logo", "desc": "Back to ~/.face or the distro logo", "action": "resetLogo", "value": "Reset" }
             ] },
+            { "name": "Dynamic bar", "rows": [
+                { "kind": "toggle", "label": "Dynamic bar", "desc": "The bar shrinks to workspaces, the clock and the song that is playing, and grows back when you hover it", "cfg": ["dynamic"] },
+                { "kind": "toggle", "label": "Expand on hover", "desc": "Off: click the small bar to expand it", "cfg": ["hover", "dynamic"] },
+                { "kind": "toggle", "label": "Music card on hover", "desc": "Hover the song to open the player; click it to open or close", "cfg": ["hover", "music"] },
+                { "kind": "toggle", "label": "Keep expanded", "desc": "Always show the whole bar", "cfg": ["pinned"] }
+            ] },
             { "name": "Entries", "rows": [
                 { "kind": "toggle", "label": "Launcher button", "desc": "Opens the launcher", "cfg": ["entries", "logo"] },
                 { "kind": "toggle", "label": "Workspaces", "desc": "Workspace switcher", "cfg": ["entries", "workspaces"] },

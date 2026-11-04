@@ -69,6 +69,12 @@ The Quickshell panels are toggled through sockets, so any other keybinding tool 
 The default style is Island; change it in Settings > Bar or with `qs ipc call bar set island|side|pill`.
 
 ## Side and Pill
+**Dynamic bar (Side):** Settings > Bar > Dynamic bar shrinks the bar to a small capsule with the workspaces, the clock
+and the song that is playing (only while a player is running). Hovering the capsule grows it back to the full bar and
+it shrinks again when the pointer leaves; with "Expand on hover" off, click the capsule instead, and "Keep expanded"
+turns the shrinking off. Hovering or clicking the song opens a compact player (cover, title, seek bar, previous, play,
+next) that grows out of the bar's edge, centred on the song.
+
 **Bar entries** (each can be turned off): launcher, workspaces, focused window title, tray, status icons (network,
 Bluetooth, volume, brightness, keyboard layout, lock keys, notifications), clock, power. The bar sits on the left,
 right, top or bottom. Scrolling the first half of the bar changes volume, the second half brightness, and scrolling the
