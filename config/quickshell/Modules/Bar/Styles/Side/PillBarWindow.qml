@@ -387,8 +387,6 @@ PanelWindow {
 
             SideButton {
                 visible: SettingsService.sideCfg("entries", "power")
-                onHoverStarted: SideState.sessionHover = true
-                onHoverEnded: SideState.sessionHover = false
                 Layout.alignment: Qt.AlignCenter
                 Layout.preferredWidth: root.railSize
                 Layout.preferredHeight: root.railSize
@@ -412,6 +410,31 @@ PanelWindow {
         property: "pillCenter"
         value: root.shown ? (root.vertical ? pill.y + pill.height / 2 : pill.x + pill.width / 2) : 0
     }
+
+    Binding {
+        target: SideState
+        property: "pillAlongStart"
+        value: root.vertical ? pill.y : pill.x
+    }
+
+    Binding {
+        target: SideState
+        property: "pillLen"
+        value: root.vertical ? pill.height : pill.width
+    }
+
+    Binding {
+        target: SideState
+        property: "pillThick"
+        value: root.vertical ? pill.width : pill.height
+    }
+
+    Binding {
+        target: SideState
+        property: "pillEdgeGap"
+        value: root.vertical ? (root.position === "left" ? pill.x : root.width - pill.x - pill.width) : (root.position === "top" ? pill.y : root.height - pill.y - pill.height)
+    }
+
 
     property bool keepOpen: false
     property string peekView: ""

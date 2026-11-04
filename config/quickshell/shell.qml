@@ -84,6 +84,13 @@ ShellRoot {
             return SettingsService.barStyle;
         }
 
+        function powermenu(): string {
+            if (SettingsService.barStyle !== "pill")
+                return "ignored";
+            AppState.toggleWidget("powerMenu");
+            return "toggled";
+        }
+
         target: "bar"
     }
 

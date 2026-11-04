@@ -42,6 +42,7 @@ bind = SUPER ALT, 1,    exec, qs ipc call bar set island
 bind = SUPER ALT, 2,    exec, qs ipc call bar set side
 bind = SUPER ALT, 3,    exec, qs ipc call bar set pill
 bind = SUPER ALT, B,    exec, qs ipc call bar cycle
+bind = SUPER, X,        exec, qs ipc call bar powermenu
 ```
 With Hyprland's Lua config: `hl.bind(mod .. " + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_launcher"))`.
 The default style is Island; pick another in Settings > Bar or with the binds above.
@@ -66,7 +67,7 @@ top edge, launcher on the bottom edge, other panels from their bar icons.
 
 **Pill** is a capsule that floats over the desktop. At rest it shows the time (or workspaces or window title) and
 morphs: workspaces when you switch, cover and title when a new song starts, the level when you change volume or
-brightness. Hover to grow it into the full bar, or keep it expanded. Panels open from its edge, centred on it.
+brightness. Hover to grow it into the full bar, or keep it expanded. Panels open from its edge, centred on it; the wallpaper and screenshot panels grow out of the capsule itself, like the Island bar's, and the launcher opens at the bottom. The power button and `Super+X` open the power menu in the middle of the screen.
 Shell settings > Pill: Reserve space, Keep expanded, Idle view, Alignment, Offset.
 
 **Wallpapers:** `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders included), editable in settings. Arrow

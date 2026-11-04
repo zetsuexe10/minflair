@@ -21,6 +21,36 @@ PanelWindow {
     readonly property bool shown: isActive && !fullscreen
     readonly property real hideShift: shown ? 0 : -(barWidth)
 
+    property bool relayouting: false
+
+    function relayout() {
+        relayouting = true;
+        settle.restart();
+    }
+
+    Timer {
+        id: settle
+
+        interval: 160
+        onTriggered: root.relayouting = false
+    }
+
+    Connections {
+        target: SideState
+
+        function onFrameChanged() { root.relayout(); }
+        function onBorderChanged() { root.relayout(); }
+    }
+
+    Connections {
+        target: SettingsService
+
+        function onSideBarPositionChanged() { root.relayout(); }
+    }
+
+    onHeightChanged: if (isActive) relayout()
+    onWidthChanged: if (isActive) relayout()
+
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-side-bar"
 
@@ -79,7 +109,7 @@ PanelWindow {
             id: content
 
             anchors.fill: parent
-            active: root.isActive
+            active: root.isActive && !root.relayouting
 
             sourceComponent: GridLayout {
                 anchors.fill: parent

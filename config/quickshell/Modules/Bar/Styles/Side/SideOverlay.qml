@@ -162,7 +162,7 @@ PanelWindow {
     Timer {
         id: closeTimer
 
-        interval: Constants.animSlow + 80
+        interval: Math.max(Constants.animSlow + 80, 560)
         onTriggered: root.shownId = ""
     }
 
@@ -305,9 +305,9 @@ PanelWindow {
             readonly property bool isLauncher: root.shownId === "launcher"
             property bool hovered: panelHover.hovered
 
-            edge: root.island ? root.position : (isDash ? "top" : (isLauncher ? "bottom" : root.position))
-            align: (!root.island && (isDash || isLauncher)) ? "center" : ((root.island && (root.shownId === "controlCenter" || root.shownId === "notificationsCenter")) ? "end" : (root.island ? "center" : "end"))
-            center: (root.island && root.shownId !== "controlCenter" && root.shownId !== "notificationsCenter") ? root.pillAlong : -1
+            edge: isLauncher ? "bottom" : (root.island ? root.position : (isDash ? "top" : root.position))
+            align: (isLauncher || (!root.island && isDash)) ? "center" : ((root.island && (root.shownId === "controlCenter" || root.shownId === "notificationsCenter")) ? "end" : (root.island ? "center" : "end"))
+            center: (root.island && !isLauncher && root.shownId !== "controlCenter" && root.shownId !== "notificationsCenter") ? root.pillAlong : -1
             open: root.open && !root.isCentered
             attached: root.attached
             rounding: SideState.rounding
@@ -384,7 +384,7 @@ PanelWindow {
             align: "center"
             center: root.island ? root.pillAlong : -1
             padding: 14
-            open: root.isActive && sessionLatch.on
+            open: root.isActive && !root.island && sessionLatch.on
             attached: root.attached
             rounding: SideState.rounding
             contentWidth: session.implicitWidth
@@ -428,28 +428,36 @@ PanelWindow {
         id: centerPanel
 
         readonly property int pad: (root.shownId === "powerMenu" || root.shownId === "screenshot") ? 0 : Constants.sizeLg
-
-        visible: opacity > 0.01
-        opacity: (root.open && root.isCentered) ? 1 : 0
         readonly property bool dropDown: root.shownId === "wallpaper" || root.shownId === "screenshot"
+        readonly property bool morphing: dropDown && root.island
+        readonly property bool shownNow: root.open && root.isCentered
+        readonly property real tw: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
+        readonly property real th: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
+        readonly property real gap: SideState.pillEdgeGap
+        readonly property real pw: root.vertical ? SideState.pillThick : SideState.pillLen
+        readonly property real ph: root.vertical ? SideState.pillLen : SideState.pillThick
+        readonly property real px: root.vertical ? (root.position === "left" ? gap : root.width - gap - pw) : SideState.pillAlongStart
+        readonly property real py: root.vertical ? SideState.pillAlongStart : (root.position === "top" ? gap : root.height - gap - ph)
+        readonly property real tx: root.vertical ? (root.position === "left" ? gap : root.width - gap - tw) : Math.max(12, Math.min(root.width - tw - 12, SideState.pillCenter - tw / 2))
+        readonly property real ty: root.vertical ? Math.max(12, Math.min(root.height - th - 12, SideState.pillCenter - th / 2)) : (root.position === "bottom" ? root.height - gap - th : gap)
+        property real morph: shownNow ? 1 : 0
 
-        transformOrigin: dropDown ? (root.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "bottom" ? Item.Bottom : Item.Top) : Item.Top) : (SideState.island ? (root.position === "left" ? Item.Left : root.position === "right" ? Item.Right : root.position === "top" ? Item.Top : Item.Bottom) : Item.Center)
-        scale: (root.open && root.isCentered) ? 1 : (dropDown ? 0.7 : (SideState.island ? 0.5 : 0.94))
-        width: Math.min(centerLoader.implicitWidth + pad * 2, root.freeW - 24)
-        height: Math.min(centerLoader.implicitHeight + pad * 2, root.freeH - 24)
-        readonly property bool vert: root.vertical
-        readonly property real alongX: Math.max(root.insL + 12, Math.min(root.insL + root.freeW - width - 12, root.insL + root.pillAlong - width / 2))
-        readonly property real alongY: Math.max(root.insT + 12, Math.min(root.insT + root.freeH - height - 12, root.insT + root.pillAlong - height / 2))
-
-        x: Math.round(dropDown && root.island ? (vert ? (root.position === "left" ? root.insL + 12 : root.insL + root.freeW - width - 12) : alongX) : root.insL + (root.freeW - width) / 2)
-        y: Math.round(dropDown ? (root.island ? (vert ? alongY : (root.position === "bottom" ? root.insT + root.freeH - height - 12 : root.insT + 12)) : root.insT + 12) : root.insT + (root.freeH - height) / 2)
+        visible: morphing ? morph > 0.005 : opacity > 0.01
+        opacity: morphing ? 1 : (shownNow ? 1 : 0)
+        transformOrigin: dropDown ? Item.Top : Item.Center
+        scale: morphing ? 1 : (shownNow ? 1 : (dropDown ? 0.7 : 0.94))
+        width: morphing ? pw + (tw - pw) * morph : tw
+        height: morphing ? ph + (th - ph) * morph : th
+        x: Math.round(morphing ? px + (tx - px) * morph : root.insL + (root.freeW - width) / 2)
+        y: Math.round(morphing ? py + (ty - py) * morph : (dropDown ? root.insT + 12 : root.insT + (root.freeH - height) / 2))
         color: SideState.surface
-        radius: Constants.size3Xl - 4
+        radius: morphing ? Math.min(width, height) / 2 + ((Constants.size3Xl - 4) - Math.min(width, height) / 2) * Math.pow(morph, 2) : Constants.size3Xl - 4
         border.width: 1
         border.color: SideState.outline
 
+        Behavior on morph { NumberAnimation { duration: 460; easing.type: Easing.OutCubic } }
         Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: SideState.island ? Constants.animSlow : Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: SideState.island ? 0.9 : 0.6 } }
+        Behavior on scale { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutBack; easing.overshoot: 0.6 } }
 
         MouseArea {
             anchors.fill: parent
@@ -461,6 +469,7 @@ PanelWindow {
 
             anchors.fill: parent
             anchors.margins: centerPanel.pad
+            opacity: centerPanel.morphing ? Math.max(0, (centerPanel.morph - 0.55) / 0.45) : 1
             active: root.panelVisible && root.isCentered
             sourceComponent: root.componentFor(root.shownId)
             onLoaded: root.prepare(item)

@@ -10,6 +10,10 @@ QtObject {
     id: root
 
     property real pillCenter: 0
+    property real pillAlongStart: 0
+    property real pillLen: 0
+    property real pillThick: 0
+    property real pillEdgeGap: 10
     property string popout: ""          // "", "network", "bluetooth", "audio"
     property real popoutCenter: 0
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts
