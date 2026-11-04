@@ -14,38 +14,59 @@ launcher, power panel, Wi-Fi / Bluetooth / sound popouts and the shell settings 
 
 ## Install
 ```sh
-sudo pacman -S hyprland quickshell python python-pillow socat wl-clipboard brightnessctl playerctl \
-     swaybg grim slurp imagemagick networkmanager bluez bluez-utils pipewire wireplumber ttf-inter cava
 git clone -b quickshell-side-island https://github.com/zetsuexe10/minflair ~/minflair
-mkdir -p ~/.config && cp -r ~/minflair/config/quickshell ~/.config/quickshell
-qs
+cd ~/minflair
+./install.sh
 ```
-Quickshell must be 0.3 or newer; if the repository version is older use `quickshell-git` from the AUR. Optional:
-`adw-gtk3` (the GTK theme the shell recolours), `qt6ct`, `zenity` (file pickers). `cava` drives the media visualiser.
+The installer asks before every step and takes the bracketed default on enter. For no questions at all:
+```sh
+./install.sh --yes
+./install.sh --yes --style pill --terminal kitty --files thunar --layout us,es
+```
+| Option | Effect |
+| :-- | :-- |
+| `-y`, `--yes` | answer yes to everything and use the defaults |
+| `--style island\|side\|pill` | starting bar style |
+| `--terminal foot\|kitty\|alacritty\|wezterm` | terminal for `Super+Return` |
+| `--files nautilus\|thunar\|dolphin` | file manager for `Super+E` |
+| `--layout us,es` | keyboard layouts |
+| `--no-packages`, `--no-shell`, `--no-hypr`, `--no-session`, `--no-services` | skip a step |
+| `--aur-helper paru\|yay` | helper for packages that are not in the repositories |
+| `--check` | report what is installed and what is missing, change nothing |
 
-## Hyprland binds (hyprland.conf)
+What it does: installs the packages with pacman (AUR helper for anything missing), checks Hyprland is 0.55 or newer and
+Quickshell 0.3 or newer, copies `config/quickshell` to `~/.config/quickshell` and `config/hypr` to `~/.config/hypr`
+(existing ones are moved to `~/.minflair/backup/<date>`), writes your choices to `~/.config/hypr/local.lua`, sets the bar
+style, installs the **Minflair** session and enables NetworkManager and Bluetooth. `./uninstall.sh` reverses it and
+offers your previous configs back. Packages are never removed.
+
+## Session
+The installer adds `/usr/share/wayland-sessions/minflair.desktop`, so **Minflair** appears in SDDM, GDM, greetd, ly and
+other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-session`, which starts Hyprland with
+`~/.config/hypr/hyprland.lua` and logs to `~/.local/state/minflair/session.log`. From a TTY run that script directly.
+`XDG_SESSION_DESKTOP` is `Minflair`; `XDG_CURRENT_DESKTOP` stays `Hyprland` so portals pick the Hyprland backend.
+Put extra variables for the session in `~/.minflair/session.env`.
+
+## Hyprland config
+`config/hypr` is a Hyprland 0.55 Lua config: `hyprland.lua` loads `animations`, `autostart`, `envs`, `keybinds`,
+`monitors`, `userprefs` and `windowrules`. `local.lua` holds what the installer asked for (terminal, floating terminal
+command, file manager, keyboard layout). Autostart skips anything that is not installed. `keybinds.lua` is the full list;
+the shell shows it in its keybinds cheat sheet. The shell's GTK/Qt theme lives in `~/.minflair`, your `~/.config/gtk-*`
+and `qt*ct` are not touched.
+
+Main binds (`Super` is the logo key):
 ```
-exec-once = qs
-bind = SUPER, A,        exec, socat - UNIX-CONNECT:/tmp/quickshell_launcher
-bind = SUPER, V,        exec, socat - UNIX-CONNECT:/tmp/quickshell_clipboard
-bind = CTRL ALT, W,     exec, socat - UNIX-CONNECT:/tmp/quickshell_wallpaper
-bind = CTRL ALT, X,     exec, socat - UNIX-CONNECT:/tmp/quickshell_powerMenu
-bind = CTRL ALT, S,     exec, socat - UNIX-CONNECT:/tmp/quickshell_controlCenter
-bind = CTRL ALT, D,     exec, socat - UNIX-CONNECT:/tmp/quickshell_dashboard
-bind = CTRL ALT, N,     exec, socat - UNIX-CONNECT:/tmp/quickshell_notificationsCenter
-bind = CTRL ALT, C,     exec, socat - UNIX-CONNECT:/tmp/quickshell_calendar
-bind = CTRL ALT, M,     exec, socat - UNIX-CONNECT:/tmp/quickshell_music
-bind = CTRL ALT, F,     exec, socat - UNIX-CONNECT:/tmp/quickshell_systemUsage
-bind = SUPER SHIFT, S,  exec, socat - UNIX-CONNECT:/tmp/quickshell_screenshot
-bind = SUPER CTRL, S,   exec, socat - UNIX-CONNECT:/tmp/quickshell_minflair_side_settings
-bind = SUPER ALT, 1,    exec, qs ipc call bar set island
-bind = SUPER ALT, 2,    exec, qs ipc call bar set side
-bind = SUPER ALT, 3,    exec, qs ipc call bar set pill
-bind = SUPER ALT, B,    exec, qs ipc call bar cycle
-bind = SUPER, X,        exec, qs ipc call bar powermenu
+Super+Return        terminal            Super+Shift+Return  floating terminal
+Super+E             file manager        Super+A             launcher
+Super+V             clipboard           Super+L             lock
+Super+Shift+D       dashboard           Super+Shift+A       control center
+Super+Shift+W       wallpapers          Super+Shift+S       screenshot
+Super+X             power menu (Pill)   Super+Alt+1/2/3     island / side / pill
 ```
-With Hyprland's Lua config: `hl.bind(mod .. " + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_launcher"))`.
-The default style is Island; pick another in Settings > Bar or with the binds above.
+The Quickshell panels are toggled through sockets, so any other keybinding tool can use
+`socat - UNIX-CONNECT:/tmp/quickshell_<panel>` with `launcher`, `clipboard`, `wallpaper`, `powerMenu`,
+`controlCenter`, `dashboard`, `notificationsCenter`, `calendar`, `music`, `systemUsage`, `screenshot`.
+The default style is Island; change it in Settings > Bar or with `qs ipc call bar set island|side|pill`.
 
 ## Side and Pill
 **Bar entries** (each can be turned off): launcher, workspaces, focused window title, tray, status icons (network,

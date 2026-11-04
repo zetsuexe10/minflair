@@ -1,0 +1,7 @@
+require("animations")
+require("autostart")
+require("envs")
+require("keybinds")
+require("monitors")
+require("userprefs")
+require("windowrules")

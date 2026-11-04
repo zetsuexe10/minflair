@@ -1,0 +1,22 @@
+#!/bin/sh
+MINFLAIR_HOME="${MINFLAIR_HOME:-$HOME/.minflair}"
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=Minflair
+export XDG_CURRENT_DESKTOP=Hyprland
+export MINFLAIR_SESSION=1
+[ -r "$MINFLAIR_HOME/session.env" ] && . "$MINFLAIR_HOME/session.env"
+
+state="${XDG_STATE_HOME:-$HOME/.local/state}/minflair"
+mkdir -p "$state" "$MINFLAIR_HOME"
+config="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.lua"
+log="$state/session.log"
+
+if [ ! -r "$config" ]; then
+  echo "minflair-session: missing $config, run the installer again" >>"$log"
+  exit 1
+fi
+
+if command -v start-hyprland >/dev/null 2>&1; then
+  exec start-hyprland -- --config "$config" >>"$log" 2>&1
+fi
+exec Hyprland --config "$config" >>"$log" 2>&1

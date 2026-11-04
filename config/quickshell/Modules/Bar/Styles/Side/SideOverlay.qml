@@ -438,8 +438,9 @@ PanelWindow {
         readonly property real ph: root.vertical ? SideState.pillLen : SideState.pillThick
         readonly property real px: root.vertical ? (root.position === "left" ? gap : root.width - gap - pw) : SideState.pillAlongStart
         readonly property real py: root.vertical ? SideState.pillAlongStart : (root.position === "top" ? gap : root.height - gap - ph)
-        readonly property real tx: root.vertical ? (root.position === "left" ? gap : root.width - gap - tw) : Math.max(12, Math.min(root.width - tw - 12, SideState.pillCenter - tw / 2))
-        readonly property real ty: root.vertical ? Math.max(12, Math.min(root.height - th - 12, SideState.pillCenter - th / 2)) : (root.position === "bottom" ? root.height - gap - th : gap)
+        readonly property bool fromTop: root.shownId === "screenshot"
+        readonly property real tx: fromTop ? Math.round(root.insL + (root.freeW - tw) / 2) : (root.vertical ? (root.position === "left" ? gap : root.width - gap - tw) : Math.max(12, Math.min(root.width - tw - 12, SideState.pillCenter - tw / 2)))
+        readonly property real ty: fromTop ? root.insT + 12 : (root.vertical ? Math.max(12, Math.min(root.height - th - 12, SideState.pillCenter - th / 2)) : (root.position === "bottom" ? root.height - gap - th : gap))
         property real morph: shownNow ? 1 : 0
 
         visible: morphing ? morph > 0.005 : opacity > 0.01
