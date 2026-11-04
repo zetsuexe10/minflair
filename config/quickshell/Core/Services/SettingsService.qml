@@ -48,7 +48,7 @@ Item {
             "pinned": false,
             "dynamic": false,
             "reserve": true,
-            "idle": "time",
+            "idle": "auto",
             "offset": 0,
             "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
             "scroll": {"workspaces": true, "volume": true, "brightness": true},

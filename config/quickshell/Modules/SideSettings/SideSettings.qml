@@ -64,8 +64,9 @@ AppWindow {
         { "title": "Pill (bar 4)", "icon": "bar", "sub": "The floating dynamic island", "sections": [
             { "name": "Behaviour", "rows": [
                 { "kind": "toggle", "label": "Reserve space", "desc": "Tiled windows stop at the pill instead of sliding under it", "cfg": ["reserve"] },
-                { "kind": "toggle", "label": "Keep expanded", "desc": "Show the whole bar all the time instead of only on hover", "cfg": ["pinned"] },
-                { "kind": "select", "label": "Idle view", "desc": "What the small pill shows when nothing changes", "cfg": ["idle"], "options": [{ "text": "Time", "value": "time" }, { "text": "Workspaces", "value": "workspaces" }, { "text": "Active window", "value": "window" }] }
+                { "kind": "toggle", "label": "Keep expanded", "desc": "Off: the pill stays small (workspaces, time or the song) and grows on hover. On: always the whole bar", "cfg": ["pinned"] },
+                { "kind": "toggle", "label": "Music card on hover", "desc": "Hover the song in the expanded pill to open the player; click it to open or close", "cfg": ["hover", "music"] },
+                { "kind": "select", "label": "Idle view", "desc": "What the small pill shows when nothing changes", "cfg": ["idle"], "options": [{ "text": "Automatic (music when playing, else time)", "value": "auto" }, { "text": "Time", "value": "time" }, { "text": "Music", "value": "media" }, { "text": "Workspaces", "value": "workspaces" }, { "text": "Active window", "value": "window" }] }
             ] },
             { "name": "Position", "rows": [
                 { "kind": "select", "label": "Alignment", "desc": "Where along the edge the pill sits (the edge is set in Bar > Position)", "cfg": ["align"], "options": alignOptions },

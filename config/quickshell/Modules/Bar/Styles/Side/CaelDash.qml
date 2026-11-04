@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
@@ -132,16 +133,33 @@ Item {
                                 color: SideState.cardHi
                                 clip: true
 
+                                Item {
+                                    id: avatarMask
+
+                                    anchors.fill: parent
+                                    visible: false
+                                    layer.enabled: true
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: width / 2
+                                    }
+                                }
+
                                 Image {
                                     id: logoImg
 
                                     anchors.fill: parent
-                                    anchors.margins: 14
                                     source: SideState.logoSource
-                                    fillMode: Image.PreserveAspectFit
-                                    sourceSize: Qt.size(160, 160)
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize: Qt.size(240, 240)
                                     smooth: true
                                     visible: status === Image.Ready
+                                    layer.enabled: true
+                                    layer.effect: MultiEffect {
+                                        maskEnabled: true
+                                        maskSource: avatarMask
+                                    }
                                 }
 
                                 Image {
@@ -150,8 +168,13 @@ Item {
                                     anchors.fill: parent
                                     source: logoImg.visible ? "" : "file://" + root.home + "/.face"
                                     fillMode: Image.PreserveAspectCrop
-                                    sourceSize: Qt.size(168, 168)
+                                    sourceSize: Qt.size(240, 240)
                                     visible: status === Image.Ready && !logoImg.visible
+                                    layer.enabled: true
+                                    layer.effect: MultiEffect {
+                                        maskEnabled: true
+                                        maskSource: avatarMask
+                                    }
                                 }
 
                                 Image {

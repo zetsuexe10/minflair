@@ -23,7 +23,9 @@ PanelWindow {
     readonly property bool isActive: SettingsService.settingsLoaded && SettingsService.barStyle === "pill" && !DisplayProfileService.gameModeActive
     readonly property bool shown: isActive && !HyprlandService.isTrueFullscreen
     readonly property bool pinned: SettingsService.sideCfg("pinned") === true
-    readonly property string idleView: SettingsService.sideCfg("idle") || "time"
+    readonly property string idleSetting: SettingsService.sideCfg("idle") || "auto"
+    readonly property bool hasPlayer: MprisService.activePlayer !== null && MprisService.activePlayer !== undefined
+    readonly property string idleView: idleSetting === "auto" ? (hasPlayer && MprisService.isPlaying ? "media" : "time") : (idleSetting === "media" && !hasPlayer ? "time" : idleSetting)
 
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "minflair-pill-bar"
@@ -377,6 +379,13 @@ PanelWindow {
                 vertical: root.vertical
                 Layout.alignment: Qt.AlignCenter
                 notificationService: root.notificationService
+            }
+
+            SideMusicChip {
+                visible: active
+                vertical: root.vertical
+                Layout.alignment: Qt.AlignCenter
+                onHoverChanged: (on) => SideState.musicHover = on
             }
 
             SideClock {

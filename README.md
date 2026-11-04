@@ -69,6 +69,11 @@ The Quickshell panels are toggled through sockets, so any other keybinding tool 
 The default style is Island; change it in Settings > Bar or with `qs ipc call bar set island|side|pill`.
 
 ## Side and Pill
+**Dynamic Pill (bar 4):** the pill rests as a small capsule showing the song when music is playing, otherwise the time
+(Settings > Pill > Idle view also offers music, workspaces or the active window), and briefly shows the workspace when you
+switch. Hover grows it into the whole bar, which includes the song; hovering or clicking the song opens the compact
+player out of the pill. "Keep expanded" turns the shrinking off.
+
 **Dynamic bar (Side):** Settings > Bar > Dynamic bar shrinks the bar to a small capsule with the workspaces, the clock
 and the song that is playing (only while a player is running). Hovering the capsule grows it back to the full bar and
 it shrinks again when the pointer leaves; with "Expand on hover" off, click the capsule instead, and "Keep expanded"

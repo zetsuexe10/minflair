@@ -226,7 +226,7 @@ PanelWindow {
         id: musicLatch
 
         delay: 350
-        wanted: root.isActive && !root.fullscreen && !root.island && root.hoverMusic && (SideState.musicHover || (root.musicByHover && panelDock.hovered))
+        wanted: root.isActive && !root.fullscreen && root.hoverMusic && (SideState.musicHover || (root.musicByHover && panelDock.hovered))
         onOnChanged: {
             if (on && AppState.activeWidget === "") {
                 root.musicByHover = true;
