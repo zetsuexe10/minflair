@@ -1,32 +1,31 @@
-# Minflair Quickshell: Island, Side and Pill
+# Minflair for Arch Linux
 
-The Quickshell configuration of Minflair for **Arch Linux** (and anything else with Hyprland and Quickshell 0.3 or
-newer). Only the Quickshell config is here: no compositor config, greeter or installer.
+The Minflair Quickshell shell and a Hyprland (Lua) config, with an installer that keeps everything in `~/.minflair`.
+Your own `~/.config/hypr`, `~/.config/quickshell` and other dotfiles are never read, replaced or changed, and your
+other Hyprland and Quickshell setups keep running as they are.
 
-| Style | What it is |
-| :-- | :-- |
-| Island | the dynamic-island top bar, widgets expand out of it |
-| Side | a Caelestia-style frame around the screen with the bar on one edge and panels that grow out of it |
-| Pill | a floating dynamic island on any edge: a small capsule that grows into the full bar |
+| # | Style | What it is | Switch |
+| :-: | :-- | :-- | :-- |
+| 1 | Convex | the original top bar with a curved centre | `Super+Alt+1` |
+| 2 | Island | the dynamic-island top bar, widgets expand out of it | `Super+Alt+2` |
+| 3 | Side | a Caelestia-style frame around the screen, bar on one edge, panels grow out of it | `Super+Alt+3` |
 
-Side and Pill share one palette (AMOLED by default), the Caelestia dashboard (Dashboard, Media, Performance, Weather),
-launcher, power panel, Wi-Fi / Bluetooth / sound popouts and the shell settings panel.
+`Super+Alt+B` cycles the styles, `Super+Alt+Shift+B` goes back, or use Settings > Bar. The default is Island.
 
 ## Install
+
 ```sh
 git clone -b quickshell-side-island https://github.com/zetsuexe10/minflair ~/minflair
 cd ~/minflair
 ./install.sh
 ```
-The installer asks before every step and takes the bracketed default on enter. For no questions at all:
-```sh
-./install.sh --yes
-./install.sh --yes --style pill --terminal kitty --files thunar --layout us,es
-```
+
+The installer asks before each step and takes the bracketed default on enter. `--yes` answers yes to everything.
+
 | Option | Effect |
 | :-- | :-- |
 | `-y`, `--yes` | answer yes to everything and use the defaults |
-| `--style island\|side\|pill` | starting bar style |
+| `--style convex\|island\|side` | starting bar style |
 | `--terminal foot\|kitty\|alacritty\|wezterm` | terminal for `Super+Return` |
 | `--files nautilus\|thunar\|dolphin` | file manager for `Super+E` |
 | `--layout us,es` | keyboard layouts |
@@ -34,91 +33,233 @@ The installer asks before every step and takes the bracketed default on enter. F
 | `--aur-helper paru\|yay` | helper for packages that are not in the repositories |
 | `--check` | report what is installed and what is missing, change nothing |
 
-What it does: installs the packages with pacman (AUR helper for anything missing), checks Hyprland is 0.55 or newer and
-Quickshell 0.3 or newer, copies `config/quickshell` to `~/.config/quickshell` and `config/hypr` to `~/.config/hypr`
-(existing ones are moved to `~/.minflair/backup/<date>`), writes your choices to `~/.config/hypr/local.lua`, sets the bar
-style, installs the **Minflair** session and enables NetworkManager and Bluetooth. `./uninstall.sh` reverses it and
-offers your previous configs back. Packages are never removed.
+```sh
+./install.sh --yes --style side --terminal kitty --files thunar --layout us,es
+```
+
+| Step | What it does |
+| :-- | :-- |
+| Packages | pacman for repository packages, an AUR helper for the rest; checks Hyprland 0.55+ and Quickshell 0.3+ |
+| Shell | copies `config/quickshell` to `~/.minflair/quickshell`, sets the starting style |
+| Hyprland | copies `config/hypr` to `~/.minflair/hypr`, writes your choices to `~/.minflair/hypr/local.lua` |
+| Launchers | `~/.minflair/bin/qs` and `~/.minflair/bin/minflair-session` |
+| Session | adds **Minflair** to `/usr/share/wayland-sessions` (sudo) |
+| Services | enables NetworkManager and Bluetooth (sudo) |
+
+Reinstalling moves the previous `~/.minflair/quickshell` and `~/.minflair/hypr` to `~/.minflair/backup/<date>`.
+`./uninstall.sh` removes the session entry and `~/.minflair` (`--keep-data` keeps the theme output and backups). It
+never touches `~/.config` and never removes packages.
+
+## Isolation
+
+| What | Where | Your setup |
+| :-- | :-- | :-- |
+| Shell | `~/.minflair/quickshell`, started as `qs -p ~/.minflair/quickshell` | `~/.config/quickshell` and other `qs -c` configs untouched |
+| Hyprland config | `~/.minflair/hypr`, started with `Hyprland --config` | `~/.config/hypr` untouched |
+| `qs` in the session | `~/.minflair/bin/qs` first in `PATH`, only inside the Minflair session | `qs` is unchanged in your other sessions |
+| GTK / Qt theme | `~/.minflair/xdg` | `~/.config/gtk-*`, `qt*ct` and gsettings untouched |
+| Session entry | `~/.minflair/bin/minflair-session` | your other session entries stay |
+
+`Super+R` restarts only the Minflair shell (`qs kill; qs`). Settings the shell saves, such as the monitor scale, the
+cursor and keyboard layout, are written to `~/.minflair/hypr`. The shell also keeps its preferences in
+`~/.cache/quickshell/settings_prefs.json`.
 
 ## Session
-The installer adds `/usr/share/wayland-sessions/minflair.desktop`, so **Minflair** appears in SDDM, GDM, greetd, ly and
-other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-session`, which starts Hyprland with
-`~/.config/hypr/hyprland.lua` and logs to `~/.local/state/minflair/session.log`. From a TTY run that script directly.
-`XDG_SESSION_DESKTOP` is `Minflair`; `XDG_CURRENT_DESKTOP` stays `Hyprland` so portals pick the Hyprland backend.
-Put extra variables for the session in `~/.minflair/session.env`.
+
+The installer adds `/usr/share/wayland-sessions/minflair.desktop`, so **Minflair** shows in SDDM, GDM, greetd, ly and
+other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-session`, which puts
+`~/.minflair/bin` first in `PATH` and starts Hyprland with `~/.minflair/hypr/hyprland.lua`.
+
+| | |
+| :-- | :-- |
+| Log | `~/.local/state/minflair/session.log` |
+| From a TTY | `~/.minflair/bin/minflair-session` |
+| `XDG_SESSION_DESKTOP` | `Minflair` |
+| `XDG_CURRENT_DESKTOP` | `Hyprland`, so portals pick the Hyprland backend |
+| Extra variables | `~/.minflair/session.env` |
 
 ## Hyprland config
-`config/hypr` is a Hyprland 0.55 Lua config: `hyprland.lua` loads `animations`, `autostart`, `envs`, `keybinds`,
-`monitors`, `userprefs` and `windowrules`. `local.lua` holds what the installer asked for (terminal, floating terminal
-command, file manager, keyboard layout). Autostart skips anything that is not installed. `keybinds.lua` is the full list;
-the shell shows it in its keybinds cheat sheet. The shell's GTK/Qt theme lives in `~/.minflair`, your `~/.config/gtk-*`
-and `qt*ct` are not touched.
 
-Main binds (`Super` is the logo key):
-```
-Super+Return        terminal            Super+Shift+Return  floating terminal
-Super+E             file manager        Super+A             launcher
-Super+V             clipboard           Super+L             lock
-Super+Shift+D       dashboard           Super+Shift+A       control center
-Super+Shift+W       wallpapers          Super+Shift+S       screenshot
-Super+X             power menu (Pill)   Super+Alt+1/2/3     island / side / pill
-```
-The Quickshell panels are toggled through sockets, so any other keybinding tool can use
-`socat - UNIX-CONNECT:/tmp/quickshell_<panel>` with `launcher`, `clipboard`, `wallpaper`, `powerMenu`,
-`controlCenter`, `dashboard`, `notificationsCenter`, `calendar`, `music`, `systemUsage`, `screenshot`.
-The default style is Island; change it in Settings > Bar or with `qs ipc call bar set island|side|pill`.
+`hyprland.lua` loads `animations`, `autostart`, `envs`, `keybinds`, `monitors`, `userprefs` and `windowrules`.
+`local.lua` holds what the installer asked for. Autostart skips anything that is not installed.
 
-## Side and Pill
-**Dynamic Pill (bar 4):** the pill rests as a small capsule showing the song when music is playing, otherwise the time
-(Settings > Pill > Idle view also offers music, workspaces or the active window), and briefly shows the workspace when you
-switch. Hover grows it into the whole bar, which includes the song; hovering or clicking the song opens the compact
-player out of the pill. "Keep expanded" turns the shrinking off.
+| File | Holds |
+| :-- | :-- |
+| `local.lua` | terminal, floating terminal command, file manager, keyboard layout |
+| `keybinds.lua` | every bind; the shell's keybinds cheat sheet (`Super+K`) reads it |
+| `autostart.lua` | idle daemon, clipboard history, keyring, polkit agent, wallpaper, the shell |
+| `envs.lua` | environment, cursor, the GTK/Qt theme overlay |
+| `monitors.lua`, `userprefs.lua` | monitor scale, input and general options |
+| `windowrules.lua`, `animations.lua` | window rules and animations |
+| `scripts/` | volume, brightness, media, touchpad, lock-key and polkit helpers |
 
-**Dynamic bar (Side):** Settings > Bar > Dynamic bar shrinks the bar to a small capsule with the workspaces, the clock
-and the song that is playing (only while a player is running). Hovering the capsule grows it back to the full bar and
-it shrinks again when the pointer leaves; with "Expand on hover" off, click the capsule instead, and "Keep expanded"
-turns the shrinking off. Hovering or clicking the song opens a compact player (cover, title, seek bar, previous, play,
-next) that grows out of the bar's edge, centred on the song.
+## Keybinds
 
-**Bar entries** (each can be turned off): launcher, workspaces, focused window title, tray, status icons (network,
-Bluetooth, volume, brightness, keyboard layout, lock keys, notifications), clock, power. The bar sits on the left,
-right, top or bottom. Scrolling the first half of the bar changes volume, the second half brightness, and scrolling the
-workspaces switches workspace.
+`Super` is the logo key. `Super+K` shows them in the shell.
 
-**Workspaces** use Caelestia's switcher: circles for empty, rounded squares for occupied, a polygon that changes shape
-for the active one, with a sliding, stretching pill. Numbers and app-icon styles are in settings.
+**Apps and tools**
 
-**Dashboard:** the user card shows your logo image, then `~/.face`, then the distro logo, then your initial. The OS
-row shows the OS brand read from `/etc/issue` and `os-release`; "OS name" in settings overrides it. The Media tab
-follows Caelestia's: cookie-shaped cover with an audio-reactive ring (needs `cava`), wavy seek bar, shuffle / previous /
-play / next / repeat, synced lyrics from lrclib.net and a player selector. With no player chosen in settings it
-follows whatever is playing.
+| Key | Action |
+| :-- | :-- |
+| `Super+Return` / `Super+Shift+Return` | terminal / floating terminal |
+| `Super+E` / `Super+B` | file manager / browser |
+| `Super+Shift+C` | colour picker |
+| `Super+Space` | switch keyboard layout |
+| `Super+R` | restart the shell |
+| `Super+Ctrl+T` | toggle touchpad |
 
-**Side** is a frame around the screen with panels that grow out of it: power panel on the right edge, dashboard on the
-top edge, launcher on the bottom edge, other panels from their bar icons.
+**Shell**
 
-**Pill** is a capsule that floats over the desktop. At rest it shows the time (or workspaces or window title) and
-morphs: workspaces when you switch, cover and title when a new song starts, the level when you change volume or
-brightness. Hover to grow it into the full bar, or keep it expanded. Panels open from its edge, centred on it; the wallpaper and screenshot panels grow out of the capsule itself, like the Island bar's, and the launcher opens at the bottom. The power button and `Super+X` open the power menu in the middle of the screen.
-Shell settings > Pill: Reserve space, Keep expanded, Idle view, Alignment, Offset.
+| Key | Action |
+| :-- | :-- |
+| `Super+A` | launcher |
+| `Ctrl+Alt+S` or `Super+Shift+A` | control center |
+| `Ctrl+Alt+D` or `Super+Shift+D` | dashboard |
+| `Ctrl+Alt+M` | music |
+| `Ctrl+Alt+N` / `Ctrl+Alt+C` | notifications / calendar |
+| `Ctrl+Alt+F` or `Super+Shift+U` | system usage |
+| `Ctrl+Alt+T` | pomodoro |
+| `Ctrl+Alt+W` or `Super+Shift+W` | wallpaper selector |
+| `Ctrl+Alt+X` or `Super+Shift+X` | power menu |
+| `Super+V` | clipboard history |
+| `Super+Shift+S` | screenshot / recording |
+| `Super+S` / `Super+Ctrl+S` | Minflair settings / shell settings |
+| `Super+L` | lock screen |
 
-**Wallpapers:** `~/Pictures/Wallpapers` and `/usr/share/backgrounds` (subfolders included), editable in settings. Arrow
-keys browse, Enter sets. The wallpaper and screenshot panels drop from the bar's edge.
+**Windows**
 
-**Shell settings** (`Super+Ctrl+S`): Bar, Pill, Frame & Style, App Appearance, Wallpapers, Panels, GitHub, Shortcuts.
+| Key | Action |
+| :-- | :-- |
+| `Super+Q` | close |
+| `Super+W` | toggle floating |
+| `Super+F` / `Super+Shift+F` | maximize / fullscreen |
+| `Super+J` / `Super+P` | toggle split / pseudo-tile |
+| `Super+C` / `Super+Shift+P` | center floating / pin |
+| `Super+N` / `Super+Shift+N` | minimize / restore minimized |
+| `Super+G` / `Super+Tab` / `Super+Shift+G` | group / cycle group / lock group |
+| `Super+Shift+M` | exit Hyprland |
 
-## App Appearance
-GTK theme, app font and size, icon theme, cursor theme and size. Written to `~/.minflair` (an `XDG_CONFIG_HOME`
-overlay that links back to `~/.config`), never to `~/.config/gtk-*`, `qt*ct` or gsettings. Apps started from the
-launcher use it at once; for the whole session add to hyprland.conf:
-```
-env = XDG_CONFIG_HOME,$HOME/.minflair/xdg
-env = QT_QPA_PLATFORMTHEME,qt6ct
-```
-The shell font is separate from the app font.
+**Navigation**
+
+| Key | Action |
+| :-- | :-- |
+| `Super+Arrows` | focus |
+| `Super+Shift+Arrows` | move window |
+| `Super+Alt+Arrows` | resize |
+| `Super+Alt+Shift+Arrows` | swap |
+| `Super+1..0` / `Super+Shift+1..0` | workspace / send window there |
+| `Super+Ctrl+Left/Right`, `Super+Scroll` | previous / next workspace |
+| `Super+Mouse left/right drag` | move / resize window |
+
+**Bar style**
+
+| Key | Action |
+| :-- | :-- |
+| `Super+Alt+B` / `Super+Alt+Shift+B` | next / previous style |
+| `Super+Alt+1` ... `3` | Convex / Island / Side |
+
+Media, volume, brightness, mic-mute, touchpad and Caps/Num-lock keys work with an on-screen display. The panels are
+toggled through sockets, so any other keybinding tool can use `socat - UNIX-CONNECT:/tmp/quickshell_<panel>` with
+`launcher`, `clipboard`, `wallpaper`, `powerMenu`, `controlCenter`, `dashboard`, `notificationsCenter`, `calendar`,
+`music`, `systemUsage` or `screenshot`. The style command is `qs ipc call bar cycle|prev|get|set <convex|island|side>`.
+
+## Side
+
+A solid frame around the screen, thick on the bar's edge, with panels that grow out of it. It has its own palette
+(AMOLED by default; Mode in Shell settings switches to Dark, Light or follow-theme), the Caelestia dashboard,
+launcher, power panel, Wi-Fi / Bluetooth / sound popouts and the shell settings.
+
+| Part | Details |
+| :-- | :-- |
+| Edge | left, right, top or bottom (Settings > Bar > Position) |
+| Panels | power panel on the right edge, dashboard on the top, launcher (off by default) on the bottom; Wi-Fi, Bluetooth, sound, calendar and notifications from their bar icons; wallpaper and screenshot drop from the top |
+| Space | the frame reserves its thickness |
+
+### Dynamic bar
+
+Off by default. It shrinks the bar to a small capsule and grows it back on demand.
+
+| | Behaviour |
+| :-- | :-- |
+| Resting state | small capsule: workspaces, clock, the song (while a player runs) |
+| Grow | hover, or click when "Expand on hover" is off |
+| Shrink | when the pointer leaves |
+| Song | hover or click opens a compact player (cover, title, seek bar, previous, play, next) out of the bar's edge, centred on the song |
+
+| Setting (Settings > Bar > Dynamic bar) | Effect |
+| :-- | :-- |
+| Dynamic bar | shrink the bar to a capsule |
+| Expand on hover | off: click the capsule to expand |
+| Music card on hover | hover the song to open the player; click always works |
+| Keep expanded | always show the whole bar |
+
+### Bar entries
+
+Each can be turned off in Settings > Bar.
+
+| Entry | Shows |
+| :-- | :-- |
+| Launcher | opens the launcher |
+| Workspaces | Caelestia's switcher: small circles for empty, rounded squares for occupied, a polygon that changes shape for the active one; numbers and app-icon styles in settings |
+| Active window | title of the focused window |
+| Tray | tray icons |
+| Status | network, Bluetooth, volume, brightness, keyboard layout, lock keys, notifications |
+| Clock | date and time; click opens the calendar |
+| Power | hover or click opens the power panel |
+
+Scrolling the first half of the bar changes volume, the second half brightness, and scrolling the workspaces switches
+workspace.
+
+### Dashboard
+
+Tabs: Dashboard, Media, Performance, Weather. Left/Right, Tab and Home/End switch, Escape closes.
+
+| Part | Details |
+| :-- | :-- |
+| User card | round avatar filled from your logo image, then `~/.face`, then the distro logo, then your initial; the OS row reads the brand from `/etc/issue` and `os-release` ("OS name" in settings overrides it) |
+| Media | cookie-shaped cover that turns while playing with an audio-reactive ring (needs `cava`), title, artist, album, wavy seek bar, shuffle / previous / play / next / repeat, synced lyrics from lrclib.net, a player selector; follows whatever is playing when no player is chosen |
+| Performance | usage gauges for the system |
+| Weather | forecast for the city set in Panels, or located by IP |
+
+### Wallpapers
+
+`~/Pictures/Wallpapers` and `/usr/share/backgrounds`, subfolders included; the folder list is editable in settings.
+Arrow keys browse, Enter sets.
+
+## Shell settings (`Super+Ctrl+S`)
+
+| Page | Covers |
+| :-- | :-- |
+| Bar | position, workspaces, dashboard logo and OS name, dynamic bar, entries, scrolling, hover popouts |
+| Frame & Style | mode, frame, border, rounding |
+| App Appearance | GTK theme, app font and size, icon theme, cursor theme and size |
+| Wallpapers | wallpaper folders, random wallpaper |
+| Panels | hover panels, dashboard, weather |
+| GitHub, Shortcuts | account widget, keybinds |
+
+**App Appearance** is written to `~/.minflair` only. Apps started from the launcher or the Minflair session pick it
+up; apps already running keep their old look until restarted. The shell font is separate from the app font.
+
+## Packages
+
+`./install.sh --check` lists what is missing.
+
+| Group | Packages |
+| :-- | :-- |
+| Core | `hyprland` `quickshell` `hypridle` `hyprpolkitagent` `hyprpicker` `xdg-desktop-portal-hyprland` `xdg-desktop-portal-gtk` `qt6-wayland` |
+| Shell | `python` `python-pillow` `socat` `wl-clipboard` `cliphist` `brightnessctl` `playerctl` `swaybg` `grim` `slurp` `imagemagick` `libnotify` |
+| System | `networkmanager` `network-manager-applet` `bluez` `bluez-utils` `pipewire` `pipewire-pulse` `pipewire-alsa` `wireplumber` `gnome-keyring` |
+| Look | `ttf-inter` `adw-gtk-theme` `qt6ct` `cava` `zenity` |
+| Your choice | terminal (`foot` `kitty` `alacritty` `wezterm`), file manager (`nautilus` `thunar` `dolphin`) |
+
+Quickshell must be 0.3 or newer; if the repository version is older use `quickshell-git` from the AUR.
 
 ## Troubleshooting
-- Nothing loads: run `qs` in a terminal and read the errors; `qs log` shows the last run.
-- Keys do nothing inside the launcher, wallpaper selector or screenshot panel: run `qs log | grep "side overlay focus"`
-  right after opening the launcher and send the output.
-- Package updates are detected for pacman, AUR (paru/yay), apt and dnf.
+
+| Symptom | What to do |
+| :-- | :-- |
+| Nothing loads | in a terminal run `~/.minflair/bin/qs` and read the errors; `~/.minflair/bin/qs log` shows the last run |
+| Session does not start | read `~/.local/state/minflair/session.log` |
+| Keys do nothing in the launcher, wallpaper selector or screenshot panel | right after opening the launcher run `~/.minflair/bin/qs log \| grep "side overlay focus"` and send the output |
+| Minflair is missing from the display manager | run `./install.sh --session --no-packages --no-shell --no-hypr` |
+| Package updates | detected for pacman, AUR (paru/yay), apt and dnf |

@@ -144,7 +144,7 @@ Item {
 
         let pref = (SettingsService.musicPlayer || "").toLowerCase().trim();
         if (!pref || pref === "none")
-            return SettingsService.sideFamily;   // Side and Pill follow whatever is playing, like Caelestia
+            return SettingsService.sideFamily;   // Side follows whatever is playing, like Caelestia
 
         let id = (p.identity || "").toLowerCase();
         let desktop = (p.desktopEntry || "").toLowerCase();

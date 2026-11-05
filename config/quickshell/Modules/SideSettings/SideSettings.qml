@@ -20,7 +20,6 @@ AppWindow {
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
     readonly property var wsStyleOptions: [{ "text": "Numbers", "value": "numbers" }, { "text": "Shapes", "value": "shapes" }, { "text": "App icons", "value": "icons" }]
-    readonly property var alignOptions: [{ "text": "Start", "value": "start" }, { "text": "Centre", "value": "center" }, { "text": "End", "value": "end" }]
     readonly property var modeOptions: [{ "text": "AMOLED", "value": "amoled" }, { "text": "Dark", "value": "dark" }, { "text": "Light", "value": "light" }, { "text": "Theme", "value": "auto" }]
     readonly property var unitOptions: [{ "text": "°C", "value": false }, { "text": "°F", "value": true }]
 
@@ -59,18 +58,6 @@ AppWindow {
                 { "kind": "toggle", "label": "Scroll volume", "desc": "Scroll the first half of the bar", "cfg": ["scroll", "volume"] },
                 { "kind": "toggle", "label": "Scroll brightness", "desc": "Scroll the second half of the bar", "cfg": ["scroll", "brightness"] },
                 { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
-            ] }
-        ] },
-        { "title": "Pill (bar 4)", "icon": "bar", "sub": "The floating dynamic island", "sections": [
-            { "name": "Behaviour", "rows": [
-                { "kind": "toggle", "label": "Reserve space", "desc": "Tiled windows stop at the pill instead of sliding under it", "cfg": ["reserve"] },
-                { "kind": "toggle", "label": "Keep expanded", "desc": "Off: the pill stays small (workspaces, time or the song) and grows on hover. On: always the whole bar", "cfg": ["pinned"] },
-                { "kind": "toggle", "label": "Music card on hover", "desc": "Hover the song in the expanded pill to open the player; click it to open or close", "cfg": ["hover", "music"] },
-                { "kind": "select", "label": "Idle view", "desc": "What the small pill shows when nothing changes", "cfg": ["idle"], "options": [{ "text": "Automatic (music when playing, else time)", "value": "auto" }, { "text": "Time", "value": "time" }, { "text": "Music", "value": "media" }, { "text": "Workspaces", "value": "workspaces" }, { "text": "Active window", "value": "window" }] }
-            ] },
-            { "name": "Position", "rows": [
-                { "kind": "select", "label": "Alignment", "desc": "Where along the edge the pill sits (the edge is set in Bar > Position)", "cfg": ["align"], "options": alignOptions },
-                { "kind": "stepper", "label": "Offset", "desc": "Distance from the start or end of the edge", "cfg": ["offset"], "from": 0, "to": 1200, "step": 10, "suffix": " px" }
             ] }
         ] },
         { "title": "Frame & Style", "icon": "layout-filled", "sub": "The screen frame the panels grow from", "sections": [
@@ -145,7 +132,7 @@ AppWindow {
         ] },
         { "title": "Shortcuts", "icon": "keyboard-filled", "sub": "Keys and mouse for the shell", "sections": [
             { "name": "Keys", "rows": [
-                { "kind": "info", "label": "Super + Alt + 1 / 2 / 3 / 4", "desc": "", "text": "Convex / Island / Side / Pill bar" },
+                { "kind": "info", "label": "Super + Alt + 1 / 2 / 3", "desc": "", "text": "Convex / Island / Side bar" },
                 { "kind": "info", "label": "Super + S", "desc": "", "text": "Settings" },
                 { "kind": "info", "label": "Super + Ctrl + S", "desc": "", "text": "This panel" },
                 { "kind": "info", "label": "Super + K", "desc": "", "text": "Keybinds cheat sheet" },

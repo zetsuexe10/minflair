@@ -1,6 +1,6 @@
 #!/bin/bash
 SCALE="${1:-1}"
-TARGET_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/monitors.lua"
+TARGET_FILE="${MINFLAIR_HOME:-$HOME/.minflair}/hypr/monitors.lua"
 mkdir -p "$(dirname "$TARGET_FILE")"
 
 cat <<EOL >"$TARGET_FILE"

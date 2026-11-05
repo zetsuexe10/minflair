@@ -51,72 +51,72 @@ hl.bind(mainMod .. " + SHIFT + N", hl.dsp.workspace.toggle_special("minimized"))
 -- # Pick Color
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
 -- # Switch Keyboard Layout
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("$HOME/.config/quickshell/Scripts/system/toggle_kb_layout.sh"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("$HOME/.minflair/quickshell/Scripts/system/toggle_kb_layout.sh"))
 -- # Restart Quickshell
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("killall qs; qs"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs kill; qs"))
 
 -- # Caps Lock / Num Lock OSD
 hl.bind(
 	"Caps_Lock",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/keyboard_lock.sh caps"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/keyboard_lock.sh caps"),
 	{ non_consuming = true, locked = true }
 )
 hl.bind(
 	"Num_Lock",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/keyboard_lock.sh num"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/keyboard_lock.sh num"),
 	{ non_consuming = true, locked = true }
 )
 
 -- # Toggle Touchpad
-hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/touchpad.sh toggle"), { locked = true })
-hl.bind("XF86TouchpadOn", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/touchpad.sh on"), { locked = true })
-hl.bind("XF86TouchpadOff", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/touchpad.sh off"), { locked = true })
-hl.bind(mainMod .. " + CTRL + T", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/touchpad.sh toggle"), { locked = true })
+hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/touchpad.sh toggle"), { locked = true })
+hl.bind("XF86TouchpadOn", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/touchpad.sh on"), { locked = true })
+hl.bind("XF86TouchpadOff", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/touchpad.sh off"), { locked = true })
+hl.bind(mainMod .. " + CTRL + T", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/touchpad.sh toggle"), { locked = true })
 
 -- ## Volume
 
 -- # Raise Volume
 hl.bind(
 	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/volume.sh up"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/volume.sh up"),
 	{ repeating = true, locked = true }
 )
 -- # Lower Volume
 hl.bind(
 	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/volume.sh down"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/volume.sh down"),
 	{ repeating = true, locked = true }
 )
 -- # Mute Speaker
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/volume.sh mute"), { locked = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/volume.sh mute"), { locked = true })
 -- # Mute Microphone
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/volume.sh mic-mute"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/volume.sh mic-mute"), { locked = true })
 
 -- ## Brightness
 
 -- # Increase Brightness
 hl.bind(
 	"XF86MonBrightnessUp",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/brightness.sh up"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/brightness.sh up"),
 	{ repeating = true, locked = true }
 )
 -- # Decrease Brightness
 hl.bind(
 	"XF86MonBrightnessDown",
-	hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/brightness.sh down"),
+	hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/brightness.sh down"),
 	{ repeating = true, locked = true }
 )
 
 -- ## Media Player
 
 -- # Play / Pause
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/media_player.sh play-pause"), { locked = true })
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/media_player.sh play-pause"), { locked = true })
 -- # Next Track
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/media_player.sh next"), { locked = true })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/media_player.sh next"), { locked = true })
 -- # Previous Track
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/media_player.sh prev"), { locked = true })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/media_player.sh prev"), { locked = true })
 -- # Stop
-hl.bind("XF86AudioStop", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/media_player.sh stop"), { locked = true })
+hl.bind("XF86AudioStop", hl.dsp.exec_cmd("$HOME/.minflair/hypr/scripts/media_player.sh stop"), { locked = true })
 
 -- ## Quickshell Widgets
 
@@ -126,8 +126,6 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell
 hl.bind("CTRL + ALT + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_controlCenter"))
 -- # Toggle Power Menu
 hl.bind("CTRL + ALT + X", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_powerMenu"))
--- # Toggle Power Menu (Pill bar only)
-hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call bar powermenu"))
 -- # Toggle Clipboard History
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_clipboard"))
 -- # Toggle Wallpaper Selector
@@ -173,12 +171,12 @@ hl.bind("CTRL + ALT + T", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd("qs ipc call bar cycle"))
 -- # Previous Bar Style
 hl.bind(mainMod .. " + ALT + SHIFT + B", hl.dsp.exec_cmd("qs ipc call bar prev"))
+-- # Convex Bar
+hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd("qs ipc call bar set convex"))
 -- # Island Bar
-hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd("qs ipc call bar set island"))
+hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd("qs ipc call bar set island"))
 -- # Side Bar
-hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd("qs ipc call bar set side"))
--- # Pill Bar
-hl.bind(mainMod .. " + ALT + 3", hl.dsp.exec_cmd("qs ipc call bar set pill"))
+hl.bind(mainMod .. " + ALT + 3", hl.dsp.exec_cmd("qs ipc call bar set side"))
 
 -- ## Window Groups
 

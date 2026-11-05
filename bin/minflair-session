@@ -1,5 +1,7 @@
 #!/bin/sh
 MINFLAIR_HOME="${MINFLAIR_HOME:-$HOME/.minflair}"
+export MINFLAIR_HOME
+export PATH="$MINFLAIR_HOME/bin:$PATH"
 export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=Minflair
 export XDG_CURRENT_DESKTOP=Hyprland
@@ -7,8 +9,8 @@ export MINFLAIR_SESSION=1
 [ -r "$MINFLAIR_HOME/session.env" ] && . "$MINFLAIR_HOME/session.env"
 
 state="${XDG_STATE_HOME:-$HOME/.local/state}/minflair"
-mkdir -p "$state" "$MINFLAIR_HOME"
-config="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.lua"
+mkdir -p "$state"
+config="$MINFLAIR_HOME/hypr/hyprland.lua"
 log="$state/session.log"
 
 if [ ! -r "$config" ]; then

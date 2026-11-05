@@ -12,7 +12,7 @@ end
 -- Minflair keeps its GTK/Qt theme in ~/.minflair (see scripts/minflair-env.sh), so nothing in
 -- ~/.config/gtk-*, qt*ct or gsettings is changed. Apps started from this session use it.
 if os.execute then
-	pcall(os.execute, '"' .. home .. '/.config/hypr/scripts/minflair-env.sh" >/dev/null 2>&1')
+	pcall(os.execute, '"' .. home .. '/.minflair/hypr/scripts/minflair-env.sh" >/dev/null 2>&1')
 end
 
 local dark = true

@@ -199,7 +199,7 @@ def parse_keybinds(filepath):
 
 
 if __name__ == "__main__":
-    conf = str(Path.home() / ".config" / "hypr" / "keybinds.lua")
+    conf = str(Path(os.environ.get("MINFLAIR_HOME") or Path.home() / ".minflair") / "hypr" / "keybinds.lua")
     if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
         conf = sys.argv[1]
     parse_keybinds(conf)

@@ -3,7 +3,6 @@ set -u
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOME_DIR="${MINFLAIR_HOME:-$HOME/.minflair}"
-CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
 SESSION_FILE="/usr/share/wayland-sessions/minflair.desktop"
 BACKUP="$HOME_DIR/backup/$(date +%Y%m%d-%H%M%S)"
 
@@ -49,7 +48,7 @@ usage: ./install.sh [options]
       --no-session        skip the login session
       --services          enable NetworkManager and Bluetooth without asking
       --no-services       do not touch services
-      --style <name>      bar style: island, side or pill
+      --style <name>      starting bar style: convex, island or side
       --terminal <name>   terminal: foot, kitty, alacritty or wezterm
       --files <name>      file manager: nautilus, thunar or dolphin
       --layout <code>     keyboard layout, for example us or us,es
@@ -147,8 +146,8 @@ SYSTEM=(networkmanager network-manager-applet bluez bluez-utils pipewire pipewir
 LOOK=(ttf-inter adw-gtk-theme qt6ct cava zenity)
 
 pick_choices() {
-  [ -n "$STYLE" ] || STYLE="$(choose "Bar style:" island island side pill)"
-  case "$STYLE" in island|side|pill) ;; *) die "unknown bar style: $STYLE (use island, side or pill)" ;; esac
+  [ -n "$STYLE" ] || STYLE="$(choose "Bar style:" island convex island side)"
+  case "$STYLE" in convex|island|side) ;; *) die "unknown bar style: $STYLE (use convex, island or side)" ;; esac
 
   [ -n "$TERMINAL" ] || TERMINAL="$(choose "Terminal:" foot foot kitty alacritty wezterm)"
   case "$TERMINAL" in foot|kitty|alacritty|wezterm) ;; *) die "unknown terminal: $TERMINAL" ;; esac
@@ -190,8 +189,9 @@ check_status() {
   if have Hyprland; then say "  $(Hyprland --version 2>/dev/null | head -n1)"; else say "  Hyprland not installed"; fi
   if have qs; then say "  $(qs --version 2>/dev/null | head -n1)"; else say "  Quickshell not installed"; fi
   step "Minflair"
-  if [ -f "$CONFIG/quickshell/shell.qml" ]; then say "  shell config: installed"; else say "  shell config: not installed"; fi
-  if [ -f "$CONFIG/hypr/hyprland.lua" ]; then say "  hyprland.lua: installed"; else say "  hyprland.lua: not installed"; fi
+  if [ -f "$HOME_DIR/quickshell/shell.qml" ]; then say "  shell config: installed in $HOME_DIR/quickshell"; else say "  shell config: not installed"; fi
+  if [ -f "$HOME_DIR/hypr/hyprland.lua" ]; then say "  hyprland.lua: installed in $HOME_DIR/hypr"; else say "  hyprland.lua: not installed"; fi
+  if [ -x "$HOME_DIR/bin/qs" ]; then say "  qs launcher: installed"; else say "  qs launcher: not installed"; fi
   if [ -f "$SESSION_FILE" ]; then say "  session entry: installed"; else say "  session entry: not installed"; fi
   say ""
   say "$missing package(s) missing"
@@ -297,11 +297,12 @@ backup() {
 
 install_shell() {
   step "Quickshell config"
-  mkdir -p "$CONFIG"
-  backup "$CONFIG/quickshell"
-  cp -r "$SRC/config/quickshell" "$CONFIG/quickshell"
-  find "$CONFIG/quickshell" -name '*.sh' -exec chmod +x {} +
-  say "installed to $CONFIG/quickshell"
+  mkdir -p "$HOME_DIR/bin"
+  backup "$HOME_DIR/quickshell"
+  cp -r "$SRC/config/quickshell" "$HOME_DIR/quickshell"
+  find "$HOME_DIR/quickshell" \( -name '*.sh' -o -name '*.py' \) -exec chmod +x {} +
+  install -m 755 "$SRC/bin/qs" "$HOME_DIR/bin/qs"
+  say "installed to $HOME_DIR/quickshell (your ~/.config/quickshell is not touched)"
 
   local cache="${XDG_CACHE_HOME:-$HOME/.cache}/quickshell"
   mkdir -p "$cache"
@@ -320,12 +321,12 @@ P
 
 install_hypr() {
   step "Hyprland config"
-  mkdir -p "$CONFIG"
-  backup "$CONFIG/hypr"
-  cp -r "$SRC/config/hypr" "$CONFIG/hypr"
-  find "$CONFIG/hypr/scripts" -name '*.sh' -exec chmod +x {} +
+  mkdir -p "$HOME_DIR"
+  backup "$HOME_DIR/hypr"
+  cp -r "$SRC/config/hypr" "$HOME_DIR/hypr"
+  find "$HOME_DIR/hypr/scripts" -name '*.sh' -exec chmod +x {} +
 
-  cat > "$CONFIG/hypr/local.lua" <<L
+  cat > "$HOME_DIR/hypr/local.lua" <<L
 return {
 	terminal = "$TERMINAL",
 	terminal_float = "$(terminal_float "$TERMINAL")",
@@ -333,8 +334,8 @@ return {
 	kb_layout = "$LAYOUT",
 }
 L
-  say "installed to $CONFIG/hypr"
-  say "terminal $TERMINAL, files $FILES, layout $LAYOUT (change them in $CONFIG/hypr/local.lua)"
+  say "installed to $HOME_DIR/hypr (your ~/.config/hypr is not touched)"
+  say "terminal $TERMINAL, files $FILES, layout $LAYOUT (change them in $HOME_DIR/hypr/local.lua)"
 
   mkdir -p "$HOME/Pictures/Wallpapers"
   if [ -z "$(find "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f 2>/dev/null | head -n1)" ]; then
@@ -346,6 +347,7 @@ install_session() {
   step "Minflair session"
   mkdir -p "$HOME_DIR/bin"
   install -m 755 "$SRC/bin/minflair-session" "$HOME_DIR/bin/minflair-session"
+  install -m 755 "$SRC/bin/qs" "$HOME_DIR/bin/qs"
 
   local tmp
   tmp="$(mktemp)"
@@ -394,8 +396,8 @@ main() {
 
   if decide "$DO_PACKAGES" "Install packages?" y; then install_packages; fi
   check_versions
-  if decide "$DO_SHELL" "Install the Quickshell config to $CONFIG/quickshell?" y; then install_shell; fi
-  if decide "$DO_HYPR" "Install the Hyprland config to $CONFIG/hypr (an existing one is backed up)?" y; then install_hypr; fi
+  if decide "$DO_SHELL" "Install the Quickshell config to $HOME_DIR/quickshell?" y; then install_shell; fi
+  if decide "$DO_HYPR" "Install the Hyprland config to $HOME_DIR/hypr?" y; then install_hypr; fi
   if decide "$DO_SESSION" "Install the Minflair login session (needs sudo)?" y; then install_session; fi
   if decide "$DO_SERVICES" "Enable NetworkManager and Bluetooth (needs sudo)?" y; then enable_services; fi
 

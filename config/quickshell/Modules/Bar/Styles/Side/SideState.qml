@@ -9,11 +9,6 @@ import qs.Core.Services
 QtObject {
     id: root
 
-    property real pillCenter: 0
-    property real pillAlongStart: 0
-    property real pillLen: 0
-    property real pillThick: 0
-    property real pillEdgeGap: 10
     property string popout: ""          // "", "network", "bluetooth", "audio"
     property real popoutCenter: 0
     property bool musicHover: false
@@ -21,11 +16,7 @@ QtObject {
     readonly property bool hoverEnabled: SettingsService.sideBarPopouts
 
     readonly property string position: SettingsService.sideBarPosition
-    readonly property bool island: SettingsService.barStyle === "pill"
-    readonly property string islandAlign: SettingsService.sideCfg("align")
-    readonly property int islandOffset: SettingsService.sideCfg("offset")
-    readonly property int islandGap: 10
-    readonly property bool frame: SettingsService.sideCfg("frame") && !island
+    readonly property bool frame: SettingsService.sideCfg("frame")
     readonly property int border: SettingsService.sideCfg("border")
     readonly property int rounding: SettingsService.sideCfg("rounding")
     readonly property int railSize: 36
@@ -72,7 +63,7 @@ QtObject {
 
     function inset(edge) {
         if (edge === position)
-            return island ? railSize + islandGap * 2 : barThickness;
+            return barThickness;
         return frame ? border : 0;
     }
 

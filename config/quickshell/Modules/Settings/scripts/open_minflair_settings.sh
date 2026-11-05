@@ -1,2 +1,2 @@
 #!/bin/sh
-exec "$HOME/.config/quickshell/Scripts/system/open_widget.sh" minflair_settings
+exec "$(dirname "$0")/../../../Scripts/system/open_widget.sh" minflair_settings

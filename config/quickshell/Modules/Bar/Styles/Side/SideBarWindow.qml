@@ -138,6 +138,10 @@ PanelWindow {
             id: content
 
             anchors.fill: parent
+            anchors.topMargin: root.vertical ? 12 : 0
+            anchors.bottomMargin: root.vertical ? 12 : 0
+            anchors.leftMargin: root.vertical ? 0 : 12
+            anchors.rightMargin: root.vertical ? 0 : 12
             active: root.isActive && !root.relayouting
             opacity: root.expanded ? 1 : 0
             visible: opacity > 0.01
@@ -155,10 +159,6 @@ PanelWindow {
                 }
 
                 anchors.fill: parent
-                anchors.topMargin: root.vertical ? 12 : 0
-                anchors.bottomMargin: root.vertical ? 12 : 0
-                anchors.leftMargin: root.vertical ? 0 : 12
-                anchors.rightMargin: root.vertical ? 0 : 12
                 flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
                 rows: root.vertical ? 99 : 1
                 columns: root.vertical ? 1 : 99
@@ -285,10 +285,6 @@ PanelWindow {
             columns: root.vertical ? 1 : 99
             rowSpacing: 6
             columnSpacing: 6
-            leftPadding: 6
-            rightPadding: 6
-            topPadding: 6
-            bottomPadding: 6
             opacity: root.expanded ? 0 : 1
             scale: root.expanded ? 0.94 : 1
             visible: root.dynamic && opacity > 0.01

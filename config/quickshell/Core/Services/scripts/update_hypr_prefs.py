@@ -142,7 +142,7 @@ def main():
     except json.JSONDecodeError:
         return
 
-    prefs_path = os.path.expanduser("~/.config/hypr/userprefs.lua")
+    prefs_path = os.path.join(os.environ.get("MINFLAIR_HOME") or os.path.expanduser("~/.minflair"), "hypr", "userprefs.lua")
     if not os.path.exists(prefs_path):
         return
 

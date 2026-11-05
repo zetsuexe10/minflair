@@ -16,16 +16,16 @@ AppContainer {
 
         SettingSegmented {
             label: "Style"
-            description: "Island (top bar), Side (frame bar) or Pill (floating dynamic island). Super+Alt+B cycles the styles."
+            description: "Convex or Island (top bar) or Side (frame bar). Super+Alt+B cycles the styles."
             model: [{
+                "text": "Convex",
+                "value": "convex"
+            }, {
                 "text": "Island",
                 "value": "island"
             }, {
                 "text": "Side",
                 "value": "side"
-            }, {
-                "text": "Pill",
-                "value": "pill"
             }]
             currentValue: SettingsService.barStyle
             onActivated: (value) => {

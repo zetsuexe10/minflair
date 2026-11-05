@@ -29,8 +29,8 @@ def main():
     Path(ROOT).mkdir(parents=True, exist_ok=True)
     Path(STATE).write_text(json.dumps(st, indent=2))
 
-    # 3. Update ~/.config/hypr/envs.lua for persistence across reboots
-    envs_lua = home / ".config" / "hypr" / "envs.lua"
+    # 3. Update ~/.minflair/hypr/envs.lua for persistence across reboots
+    envs_lua = home / ".minflair" / "hypr" / "envs.lua"
     if envs_lua.is_file():
         try:
             content = envs_lua.read_text(encoding="utf-8")

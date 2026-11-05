@@ -1,0 +1,9 @@
+#!/bin/sh
+MINFLAIR_HOME="${MINFLAIR_HOME:-$HOME/.minflair}"
+self="$MINFLAIR_HOME/bin"
+PATH="$(printf '%s' "$PATH" | tr ':' '\n' | grep -vxF "$self" | paste -sd: -)"
+export PATH
+case "${1:-}" in
+  -c|-p|-m|--config|--path|--manifest) exec qs "$@" ;;
+esac
+exec qs -p "$MINFLAIR_HOME/quickshell" "$@"

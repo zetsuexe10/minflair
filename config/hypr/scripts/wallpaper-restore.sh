@@ -10,4 +10,4 @@ if [ ! -f "$img" ]; then
 fi
 [ -n "$img" ] || { echo "no wallpaper found in $dir" >&2; exit 1; }
 mode=$(python3 -c "import json,sys;print(json.load(open('$cache/settings_prefs.json')).get('wpResizeMode','crop'))" 2>/dev/null || echo crop)
-exec "$HOME/.config/quickshell/Scripts/system/awww-compat.sh" img "$img" --resize "$mode"
+exec "$HOME/.minflair/quickshell/Scripts/system/awww-compat.sh" img "$img" --resize "$mode"
