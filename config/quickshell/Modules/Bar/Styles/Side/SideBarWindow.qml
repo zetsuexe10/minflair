@@ -26,7 +26,6 @@ PanelWindow {
     readonly property bool expanded: !dynamic || SettingsService.sideCfg("pinned") || hold
     property bool hold: false
     property bool relayouting: false
-    property int healed: 0
 
     function relayout() {
         relayouting = true;
@@ -148,116 +147,173 @@ PanelWindow {
 
             Behavior on opacity { NumberAnimation { duration: Constants.animNormal; easing.type: Easing.OutCubic } }
 
-            sourceComponent: GridLayout {
-                id: grid
+            sourceComponent: Item {
+                id: stage
 
-                function overflow() {
-                    const r = root.vertical ? childrenRect.y + childrenRect.height : childrenRect.x + childrenRect.width;
-                    const limit = root.vertical ? height : width;
-                    const screenW = root.screen ? root.screen.width : root.width;
-                    return r > limit + 1 || (!root.vertical && root.width > screenW + 1);
+                readonly property var moduleIds: ["logo", "workspaces", "activeWindow", "music", "tray", "statusIcons", "clock", "power"]
+
+                function idsFor(section) {
+                    return moduleIds.filter(id => SettingsService.sideCfg("place", id) === section).sort((x, y) => SettingsService.sideCfg("order", x) - SettingsService.sideCfg("order", y));
                 }
 
-                anchors.fill: parent
-                flow: root.vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
-                rows: root.vertical ? 99 : 1
-                columns: root.vertical ? 1 : 99
-                rowSpacing: 6
-                columnSpacing: 6
+                function shown(id) {
+                    if (!SettingsService.sideCfg("entries", id))
+                        return false;
+                    return id !== "music" || (MprisService.activePlayer !== null && MprisService.activePlayer !== undefined);
+                }
 
-                Timer {
-                    interval: 250
-                    repeat: true
-                    running: root.shown
-                    onTriggered: {
-                        if (grid.overflow()) {
-                            if (root.healed < 8) {
-                                root.healed++;
-                                root.relayout();
-                            }
-                        } else {
-                            root.healed = 0;
+                function comp(id) {
+                    switch (id) {
+                    case "logo": return logoC;
+                    case "workspaces": return workspacesC;
+                    case "activeWindow": return windowC;
+                    case "music": return musicC;
+                    case "tray": return trayC;
+                    case "statusIcons": return statusC;
+                    case "clock": return clockC;
+                    default: return powerC;
+                    }
+                }
+
+                component Group: GridLayout {
+                    property string section: "start"
+                    property var host: null
+                    property bool vert: false
+                    property real rail: 0
+
+                    flow: vert ? GridLayout.TopToBottom : GridLayout.LeftToRight
+                    rows: vert ? 99 : 1
+                    columns: vert ? 1 : 99
+                    rowSpacing: 6
+                    columnSpacing: 6
+
+                    Repeater {
+                        model: host ? host.idsFor(section) : []
+
+                        Loader {
+                            required property string modelData
+
+                            visible: host.shown(modelData)
+                            sourceComponent: host.comp(modelData)
+                            Layout.alignment: Qt.AlignCenter
+                            Layout.preferredWidth: modelData === "logo" || modelData === "power" ? rail : (modelData === "activeWindow" ? (vert ? rail : 190) : -1)
+                            Layout.preferredHeight: modelData === "logo" || modelData === "power" ? rail : (modelData === "activeWindow" ? (vert ? 130 : rail) : -1)
                         }
                     }
                 }
 
-                SideButton {
-                    visible: SettingsService.sideCfg("entries", "logo")
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: root.railSize
-                    Layout.preferredHeight: root.railSize
-                    size: root.railSize
-                    icon: "apps-filled"
-                    iconColor: SideState.primary
-                    iconSize: Constants.sizeXl
-                    active: AppState.isWidgetOpen("launcher")
-                    onClicked: AppState.toggleWidget("launcher")
+                Group {
+                    section: "start"
+                    host: stage
+                    vert: root.vertical
+                    rail: root.railSize
+                    x: 0
+                    y: 0
+                }
 
-                    SidePill {
-                        z: -1
-                        anchors.fill: parent
-                        radius: width / 2
+                Group {
+                    section: "center"
+                    host: stage
+                    vert: root.vertical
+                    rail: root.railSize
+                    anchors.centerIn: parent
+                }
+
+                Group {
+                    section: "end"
+                    host: stage
+                    vert: root.vertical
+                    rail: root.railSize
+                    x: root.vertical ? 0 : parent.width - width
+                    y: root.vertical ? parent.height - height : 0
+                }
+
+                Component {
+                    id: logoC
+
+                    SideButton {
+                        size: root.railSize
+                        icon: "apps-filled"
+                        iconColor: SideState.primary
+                        iconSize: Constants.sizeXl
+                        active: AppState.isWidgetOpen("launcher")
+                        onClicked: AppState.toggleWidget("launcher")
+
+                        SidePill {
+                            z: -1
+                            anchors.fill: parent
+                            radius: width / 2
+                        }
                     }
                 }
 
-                SideWorkspaces {
-                    visible: SettingsService.sideCfg("entries", "workspaces")
-                    vertical: root.vertical
-                    Layout.alignment: Qt.AlignCenter
+                Component {
+                    id: workspacesC
+
+                    SideWorkspaces {
+                        vertical: root.vertical
+                    }
                 }
 
-                SideActiveWindow {
-                    visible: SettingsService.sideCfg("entries", "activeWindow")
-                    vertical: root.vertical
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.fillHeight: root.vertical
-                    Layout.fillWidth: !root.vertical
-                    Layout.preferredWidth: root.vertical ? root.railSize : -1
-                    Layout.preferredHeight: root.vertical ? -1 : root.railSize
+                Component {
+                    id: windowC
+
+                    SideActiveWindow {
+                        vertical: root.vertical
+                    }
                 }
 
-                SideTray {
-                    visible: SettingsService.sideCfg("entries", "tray")
-                    vertical: root.vertical
-                    Layout.alignment: Qt.AlignCenter
+                Component {
+                    id: musicC
+
+                    SideMusicChip {
+                        vertical: root.vertical
+                        onHoverChanged: (on) => SideState.musicHover = on
+                    }
                 }
 
-                SideStatus {
-                    visible: SettingsService.sideCfg("entries", "statusIcons")
-                    vertical: root.vertical
-                    Layout.alignment: Qt.AlignCenter
-                    notificationService: root.notificationService
+                Component {
+                    id: trayC
+
+                    SideTray {
+                        vertical: root.vertical
+                    }
                 }
 
-                SideClock {
-                    visible: SettingsService.sideCfg("entries", "clock")
-                    vertical: root.vertical
-                    Layout.alignment: Qt.AlignCenter
+                Component {
+                    id: statusC
+
+                    SideStatus {
+                        vertical: root.vertical
+                        notificationService: root.notificationService
+                    }
                 }
 
-                Item {
-                    visible: !SettingsService.sideCfg("entries", "activeWindow")
-                    Layout.fillHeight: root.vertical
-                    Layout.fillWidth: !root.vertical
+                Component {
+                    id: clockC
+
+                    SideClock {
+                        vertical: root.vertical
+                    }
                 }
 
-                SideButton {
-                    visible: SettingsService.sideCfg("entries", "power")
-                    onHoverStarted: SideState.sessionHover = true
-                    onHoverEnded: SideState.sessionHover = false
-                    Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: root.railSize
-                    Layout.preferredHeight: root.railSize
-                    size: root.railSize
-                    icon: "power"
-                    iconSize: Constants.sizeXl
-                    active: AppState.isWidgetOpen("powerMenu")
-                    onClicked: AppState.toggleWidget("powerMenu")
+                Component {
+                    id: powerC
 
-                    SidePill {
-                        z: -1
-                        anchors.fill: parent
-                        radius: width / 2
+                    SideButton {
+                        size: root.railSize
+                        icon: "power"
+                        iconSize: Constants.sizeXl
+                        active: AppState.isWidgetOpen("powerMenu")
+                        onHoverStarted: SideState.sessionHover = true
+                        onHoverEnded: SideState.sessionHover = false
+                        onClicked: AppState.toggleWidget("powerMenu")
+
+                        SidePill {
+                            z: -1
+                            anchors.fill: parent
+                            radius: width / 2
+                        }
                     }
                 }
             }
@@ -311,11 +367,6 @@ PanelWindow {
                 onHoverChanged: (on) => SideState.musicHover = on
             }
 
-            Binding {
-                target: SideState
-                property: "musicCenter"
-                value: chip.visible ? (root.vertical ? rail.y + dyn.y + chip.y + chip.height / 2 : rail.x + dyn.x + chip.x + chip.width / 2) : -1
-            }
         }
     }
 }

@@ -46,7 +46,9 @@ Item {
             "workspaceStyle": "shapes",
             "pinned": false,
             "dynamic": false,
-            "entries": {"logo": true, "workspaces": true, "activeWindow": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
+            "entries": {"logo": true, "workspaces": true, "activeWindow": true, "music": true, "tray": true, "clock": true, "statusIcons": true, "power": true},
+            "place": {"logo": "start", "workspaces": "start", "activeWindow": "start", "music": "center", "tray": "end", "statusIcons": "end", "clock": "end", "power": "end"},
+            "order": {"logo": 1, "workspaces": 2, "activeWindow": 3, "music": 1, "tray": 1, "statusIcons": 2, "clock": 3, "power": 4},
             "scroll": {"workspaces": true, "volume": true, "brightness": true},
             "hover": {"dashboard": true, "session": true, "launcher": false, "dynamic": true, "music": true}
         })

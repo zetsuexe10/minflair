@@ -1,6 +1,7 @@
-# Minflair for Arch Linux
+# Minflair
 
-The Minflair Quickshell shell and a Hyprland (Lua) config, with an installer that keeps everything in `~/.minflair`.
+The Minflair Quickshell shell and a Hyprland (Lua) config for **Arch Linux** and **Debian 13 (trixie)**, with one
+installer that keeps everything in `~/.minflair`.
 Your own `~/.config/hypr`, `~/.config/quickshell` and other dotfiles are never read, replaced or changed, and your
 other Hyprland and Quickshell setups keep running as they are.
 
@@ -15,12 +16,12 @@ other Hyprland and Quickshell setups keep running as they are.
 ## Install
 
 ```sh
-git clone -b quickshell-side-island https://github.com/zetsuexe10/minflair ~/minflair
+git clone -b minflair https://github.com/zetsuexe10/minflair ~/minflair
 cd ~/minflair
 ./install.sh
 ```
 
-The installer asks before each step and takes the bracketed default on enter. `--yes` answers yes to everything.
+The installer detects pacman or apt and asks before each step and takes the bracketed default on enter. `--yes` answers yes to everything.
 
 | Option | Effect |
 | :-- | :-- |
@@ -30,7 +31,8 @@ The installer asks before each step and takes the bracketed default on enter. `-
 | `--files nautilus\|thunar\|dolphin` | file manager for `Super+E` |
 | `--layout us,es` | keyboard layouts |
 | `--no-packages`, `--no-shell`, `--no-hypr`, `--no-session`, `--no-services` | skip a step |
-| `--aur-helper paru\|yay` | helper for packages that are not in the repositories |
+| `--aur-helper paru\|yay` | Arch only: helper for packages that are not in the repositories |
+| `--greeter` | Debian/FlickOS only: also install the greetd login screen |
 | `--check` | report what is installed and what is missing, change nothing |
 
 ```sh
@@ -39,7 +41,7 @@ The installer asks before each step and takes the bracketed default on enter. `-
 
 | Step | What it does |
 | :-- | :-- |
-| Packages | pacman for repository packages, an AUR helper for the rest; checks Hyprland 0.55+ and Quickshell 0.3+ |
+| Packages | Arch: pacman, plus an AUR helper for the rest. Debian: apt, with Hyprland and Quickshell from `trixie-backports` (enabled if missing). Checks Hyprland 0.55+ and Quickshell 0.3+ |
 | Shell | copies `config/quickshell` to `~/.minflair/quickshell`, sets the starting style |
 | Hyprland | copies `config/hypr` to `~/.minflair/hypr`, writes your choices to `~/.minflair/hypr/local.lua` |
 | Launchers | `~/.minflair/bin/qs` and `~/.minflair/bin/minflair-session` |
@@ -195,7 +197,7 @@ Off by default. It shrinks the bar to a small capsule and grows it back on deman
 
 ### Bar entries
 
-Each can be turned off in Settings > Bar.
+Each can be turned off in Settings > Bar > Entries.
 
 | Entry | Shows |
 | :-- | :-- |
@@ -205,7 +207,24 @@ Each can be turned off in Settings > Bar.
 | Tray | tray icons |
 | Status | network, Bluetooth, volume, brightness, keyboard layout, lock keys, notifications |
 | Clock | date and time; click opens the calendar |
+| Now playing | the song with its cover (only while a player runs), in the middle of the bar by default; hover or click opens the player |
 | Power | hover or click opens the power panel |
+
+### Bar layout
+
+Settings > Bar > Layout places every entry in the **Start**, **Centre** or **End** part of the bar and sets its order
+inside that part (lowest first). The centre part is centred on the screen edge, so the song stays in the middle.
+
+| Entry | Default part | Default order |
+| :-- | :-- | :-: |
+| Launcher button | Start | 1 |
+| Workspaces | Start | 2 |
+| Active window | Start | 3 |
+| Now playing | Centre | 1 |
+| System tray | End | 1 |
+| Status icons | End | 2 |
+| Clock | End | 3 |
+| Power button | End | 4 |
 
 Scrolling the first half of the bar changes volume, the second half brightness, and scrolling the workspaces switches
 workspace.
@@ -230,7 +249,7 @@ Arrow keys browse, Enter sets.
 
 | Page | Covers |
 | :-- | :-- |
-| Bar | position, workspaces, dashboard logo and OS name, dynamic bar, entries, scrolling, hover popouts |
+| Bar | position, workspaces, dashboard logo and OS name, dynamic bar, entries, layout, scrolling, hover popouts |
 | Frame & Style | mode, frame, border, rounding |
 | App Appearance | GTK theme, app font and size, icon theme, cursor theme and size |
 | Wallpapers | wallpaper folders, random wallpaper |
@@ -242,24 +261,33 @@ up; apps already running keep their old look until restarted. The shell font is 
 
 ## Packages
 
-`./install.sh --check` lists what is missing.
+`./install.sh --check` lists what is missing on your system. Quickshell must be 0.3 or newer; on Arch use
+`quickshell-git` from the AUR if the repository version is older.
 
-| Group | Packages |
-| :-- | :-- |
-| Core | `hyprland` `quickshell` `hypridle` `hyprpolkitagent` `hyprpicker` `xdg-desktop-portal-hyprland` `xdg-desktop-portal-gtk` `qt6-wayland` |
-| Shell | `python` `python-pillow` `socat` `wl-clipboard` `cliphist` `brightnessctl` `playerctl` `swaybg` `grim` `slurp` `imagemagick` `libnotify` |
-| System | `networkmanager` `network-manager-applet` `bluez` `bluez-utils` `pipewire` `pipewire-pulse` `pipewire-alsa` `wireplumber` `gnome-keyring` |
-| Look | `ttf-inter` `adw-gtk-theme` `qt6ct` `cava` `zenity` |
-| Your choice | terminal (`foot` `kitty` `alacritty` `wezterm`), file manager (`nautilus` `thunar` `dolphin`) |
+| Group | Arch | Debian 13 |
+| :-- | :-- | :-- |
+| Core | `hyprland` `quickshell` `hypridle` `hyprpolkitagent` `hyprpicker` `xdg-desktop-portal-hyprland` `xdg-desktop-portal-gtk` `qt6-wayland` | the same plus `hyprlock` `hyprsunset`; Hyprland and Quickshell from `trixie-backports` |
+| Shell | `python` `python-pillow` `python-gobject` `socat` `jq` `wl-clipboard` `cliphist` `brightnessctl` `playerctl` `swaybg` `grim` `slurp` `wf-recorder` `tesseract` `imagemagick` `libnotify` | `python3` `python3-gi` `python3-pam` `python3-pil` and the same tools (`libnotify-bin`, `tesseract-ocr`) |
+| System | `networkmanager` `network-manager-applet` `bluez` `power-profiles-daemon` `upower` `pipewire` `wireplumber` `gnome-keyring` | `network-manager` `network-manager-gnome` and the same |
+| Look | `ttf-inter` `adw-gtk-theme` `qt6ct` `cava` `zenity` `papirus-icon-theme` `noto-fonts` | `fonts-inter` `adw-gtk3` `qt6ct` `cava` `zenity` `papirus-icon-theme` `fonts-noto-*` |
+| Your choice | terminal (`foot` `kitty` `alacritty` `wezterm`), file manager (`nautilus` `thunar` `dolphin`) | same |
 
-Quickshell must be 0.3 or newer; if the repository version is older use `quickshell-git` from the AUR.
+The cursor theme `Vimix-cursors` is optional and not packaged on Debian (`git clone https://github.com/vinceliuice/Vimix-cursors && cd Vimix-cursors && ./install.sh`); Adwaita is used until then.
+
+## Login screen (Debian/FlickOS, optional)
+
+`./install.sh --greeter` (or `sudo tools/install-greeter.sh`) installs a Quickshell greeter on greetd inside cage:
+user, password and a session picker with readable names read from `/usr/share/wayland-sessions`. Colours and the
+blurred wallpaper follow the shell. `sudo tools/install-greeter.sh --revert` restores the original greeter. Log:
+`/var/tmp/minflair-greeter/greeter.log`. Layout and icons are adapted from the Archcraft SDDM theme (GPLv3, see
+`greeter/assets/NOTICE`). On other display managers (SDDM, GDM, ly) the **Minflair** session entry is enough.
 
 ## Troubleshooting
 
 | Symptom | What to do |
 | :-- | :-- |
-| Nothing loads | in a terminal run `~/.minflair/bin/qs` and read the errors; `~/.minflair/bin/qs log` shows the last run |
+| Nothing loads | run `./tools/doctor.sh` inside the session and send the output; or run `~/.minflair/bin/qs` in a terminal and read the errors, `~/.minflair/bin/qs log` shows the last run |
 | Session does not start | read `~/.local/state/minflair/session.log` |
 | Keys do nothing in the launcher, wallpaper selector or screenshot panel | right after opening the launcher run `~/.minflair/bin/qs log \| grep "side overlay focus"` and send the output |
-| Minflair is missing from the display manager | run `./install.sh --session --no-packages --no-shell --no-hypr` |
+| Minflair does not show in SDDM | the session file must not contain `TryExec`; re-run `./install.sh --session --no-packages --no-shell --no-hypr` and `sudo systemctl restart sddm` |
 | Package updates | detected for pacman, AUR (paru/yay), apt and dnf |

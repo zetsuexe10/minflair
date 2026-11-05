@@ -17,6 +17,7 @@ AppWindow {
     property string query: ""
     readonly property string q: query.trim().toLowerCase()
 
+    readonly property var placeOptions: [{ "text": "Start", "value": "start" }, { "text": "Centre", "value": "center" }, { "text": "End", "value": "end" }]
     readonly property var positionOptions: [{ "text": "Left", "value": "left" }, { "text": "Right", "value": "right" }, { "text": "Top", "value": "top" }, { "text": "Bottom", "value": "bottom" }]
     readonly property var dashTabOptions: [{ "text": "Dashboard", "value": 0 }, { "text": "Media", "value": 1 }, { "text": "Performance", "value": 2 }, { "text": "Weather", "value": 3 }]
     readonly property var wsStyleOptions: [{ "text": "Numbers", "value": "numbers" }, { "text": "Shapes", "value": "shapes" }, { "text": "App icons", "value": "icons" }]
@@ -49,8 +50,27 @@ AppWindow {
                 { "kind": "toggle", "label": "Window title text", "desc": "Show the title text on the bar", "prop": "sideBarWindowTitle" },
                 { "kind": "toggle", "label": "System tray", "desc": "Tray icons", "cfg": ["entries", "tray"] },
                 { "kind": "toggle", "label": "Status icons", "desc": "Network, Bluetooth, volume, brightness, keyboard, notifications", "cfg": ["entries", "statusIcons"] },
+                { "kind": "toggle", "label": "Now playing", "desc": "The song that is playing, with its cover; hover or click opens the player", "cfg": ["entries", "music"] },
                 { "kind": "toggle", "label": "Clock", "desc": "Date and time", "cfg": ["entries", "clock"] },
                 { "kind": "toggle", "label": "Power button", "desc": "Hover or click opens the power panel", "cfg": ["entries", "power"] }
+            ] },
+            { "name": "Layout", "rows": [
+                { "kind": "select", "label": "Launcher button", "desc": "Which part of the bar it sits in", "cfg": ["place", "logo"], "options": placeOptions },
+                { "kind": "stepper", "label": "Launcher button order", "desc": "Position within its part, lowest first", "cfg": ["order", "logo"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Workspaces", "desc": "Which part of the bar it sits in", "cfg": ["place", "workspaces"], "options": placeOptions },
+                { "kind": "stepper", "label": "Workspaces order", "desc": "Position within its part, lowest first", "cfg": ["order", "workspaces"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Active window", "desc": "Which part of the bar it sits in", "cfg": ["place", "activeWindow"], "options": placeOptions },
+                { "kind": "stepper", "label": "Active window order", "desc": "Position within its part, lowest first", "cfg": ["order", "activeWindow"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Now playing", "desc": "Which part of the bar it sits in", "cfg": ["place", "music"], "options": placeOptions },
+                { "kind": "stepper", "label": "Now playing order", "desc": "Position within its part, lowest first", "cfg": ["order", "music"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "System tray", "desc": "Which part of the bar it sits in", "cfg": ["place", "tray"], "options": placeOptions },
+                { "kind": "stepper", "label": "System tray order", "desc": "Position within its part, lowest first", "cfg": ["order", "tray"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Status icons", "desc": "Which part of the bar it sits in", "cfg": ["place", "statusIcons"], "options": placeOptions },
+                { "kind": "stepper", "label": "Status icons order", "desc": "Position within its part, lowest first", "cfg": ["order", "statusIcons"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Clock", "desc": "Which part of the bar it sits in", "cfg": ["place", "clock"], "options": placeOptions },
+                { "kind": "stepper", "label": "Clock order", "desc": "Position within its part, lowest first", "cfg": ["order", "clock"], "from": 1, "to": 9, "step": 1 },
+                { "kind": "select", "label": "Power button", "desc": "Which part of the bar it sits in", "cfg": ["place", "power"], "options": placeOptions },
+                { "kind": "stepper", "label": "Power button order", "desc": "Position within its part, lowest first", "cfg": ["order", "power"], "from": 1, "to": 9, "step": 1 }
             ] },
             { "name": "Popouts and scrolling", "rows": [
                 { "kind": "toggle", "label": "Hover popouts", "desc": "Open the Wi-Fi, Bluetooth, sound, calendar and notification panels from their icons", "prop": "sideBarPopouts" },

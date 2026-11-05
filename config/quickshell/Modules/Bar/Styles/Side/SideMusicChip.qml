@@ -14,6 +14,11 @@ SidePill {
 
     signal hoverChanged(bool on)
 
+    function publish() {
+        const p = mapToItem(null, width / 2, height / 2);
+        SideState.musicCenter = vertical ? p.y : p.x;
+    }
+
     implicitWidth: vertical ? SideState.railSize : Math.min(240, 26 + 10 + metrics.width + 22)
     implicitHeight: vertical ? SideState.railSize : SideState.railSize
     color: area.containsMouse || AppState.isWidgetOpen("music") ? Qt.tint(SideState.surface, SideState.card) : SideState.surface
@@ -91,7 +96,14 @@ SidePill {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: AppState.toggleWidget("music")
-        onContainsMouseChanged: root.hoverChanged(containsMouse)
+        onClicked: {
+            root.publish();
+            AppState.toggleWidget("music");
+        }
+        onContainsMouseChanged: {
+            if (containsMouse)
+                root.publish();
+            root.hoverChanged(containsMouse);
+        }
     }
 }
