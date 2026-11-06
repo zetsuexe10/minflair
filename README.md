@@ -263,13 +263,13 @@ One window with a search box, grouped in the sidebar. Each bar has its own page.
 | :-- | :-- |
 | Profile | account, host, distro and the picture used by the lock screen |
 | Desktop | Appearance, Wallpaper, Bar (active style, clock, workspaces), Panels (dashboard, weather), Visual Effects, Windows & Display |
-| Bar styles | Convex, Island, Side, Dynamic, each with its own options |
+| Bars | Convex, Island, Side (plus Side · Layout and Side · Frame), Dynamic; each page has its own options and a reset button where it applies |
 | Input & hardware | Mouse & Touchpad, Keyboard & Clipboard |
-| Management | App Appearance, Integrations & Apps (default apps, GitHub account, token and overview) |
+| System | App Appearance, Integrations & Apps (default apps, GitHub account, token and overview) |
 | About | Shortcuts, About System |
 
-The Side page holds everything for bar 3: edge, dynamic mode, entries, layout, hover panels, scrolling, clock and the
-screen frame with its colour Mode. The Dynamic page has its own options for bar 4.
+The Side pages hold everything for bar 3: edge, dynamic mode, entries, hover panels and scrolling on the main page, the
+placement and order of each entry on Layout, and the screen frame with its colour Mode on Frame. The Dynamic page has its own options for bar 4.
 
 **App Appearance** is written to `~/.minflair` only. Apps started from the launcher or the Minflair session pick it
 up; apps already running keep their old look until restarted. The shell font is separate from the app font.

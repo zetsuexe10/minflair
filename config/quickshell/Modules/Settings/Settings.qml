@@ -96,7 +96,7 @@ AppWindow {
             { "key": "effects", "title": "Visual Effects", "icon": "sparkles", "section": "DESKTOP", "sub": "Blur, opacity, window animations and shadows", "component": effectsComp },
             { "key": "windows", "title": "Windows & Display", "icon": "monitor", "section": "DESKTOP", "sub": "Window rules, borders, gaps and monitors", "component": windowComp },
 
-            { "key": "convex", "title": "Convex (bar 1)", "icon": "bar", "section": "BAR STYLES", "sub": "The classic curved top bar", "sections": [
+            { "key": "convex", "title": "Convex (bar 1)", "icon": "bar", "section": "BARS", "sub": "The classic curved top bar", "sections": [
                 { "name": "Layout", "rows": [
                     { "kind": "info", "label": "Bar", "desc": "", "text": "Top edge, curved centre" },
                     { "kind": "info", "label": "Workspaces", "desc": "", "text": "Left, with the focused window" },
@@ -105,7 +105,7 @@ AppWindow {
                     { "kind": "button", "label": "Clock and workspaces", "desc": "Shared by every bar", "action": "gotoPage", "page": "bar", "value": "Open" }
                 ] },
             ] },
-            { "key": "island", "title": "Island (bar 2)", "icon": "box", "section": "BAR STYLES", "sub": "The expanding top-centre island", "sections": [
+            { "key": "island", "title": "Island (bar 2)", "icon": "box", "section": "BARS", "sub": "The expanding top-centre island", "sections": [
                 { "name": "Island", "rows": [
                     { "kind": "toggle", "label": "Single island", "desc": "Only the centre pill: star, clock and media. Hides workspaces and tray", "prop": "islandSinglePill" },
                     { "kind": "select", "label": "Right circular island", "desc": "What the right island shows", "prop": "islandRightMode", "options": root.islandRightOptions },
@@ -113,7 +113,7 @@ AppWindow {
                     { "kind": "toggle", "label": "Show system tray", "desc": "Tray icons on the right", "prop": "islandShowTray" }
                 ] },
             ] },
-            { "key": "side", "title": "Side (bar 3)", "icon": "layout-filled", "section": "BAR STYLES", "sub": "Frame bar, dynamic mode, entries, layout and frame", "sections": [
+            { "key": "side", "title": "Side (bar 3)", "icon": "layout-filled", "section": "BARS", "sub": "Frame bar, dynamic mode, entries and scrolling", "sections": [
                 { "name": "Position", "rows": [
                     { "kind": "select", "label": "Edge", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": root.positionOptions }
                 ] },
@@ -135,7 +135,6 @@ AppWindow {
                     { "kind": "toggle", "label": "Clock", "desc": "Date and time", "cfg": ["entries", "clock"] },
                     { "kind": "toggle", "label": "Power button", "desc": "Hover or click opens the power panel", "cfg": ["entries", "power"] }
                 ] },
-                { "name": "Layout", "rows": root.layoutRows },
                 { "name": "Hover panels", "rows": [
                     { "kind": "toggle", "label": "Power panel", "desc": "Hover the power button on the bar", "cfg": ["hover", "session"] },
                     { "kind": "toggle", "label": "Dashboard", "desc": "Hover the top edge, centre", "cfg": ["hover", "dashboard"] },
@@ -148,6 +147,18 @@ AppWindow {
                     { "kind": "toggle", "label": "Scroll brightness", "desc": "Scroll the second half of the bar", "cfg": ["scroll", "brightness"] },
                     { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
                 ] },
+                { "name": "More", "rows": [
+                    { "kind": "button", "label": "Layout", "desc": "Choose which part of the bar each entry sits in and in what order", "action": "gotoPage", "page": "sidelayout", "value": "Open" },
+                    { "kind": "button", "label": "Frame and colours", "desc": "Screen frame, border, rounding and colour mode", "action": "gotoPage", "page": "sideframe", "value": "Open" }
+                ] }
+            ] },
+            { "key": "sidelayout", "title": "Side · Layout", "icon": "layout-filled", "section": "BARS", "sub": "Where each entry sits on the Side bar", "sections": [
+                { "name": "Placement and order", "rows": root.layoutRows },
+                { "name": "Reset", "rows": [
+                    { "kind": "button", "label": "Reset the Side bar", "desc": "Back to the default entries, layout, frame and colours", "action": "resetSide", "value": "Reset" }
+                ] }
+            ] },
+            { "key": "sideframe", "title": "Side · Frame", "icon": "layout-filled", "section": "BARS", "sub": "Screen frame and colour mode of the Side bar", "sections": [
                 { "name": "Frame and colours", "rows": [
                     { "kind": "toggle", "label": "Screen frame", "desc": "Border around the screen with rounded inner corners", "cfg": ["frame"] },
                     { "kind": "stepper", "label": "Border thickness", "desc": "Width of the frame on edges without the bar", "cfg": ["border"], "from": 4, "to": 24, "step": 1, "suffix": " px" },
@@ -155,7 +166,7 @@ AppWindow {
                     { "kind": "select", "label": "Mode", "desc": "AMOLED is pure black; the Side bar and its panels follow it", "cfg": ["mode"], "options": root.modeOptions }
                 ] }
             ] },
-            { "key": "dynamic", "title": "Dynamic (bar 4)", "icon": "widgets", "section": "BAR STYLES", "sub": "Top-centre pill, orbs and island views", "sections": [
+            { "key": "dynamic", "title": "Dynamic (bar 4)", "icon": "widgets", "section": "BARS", "sub": "Top-centre pill, orbs and island views", "sections": [
                 { "name": "Behaviour", "rows": [
                     { "kind": "toggle", "label": "Music button", "desc": "Round music button beside the pill; click it to open the player", "dyn": ["musicButton"] },
                     { "kind": "toggle", "label": "Hover peek", "desc": "Hover the pill to peek at the song instead of the current view", "dyn": ["glance"] },
@@ -173,6 +184,9 @@ AppWindow {
                     { "kind": "toggle", "label": "Screen frame", "desc": "Border around the screen with rounded inner corners", "dyn": ["frame"] },
                     { "kind": "info", "label": "Frame size and colours", "desc": "The frame thickness, corner rounding and colour mode are shared with the Side bar", "text": "Set under Side (bar 3)" }
                 ] },
+                { "name": "Reset", "rows": [
+                    { "kind": "button", "label": "Reset the Dynamic bar", "desc": "Back to the default behaviour and views", "action": "resetDynamic", "value": "Reset" }
+                ] },
                 { "name": "Island widgets", "rows": [
                     { "kind": "info", "label": "Inside the island", "desc": "", "text": "Wallpaper, screenshot, clipboard, power, launcher, dashboard and GitHub" },
                     { "kind": "info", "label": "Keys", "desc": "", "text": "Super+Shift+D dashboard · Super+Shift+I GitHub · Super+V clipboard · Super+X power" }
@@ -182,7 +196,7 @@ AppWindow {
             { "key": "mouse", "title": "Mouse & Touchpad", "icon": "cursor", "section": "INPUT & HARDWARE", "sub": "Speed, acceleration, scrolling and gestures", "component": mouseComp },
             { "key": "keyboard", "title": "Keyboard & Clipboard", "icon": "keyboard", "section": "INPUT & HARDWARE", "sub": "Layouts, repeat delay and clipboard history", "component": inputComp },
 
-            { "key": "apps", "title": "App Appearance", "icon": "font", "section": "MANAGEMENT", "sub": "GTK, fonts, icons and cursor for this session", "sections": [
+            { "key": "apps", "title": "App Appearance", "icon": "font", "section": "SYSTEM", "sub": "GTK, fonts, icons and cursor for this session", "sections": [
                 { "name": "GTK theme", "rows": [
                     { "kind": "picker", "label": "GTK theme", "desc": "Empty = adw-gtk3 following light/dark. Only adw-gtk3 takes the shell colours", "app": "gtk_theme", "list": "gtkThemes", "placeholder": "adw-gtk3 (auto)" }
                 ] },
@@ -202,7 +216,7 @@ AppWindow {
                     { "kind": "info", "label": "Where this applies", "desc": "Written to ~/.minflair only; ~/.config GTK/Qt files and gsettings are never touched.", "text": "This session" }
                 ] }
             ] },
-            { "key": "integrations", "title": "Integrations & Apps", "icon": "apps", "section": "MANAGEMENT", "sub": "Default applications, quotes and GitHub", "component": integrationsComp },
+            { "key": "integrations", "title": "Integrations & Apps", "icon": "apps", "section": "SYSTEM", "sub": "Default applications, quotes and GitHub", "component": integrationsComp },
 
             { "key": "shortcuts", "title": "Shortcuts", "icon": "keyboard-filled", "section": "ABOUT", "sub": "Keys and mouse for the shell", "sections": [
                 { "name": "Keys", "rows": [
@@ -331,6 +345,10 @@ AppWindow {
             SettingsService.setSideCfg("logoImage", undefined, "");
         else if (row.action === "browseLogo")
             logoPicker.running = true;
+        else if (row.action === "resetSide")
+            SettingsService.sideBarConfig = SettingsService.sideBarDefaults;
+        else if (row.action === "resetDynamic")
+            SettingsService.dynamicBarConfig = SettingsService.dynamicBarDefaults;
         else if (row.action === "gotoPage") {
             const i = pageIndex(row.page);
             if (i !== -1)
