@@ -24,23 +24,28 @@ Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all insid
 ## 📖 Table of contents
 
 1. ✨ [Highlights](#highlights)
-2. 📦 [Install](#install)
-3. 🔄 [Update and uninstall](#update-and-uninstall)
-4. 🧱 [Isolation](#isolation)
-5. 🖥️ [Session](#session)
-6. 🌿 [Hyprland config](#hyprland-config)
-7. ⌨️ [Keybinds](#keybinds)
-8. 🎛️ [Bars](#bars)
+2. 📸 [Showcase](#showcase)
+3. 📦 [Install](#install)
+4. 🔄 [Update and uninstall](#update-and-uninstall)
+5. 🧱 [Isolation](#isolation)
+6. 🖥️ [Session](#session)
+7. 🌿 [Hyprland config](#hyprland-config)
+8. ⌨️ [Keybinds](#keybinds)
+9. 🎛️ [Bars](#bars)
    - 🏝️ [Convex and Island](#convex-and-island)
    - 🪟 [Side](#side)
    - 💊 [Dynamic](#dynamic)
-9. 📊 [Dashboard](#dashboard)
-10. ⚙️ [Settings](#settings)
-11. 🧩 [Packages](#packages)
-12. 🔐 [Login screen](#login-screen)
-13. 🛠️ [Troubleshooting](#troubleshooting)
-14. 💜 [Credits](#credits)
-15. 📄 [License](#license)
+10. 📊 [Dashboard](#dashboard)
+11. 🧰 [Widgets](#widgets)
+12. 👤 [Profile and lock screen](#profile)
+13. 🎨 [Wallpaper and theming](#wallpaper-and-theming)
+14. ⚙️ [Settings](#settings)
+15. 🏗️ [Architecture](#architecture)
+16. 🧩 [Packages](#packages)
+17. 🔐 [Login screen](#login-screen)
+18. 🛠️ [Troubleshooting](#troubleshooting)
+19. 💜 [Credits](#credits)
+20. 📄 [License](#license)
 
 <a id="highlights"></a>
 
@@ -64,6 +69,76 @@ Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all insid
 | 4 | 💊 Dynamic | a compact pill with the clock, now playing and notifications; widgets morph out of it | `Super+Alt+4` |
 
 `Super+Alt+B` cycles the bars, `Super+Alt+Shift+B` goes back, or use Settings > Bar. The default is Island.
+
+<a id="showcase"></a>
+
+## 📸 Showcase
+
+<details open>
+<summary><b>🌙 Convex</b> — curved top bar, popouts drop from it</summary>
+
+![Convex bar](docs/screenshots/style-convex.jpg)
+
+![Music popout on the Convex bar](docs/screenshots/convex-expanded.jpg)
+
+</details>
+
+<details>
+<summary><b>🏝️ Island</b> — a floating island that grows into the widget you open</summary>
+
+![Island bar](docs/screenshots/style-island.jpg)
+
+![Wallpaper picker expanded from the island](docs/screenshots/island-wallpaper.jpg)
+
+![Music expanded from the island](docs/screenshots/island-expanded.jpg)
+
+![Dashboard expanded from the island](docs/screenshots/island-dashboard.jpg)
+
+</details>
+
+<details>
+<summary><b>🪟 Side</b> — a frame around the screen, bar on one edge, panels grow out of it</summary>
+
+![Side bar on the left edge](docs/screenshots/style-side.jpg)
+
+![Launcher opened from the Side bar](docs/screenshots/side-launcher.jpg)
+
+</details>
+
+<details>
+<summary><b>💊 Dynamic</b> — a compact pill; widgets morph out of the island</summary>
+
+![Dynamic bar](docs/screenshots/style-dynamic.jpg)
+
+![Music in the dynamic island](docs/screenshots/dynamic-music.jpg)
+
+![Wallpaper picker inside the island](docs/screenshots/dynamic-wallpaper.jpg)
+
+![Launcher inside the island](docs/screenshots/dynamic-launcher.jpg)
+
+![Dashboard inside the island](docs/screenshots/dynamic-dashboard.jpg)
+
+![Control centre inside the island](docs/screenshots/dynamic-control-center.jpg)
+
+![GitHub widget inside the island](docs/screenshots/dynamic-github.jpg)
+
+![Dynamic bar without the screen frame](docs/screenshots/dynamic-no-frame.jpg)
+
+</details>
+
+<details>
+<summary><b>⚙️ Settings</b> — one searchable window</summary>
+
+![Settings overview](docs/screenshots/settings-overview.jpg)
+
+![Side bar settings](docs/screenshots/settings-side.jpg)
+
+![Integrations and GitHub](docs/screenshots/settings-integrations.jpg)
+
+</details>
+
+> The screenshots come from the Debian build this fork started from. Pages and options have since been regrouped, so
+> labels in Settings can differ slightly.
 
 <a id="install"></a>
 
@@ -373,6 +448,82 @@ Tabs: Dashboard, Media, Performance, Weather. Left/Right, Tab and Home/End switc
 Wallpapers come from `~/Pictures/Wallpapers` and `/usr/share/backgrounds`, subfolders included; the folder list is
 editable in Settings > Wallpaper. Arrow keys browse, Enter sets.
 
+<a id="widgets"></a>
+
+## 🧰 Widgets
+
+Every widget is one QML component loaded into whichever surface the active bar provides: a popout, a panel grown from
+the frame, the inside of the island or a standalone window. Panels toggle through
+`socat - UNIX-CONNECT:/tmp/quickshell_<panel>`.
+
+| Widget | Key | What it does |
+| :-- | :-- | :-- |
+| 🚀 Launcher | `Super+A` | fuzzy app search with app actions, inline calculator, `>` commands, web prefixes `g` `yt` `w` `gh` `ddg` |
+| 📊 Dashboard | `Super+Shift+D` | Caelestia's four tabs on Side and Dynamic, a compact GitHub and system card on Convex and Island |
+| 🎵 Media | `Ctrl+Alt+M` | cover, title, seek bar and transport controls |
+| 🐙 GitHub | `Super+Shift+I` | profile card, totals, repositories sorted by activity or stars |
+| 🎚️ Control centre | `Ctrl+Alt+S` | Wi-Fi, Bluetooth, night light, caffeine, game mode, sliders, performance mode |
+| 🔔 Notifications, calendar | `Ctrl+Alt+N`, `Ctrl+Alt+C` | popups on every bar, history, month grid |
+| 📋 Clipboard | `Super+V` | `cliphist` history with images and search |
+| 🖼️ Wallpaper selector | `Ctrl+Alt+W` | browse and apply; regenerates the palette and GTK/Qt theme |
+| 📸 Screen capture | `Super+Shift+S` | screenshots, OCR text extraction, screen recording |
+| ⏻ Power menu | `Ctrl+Alt+X`, `Super+X` on Dynamic | lock, log out, suspend, reboot, shut down with confirmation |
+| 🍅 Pomodoro, system usage | `Ctrl+Alt+T`, `Ctrl+Alt+F` | focus timer that survives restarts; CPU, memory, disk and GPU |
+| 🔒 Lock screen | `Super+L` | Quickshell's own, PAM authentication, your profile picture |
+
+**Launcher.** Arrow keys move, Enter opens, Escape closes. A web prefix only becomes a search after a space, so typing
+an app name that starts with `g` still searches apps. Anything after `>` that is not a Minflair action is offered as a
+shell command.
+
+**GitHub.** Set the username and token under Settings > Integrations & Apps. A token with `repo` scope adds private
+repositories and commit totals; without one the public API works at a lower rate limit. The token is stored in
+`~/.cache/quickshell/settings_prefs.json` (mode `600`), handed to the fetch scripts through the environment, and only
+ever sent to GitHub.
+
+**Screen capture.** Full screen, area, current window (with or without a 3 second delay), text extraction (`tesseract`,
+English and Spanish), area or full-screen recording with `wf-recorder`. Shots go to `~/Pictures/Screenshots` and the
+clipboard.
+
+**Pomodoro.** 25 minute focus, 5 minute breaks, 15 minute long break every fourth session, with auto-start,
+notifications and sound options.
+
+<a id="profile"></a>
+
+## 👤 Profile and lock screen
+
+Settings > Profile is an identity card and the place where the lock-screen picture is chosen. It shows account name,
+hostname, distro, desktop, kernel, display server, package count, processor, memory, storage and graphics, read from
+the running system when the page opens.
+
+**Picture chain**, used by the Profile page and the lock screen:
+
+1. the picture chosen in Settings > Profile
+2. `~/.face`
+3. the distro logo from the icon theme
+4. the account initial on the accent circle
+
+| Control | Effect |
+| :-- | :-- |
+| Choose picture | opens the desktop's own file chooser through `xdg-desktop-portal` (Images filter); cancelling keeps the current picture |
+| Image path | type or paste a path (`~/Pictures/me.jpg` or a `file://` URI) and press Enter |
+| Thumbnail grid | built-in fallback over `~/Pictures`, `~/.face` and `/usr/share/backgrounds` when the portal is missing |
+| Reset | back to `~/.face`, the distro logo, then the initial |
+
+The dashboard user card has its own logo setting under Settings > Panels, with the same fallbacks.
+
+<a id="wallpaper-and-theming"></a>
+
+## 🎨 Wallpaper and theming
+
+| | |
+| :-- | :-- |
+| Folders | `~/Pictures/Wallpapers` (subfolders, five levels deep) and `/usr/share/backgrounds`; editable in Settings > Wallpaper |
+| Formats | JPG, PNG, WebP, GIF |
+| Apply | click a thumbnail, press Enter in the wallpaper panel, **Shuffle** for a random one, **Browse** for a file; drawn by `swaybg` |
+| Palette | derived from the wallpaper accent; applying a wallpaper regenerates the shell colours, the GTK/Qt overlay and the greeter colours |
+| Side colour mode | AMOLED (pure black, default), Dark, Light or follow the theme; set under Settings > Side · Frame |
+| Screen frame | Side (on by default) and Dynamic (off by default) can draw a border with rounded inner corners; thickness and rounding live on the Side · Frame page |
+
 <a id="settings"></a>
 
 ## ⚙️ Settings
@@ -392,6 +543,38 @@ editable in Settings > Wallpaper. Arrow keys browse, Enter sets.
 and restored on every start. Apps started from the launcher or the Minflair session pick it up; apps already running
 keep their old look until restarted. The shell font is separate from the app font. The GitHub token is passed to the
 fetch scripts through the environment, never on a command line.
+
+<a id="architecture"></a>
+
+## 🏗️ Architecture
+
+| Part | How it works |
+| :-- | :-- |
+| Shell | one Quickshell process, `qs -p ~/.minflair/quickshell`, owns every bar, panel and the lock screen |
+| Bars | `Modules/Bar/Styles/{Convex,Island,Side,Dynamic}`; the active one is chosen by `SettingsService.barStyle` |
+| Widgets | loaded by `Core/Windows/WidgetLoader.qml` into the surface the active bar provides |
+| Panel sockets | each widget listens on `/tmp/quickshell_<widgetId>` for toggles |
+| IPC | `qs ipc call bar ...`, `qs ipc call settings open <page>`, `qs ipc call widgets toggle <id>` |
+| Preferences | `~/.cache/quickshell/settings_prefs.json`; theme and app appearance in `~/.minflair/theme.json` |
+| Hyprland | `~/.minflair/hypr`, started by `minflair-session` |
+
+```text
+config/
+  hypr/                     Hyprland Lua config and helper scripts
+  quickshell/
+    shell.qml               entry point
+    Core/                   services, theme, widget loader
+    Modules/
+      Bar/Styles/           Convex, Island, Side, Dynamic
+      Dashboard, Launcher, ControlCenter, Clipboard, ScreenCapture,
+      WallpaperSelector, PowerMenu, Notifications, Pomodoro, LockScreen, ...
+      Settings/             the settings window and its pages
+    Scripts/                theme, system and helper scripts
+bin/                        qs shim and minflair-session
+greeter/                    optional greetd login screen
+tools/                      doctor, smoke test, greeter installer
+install.sh, uninstall.sh
+```
 
 <a id="packages"></a>
 
