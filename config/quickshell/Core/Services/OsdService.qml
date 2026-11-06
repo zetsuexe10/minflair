@@ -17,8 +17,13 @@ Item {
     property bool isMuted: false
     property bool showProgress: true
     property bool _ready: false
+    property string kind: "toggle"
+    readonly property bool sliderKind: kind === "volume" || kind === "mic" || kind === "brightness"
+    readonly property bool nativeVisible: isOpen && !(sliderKind && SettingsService.edgeOsdActive)
+    signal edgeRequested()
 
-    function trigger(title, valText, level, icon, isMuted) {
+    function trigger(title, valText, level, icon, isMuted, kindName) {
+        osdService.kind = kindName || "toggle";
         osdService.title = title;
         osdService.valueText = valText;
         osdService.level = Math.max(0, Math.min(1, level));
@@ -31,6 +36,7 @@ Item {
     }
 
     function displayMessage(title, valText, icon, isAccent) {
+        osdService.kind = "message";
         osdService.title = title;
         osdService.valueText = valText;
         osdService.icon = icon || "info";
@@ -68,7 +74,8 @@ Item {
         }
         let iconName = (muted || vol === 0) ? "volume-off" : "volume";
         let text = muted ? "Muted" : (vol + "%");
-        osdService.trigger("Volume", text, muted ? 0 : (vol / 100), iconName, muted);
+        osdService.trigger("Volume", text, muted ? 0 : (vol / 100), iconName, muted, "volume");
+        osdService.edgeRequested();
     }
 
     function displayMic(volume, isMuted) {
@@ -92,7 +99,8 @@ Item {
             muted = AudioService.micMuted;
         let iconName = (muted || vol === 0) ? "microphone-off" : "microphone";
         let text = muted ? "Muted" : (vol + "%");
-        osdService.trigger("Microphone", text, muted ? 0 : (vol / 100), iconName, muted);
+        osdService.trigger("Microphone", text, muted ? 0 : (vol / 100), iconName, muted, "mic");
+        osdService.edgeRequested();
     }
 
     function displayBrightness(percent) {
@@ -101,7 +109,8 @@ Item {
             val = 0;
 
         val = Math.max(0, Math.min(100, val));
-        osdService.trigger("Brightness", val + "%", val / 100, "sun", false);
+        osdService.trigger("Brightness", val + "%", val / 100, "sun", false, "brightness");
+        osdService.edgeRequested();
     }
 
     Timer {

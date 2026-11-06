@@ -260,6 +260,7 @@ Autostart skips anything that is not installed.
 | `Super+Return` / `Super+Shift+Return` | terminal / floating terminal |
 | `Super+E` / `Super+B` | file manager / browser |
 | `Super+Shift+C` | colour picker |
+| `Super+Z` | quick panel: Wi-Fi, brightness, volume |
 | `Super+Space` | switch keyboard layout |
 | `Super+R` | restart the shell |
 | `Super+Ctrl+T` | toggle touchpad |
@@ -418,6 +419,20 @@ island, and arrow keys browse the wallpaper list.
 | Views | clock, workspaces, music, notifications |
 | Screen frame | optional border like the Side bar; thickness, rounding and colours come from Side |
 
+### 🎚️ On-screen display
+
+Volume and brightness changes show a Caelestia-style slider card on the right edge of the screen. It works with every
+bar, can be switched off per bar in Settings (each bar page has an On-screen display toggle) and you can drag the
+sliders while it is visible. Settings > Panels sets the hide delay and an optional microphone slider. With it off, the
+bar's own native indicator is used. Trigger it from scripts with `qs ipc call osd showVolume` or `showBrightness`.
+
+### 🎛️ Quick panel
+
+`Super+Z` opens an iPhone-style control panel: a Wi-Fi tile (toggle the radio, open the network list to scan, connect
+with a password, disconnect or forget), Sound and Mic toggles and draggable brightness and volume sliders. On the
+Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
+centred popup.
+
 <a id="dashboard"></a>
 
 ## 📊 Dashboard
@@ -444,6 +459,7 @@ the frame, the inside of the island or a standalone window. Panels toggle throug
 
 | Widget | Key | What it does |
 | :-- | :-- | :-- |
+| 🎛️ Quick panel | `Super+Z` | Wi-Fi scan and connect, brightness and volume sliders |
 | 🚀 Launcher | `Super+A` | fuzzy app search with app actions, inline calculator, `>` commands, web prefixes `g` `yt` `w` `gh` `ddg` |
 | 📊 Dashboard | `Super+Shift+D` | Caelestia's four tabs on Side and Dynamic, a compact GitHub and system card on Convex and Island |
 | 🎵 Media | `Ctrl+Alt+M` | cover, title, seek bar and transport controls |
@@ -554,11 +570,13 @@ config/
       Bar/Styles/           Convex, Island, Side, Dynamic
       Dashboard, Launcher, ControlCenter, Clipboard, ScreenCapture,
       WallpaperSelector, PowerMenu, Notifications, Pomodoro, LockScreen, ...
+      ControlPanel/         quick panel (Wi-Fi, brightness, volume)
+      Osd/                  right-edge volume and brightness display
       Settings/             the settings window and its pages
     Scripts/                theme, system and helper scripts
 bin/                        qs shim and minflair-session
 greeter/                    optional greetd login screen
-tools/                      doctor, smoke test, greeter installer
+tools/                      doctor, smoke test, greeter installer, hero image builder
 install.sh, uninstall.sh
 ```
 

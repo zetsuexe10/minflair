@@ -17,7 +17,7 @@ IslandBackground {
     readonly property bool hasActiveNotifications: notifLayer.hasActiveNotifications
     readonly property bool isRemovingNotif: notifLayer.isRemovingNotif
     property real notifProgress: (hasActiveNotifications && !isRemovingNotif) ? 1 : 0
-    readonly property bool hasActiveOsd: OsdService.isOpen && !hasActiveNotifications && openProgress === 0
+    readonly property bool hasActiveOsd: OsdService.nativeVisible && !hasActiveNotifications && openProgress === 0
     property real osdProgress: hasActiveOsd ? 1 : 0
     readonly property real dynamicOsdW: {
         if (OsdService.showProgress)

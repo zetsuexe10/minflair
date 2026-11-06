@@ -23,7 +23,7 @@ Item {
     // State & mode flags
     readonly property bool hasActiveNotifications: notifLayer.hasActiveNotifications
     property real notifProgress: (hasActiveNotifications && !notifLayer.isRemovingNotif) ? 1 : 0
-    readonly property bool hasActiveOsd: OsdService.isOpen && !hasActiveNotifications && !isOpen
+    readonly property bool hasActiveOsd: OsdService.nativeVisible && !hasActiveNotifications && !isOpen
     property real osdProgress: hasActiveOsd ? 1 : 0
     readonly property bool isCenterExpanded: SettingsService.barConvexMode && (AppState.isWidgetOpen("music") || AppState.isWidgetOpen("calendar") || AppState.isWidgetOpen("systemUsage"))
     readonly property string activeContentType: AppState.isWidgetOpen("music") ? "music" : (AppState.isWidgetOpen("calendar") ? "calendar" : (AppState.isWidgetOpen("systemUsage") ? "systemUsage" : ""))

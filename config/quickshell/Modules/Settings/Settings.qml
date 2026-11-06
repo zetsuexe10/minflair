@@ -78,14 +78,19 @@ AppWindow {
                 { "name": "Clock (all bars)", "rows": root.clockRows },
                 { "name": "Workspaces (all bars)", "rows": root.workspaceRows }
             ] },
-            { "key": "panels", "title": "Panels", "icon": "widgets", "section": "DESKTOP", "sub": "Hover panels, dashboard, OSD and weather", "sections": [
+            { "key": "panels", "title": "Panels", "icon": "widgets", "section": "DESKTOP", "sub": "Hover panels, dashboard, on-screen display and weather", "sections": [
                 { "name": "Dashboard", "rows": [
                     { "kind": "select", "label": "Opens on", "desc": "Tab shown when the dashboard opens", "prop": "sideDashTab", "options": root.dashTabOptions },
-                    { "kind": "toggle", "label": "On-screen feedback", "desc": "Indicator on the right edge for volume, brightness and microphone", "prop": "sideOsd" },
                     { "kind": "text", "label": "OS name", "desc": "Shown on the dashboard. Empty detects it from os-release", "prop": "osNameOverride", "placeholder": "FlickOS" },
                     { "kind": "text", "label": "Dashboard logo", "desc": "PNG, SVG or JPG shown in the round avatar. Empty uses ~/.face, then the distro logo", "cfg": ["logoImage"], "placeholder": "~/Pictures/logo.png" },
                     { "kind": "button", "label": "Choose logo", "desc": "Pick a file from a dialog", "action": "browseLogo", "value": "Browse" },
                     { "kind": "button", "label": "Reset logo", "desc": "Back to ~/.face or the distro logo", "action": "resetLogo", "value": "Reset" }
+                ] },
+                { "name": "On-screen display", "rows": [
+                    { "kind": "stepper", "label": "Hide after", "desc": "How long the sliders stay once you stop changing the value", "prop": "osdHideDelay", "from": 500, "to": 6000, "step": 100, "suffix": " ms" },
+                    { "kind": "toggle", "label": "Microphone slider", "desc": "Add a third slider for the microphone", "prop": "osdMicrophone" },
+                    { "kind": "toggle", "label": "Built-in Side bar indicator", "desc": "Used on the Side bar only while its edge sliders are turned off", "prop": "sideOsd" },
+                    { "kind": "info", "label": "Per bar", "desc": "", "text": "Turn the sliders on or off on each bar's page" }
                 ] },
                 { "name": "Weather", "rows": [
                     { "kind": "text", "label": "City", "desc": "Leave empty to locate by IP address", "prop": "weatherCity", "placeholder": "Lisbon" },
@@ -104,6 +109,9 @@ AppWindow {
                     { "kind": "info", "label": "Status", "desc": "", "text": "Tray and status icons on the right" },
                     { "kind": "button", "label": "Clock and workspaces", "desc": "Shared by every bar", "action": "gotoPage", "page": "bar", "value": "Open" }
                 ] },
+                { "name": "On-screen display", "rows": [
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "convex" }
+                ] },
             ] },
             { "key": "island", "title": "Island (bar 2)", "icon": "box", "section": "BARS", "sub": "The expanding top-centre island", "sections": [
                 { "name": "Island", "rows": [
@@ -111,6 +119,9 @@ AppWindow {
                     { "kind": "select", "label": "Right circular island", "desc": "What the right island shows", "prop": "islandRightMode", "options": root.islandRightOptions },
                     { "kind": "toggle", "label": "Show workspaces", "desc": "Interactive workspace indicators on the left", "prop": "islandShowWorkspaces" },
                     { "kind": "toggle", "label": "Show system tray", "desc": "Tray icons on the right", "prop": "islandShowTray" }
+                ] },
+                { "name": "On-screen display", "rows": [
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "island" }
                 ] },
             ] },
             { "key": "side", "title": "Side (bar 3)", "icon": "layout-filled", "section": "BARS", "sub": "Frame bar, dynamic mode, entries and scrolling", "sections": [
@@ -139,6 +150,9 @@ AppWindow {
                     { "kind": "toggle", "label": "Power panel", "desc": "Hover the power button on the bar", "cfg": ["hover", "session"] },
                     { "kind": "toggle", "label": "Dashboard", "desc": "Hover the top edge, centre", "cfg": ["hover", "dashboard"] },
                     { "kind": "toggle", "label": "Launcher", "desc": "Hover the bottom edge, centre", "cfg": ["hover", "launcher"] }
+                ] },
+                { "name": "On-screen display", "rows": [
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "side" }
                 ] },
                 { "name": "Popouts and scrolling", "rows": [
                     { "kind": "toggle", "label": "Hover popouts", "desc": "Open the Wi-Fi, Bluetooth, sound, calendar and notification panels from their icons", "prop": "sideBarPopouts" },
@@ -184,6 +198,9 @@ AppWindow {
                     { "kind": "toggle", "label": "Screen frame", "desc": "Border around the screen with rounded inner corners", "dyn": ["frame"] },
                     { "kind": "info", "label": "Frame size and colours", "desc": "The frame thickness, corner rounding and colour mode are shared with the Side bar", "text": "Set under Side (bar 3)" }
                 ] },
+                { "name": "On-screen display", "rows": [
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "dynamic" }
+                ] },
                 { "name": "Reset", "rows": [
                     { "kind": "button", "label": "Reset the Dynamic bar", "desc": "Back to the default behaviour and views", "action": "resetDynamic", "value": "Reset" }
                 ] },
@@ -226,6 +243,7 @@ AppWindow {
                     { "kind": "info", "label": "Super + K", "desc": "", "text": "Keybinds cheat sheet" },
                     { "kind": "info", "label": "Super + Shift + D", "desc": "", "text": "Dashboard" },
                     { "kind": "info", "label": "Super + Shift + I", "desc": "", "text": "GitHub widget" },
+                    { "kind": "info", "label": "Super + Z", "desc": "", "text": "Quick panel: Wi-Fi, brightness, volume" },
                     { "kind": "info", "label": "Super + X", "desc": "", "text": "Power menu (Dynamic bar)" },
                     { "kind": "info", "label": "Super + V", "desc": "", "text": "Clipboard history (opens in the Dynamic island)" },
                     { "kind": "info", "label": "Ctrl + Alt + W", "desc": "", "text": "Wallpaper selector" }
@@ -297,6 +315,8 @@ AppWindow {
             return SettingsService.cursorSize;
         if (row.app)
             return AppearanceService.values[row.app];
+        if (row.osd)
+            return SettingsService.osdBars[row.osd] !== false;
         if (row.dyn)
             return SettingsService.dynCfg(row.dyn[0], row.dyn[1]);
         if (row.cfg)
@@ -328,6 +348,8 @@ AppWindow {
             SettingsService.cursorSize = v;
         else if (row.app)
             AppearanceService.set(row.app, v);
+        else if (row.osd)
+            SettingsService.setOsdBar(row.osd, v);
         else if (row.dyn)
             SettingsService.setDynCfg(row.dyn[0], row.dyn[1], v);
         else if (row.cfg)

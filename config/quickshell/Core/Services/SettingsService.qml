@@ -34,6 +34,16 @@ Item {
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
     property bool sideOsd: true
+    property var osdBars: ({"convex": true, "island": true, "side": true, "dynamic": true})
+    property bool osdMicrophone: false
+    property int osdHideDelay: 1800
+    readonly property bool edgeOsdActive: osdBars[barStyle] !== false
+
+    function setOsdBar(style, value) {
+        const next = JSON.parse(JSON.stringify(osdBars || {}));
+        next[style] = value;
+        osdBars = next;
+    }
     property string osNameOverride: ""         // dashboard OS name; empty = detect
     property string weatherCity: ""            // empty: locate by IP
     property bool weatherFahrenheit: false
@@ -282,6 +292,18 @@ Item {
         if (settingsLoaded)
             saveSettings();
     }
+    onOsdBarsChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onOsdMicrophoneChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onOsdHideDelayChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onDynamicBarConfigChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -405,6 +427,9 @@ Item {
                 "sideBarPopouts": settingsService.sideBarPopouts,
                 "sideBarWindowTitle": settingsService.sideBarWindowTitle,
                 "sideOsd": settingsService.sideOsd,
+                "osdBars": settingsService.osdBars,
+                "osdMicrophone": settingsService.osdMicrophone,
+                "osdHideDelay": settingsService.osdHideDelay,
                 "weatherCity": settingsService.weatherCity,
                 "osNameOverride": settingsService.osNameOverride,
                 "weatherFahrenheit": settingsService.weatherFahrenheit,
@@ -602,6 +627,12 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                         if (prefs.weatherFahrenheit !== undefined)
                             settingsService.weatherFahrenheit = prefs.weatherFahrenheit;
 
+                        if (prefs.osdBars && typeof prefs.osdBars === "object")
+                            settingsService.osdBars = prefs.osdBars;
+                        if (prefs.osdMicrophone !== undefined)
+                            settingsService.osdMicrophone = prefs.osdMicrophone;
+                        if (typeof prefs.osdHideDelay === "number")
+                            settingsService.osdHideDelay = prefs.osdHideDelay;
                         if (prefs.sideOsd !== undefined)
                             settingsService.sideOsd = prefs.sideOsd;
 

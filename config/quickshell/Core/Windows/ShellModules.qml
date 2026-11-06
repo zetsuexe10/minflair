@@ -6,6 +6,7 @@ import qs.Modules.Launcher
 import qs.Modules.LockScreen
 import qs.Modules.Pomodoro
 import qs.Modules.Settings
+import qs.Modules.ControlPanel
 import qs.Modules.Dashboard
 import qs.Modules.WallpaperSelector
 
@@ -54,6 +55,17 @@ Item {
 
         sourceComponent: Component {
             Clipboard {
+            }
+
+        }
+
+    }
+
+    WidgetLoader {
+        widgetId: "quickPanel"
+
+        sourceComponent: Component {
+            ControlPanelWindow {
             }
 
         }

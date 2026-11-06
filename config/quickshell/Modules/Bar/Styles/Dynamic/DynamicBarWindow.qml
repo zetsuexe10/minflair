@@ -8,6 +8,7 @@ import qs.Core
 import qs.Core.Components
 import qs.Core.Services
 import qs.Modules.Bar.Styles.Side
+import qs.Modules.ControlPanel
 import qs.Modules.Clipboard
 import qs.Modules.ControlCenter
 import qs.Modules.Dashboard
@@ -93,7 +94,7 @@ PanelWindow {
     readonly property int cornerPad: 12
 
     readonly property bool toolsOpen: toolsView !== ""
-    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard"
+    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard" || toolsView === "quickPanel"
     readonly property bool orbsVisible: shown && !toolFocus
     readonly property bool musicButtonVisible: orbsVisible && showMusicButton
     readonly property bool workspacesVisible: shown && showWorkspaces
@@ -105,7 +106,7 @@ PanelWindow {
     property real netLastRx: -1
     property real netLastTime: 0
 
-    readonly property int toolsMenuW: 560
+    readonly property int toolsMenuW: 700
     readonly property int toolsMenuH: 92
     readonly property real ccW: (ccLoader.item && ccLoader.item.implicitWidth > 0) ? ccLoader.item.implicitWidth + 32 : 532
     readonly property real ccH: (ccLoader.item && ccLoader.item.implicitHeight > 0) ? ccLoader.item.implicitHeight + 32 : 632
@@ -178,6 +179,8 @@ PanelWindow {
             return Math.min(width - 64, githubView.implicitWidth + 24);
         if (toolsView === "clipboard")
             return Math.min(width - 32, clipboardView.preferredContentWidth + 60);
+        if (toolsView === "quickPanel")
+            return Math.min(width - 32, quickView.implicitWidth + 48);
         if (toolsView === "menu")
             return Math.min(width - 120, toolsMenuW);
         return Math.min(width - 120, glanceActive ? glanceWidth : pageWidth);
@@ -201,6 +204,8 @@ PanelWindow {
             return Math.min(root.height - 120, githubView.implicitHeight + 24);
         if (toolsView === "clipboard")
             return clipboardView.implicitHeight + 24;
+        if (toolsView === "quickPanel")
+            return quickView.implicitHeight + 36;
         if (toolsView === "menu")
             return toolsMenuH;
         return pillH;
@@ -263,6 +268,8 @@ PanelWindow {
             AppState.openWidget("screenshot");
         else if (id === "clipboard")
             AppState.openWidget("clipboard");
+        else if (id === "quickPanel")
+            AppState.openWidget("quickPanel");
     }
 
     function togglePower() {
@@ -307,6 +314,8 @@ PanelWindow {
             AppState.closeWidget("github");
         else if (toolsView === "clipboard")
             AppState.closeWidget("clipboard");
+        else if (toolsView === "quickPanel")
+            AppState.closeWidget("quickPanel");
         root.toolsView = "";
     }
 
@@ -314,7 +323,7 @@ PanelWindow {
         if (!isActive)
             return;
         const open = AppState.isWidgetOpen(id);
-        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard") {
+        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard" || id === "quickPanel") {
             const view = id === "powerMenu" ? "power" : id;
             if (open) {
                 toolsView = view;
@@ -348,7 +357,11 @@ PanelWindow {
     }
 
     onToolsViewChanged: {
-        if (toolsView === "wallpaper")
+        quickView.active = toolsView === "quickPanel";
+        if (toolsView === "quickPanel") {
+            quickView.reset();
+            Qt.callLater(() => quickView.initialFocusItem.forceActiveFocus());
+        } else if (toolsView === "wallpaper")
             Qt.callLater(() => wallpaperView.initialFocusItem.forceActiveFocus());
         else if (toolsView === "screenshot")
             Qt.callLater(() => shotView.initialFocusItem.forceActiveFocus());
@@ -867,6 +880,22 @@ PanelWindow {
                 label: "Clipboard"
                 onActivated: root.openTool("clipboard")
             }
+
+            ToolCard {
+                icon: "tune"
+                label: "Controls"
+                onActivated: root.openTool("quickPanel")
+            }
+        }
+
+        ControlPanelContent {
+            id: quickView
+
+            x: 24
+            y: 18
+            active: false
+            visible: root.toolsView === "quickPanel"
+            onCloseRequested: root.closeTools()
         }
 
         WallpaperSelectorContent {

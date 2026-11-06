@@ -427,7 +427,7 @@ PanelWindow {
             edge: root.opposite === "left" && root.position === "right" ? "left" : (root.position === "right" ? "left" : "right")
             align: "center"
             padding: 14
-            open: root.isActive && SettingsService.sideOsd && OsdService.isOpen && !root.open && !sessionLatch.on
+            open: root.isActive && SettingsService.sideOsd && OsdService.nativeVisible && !root.open && !sessionLatch.on
             attached: root.attached
             rounding: SideState.rounding
             contentWidth: osd.implicitWidth

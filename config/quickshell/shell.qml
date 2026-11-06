@@ -10,6 +10,7 @@ import qs.Modules.Bar
 import qs.Modules.Bar.Styles.Convex
 import qs.Modules.Bar.Styles.Gaming
 import qs.Modules.Bar.Styles.Dynamic
+import qs.Modules.Osd
 import qs.Modules.Bar.Styles.Side
 
 ShellRoot {
@@ -200,6 +201,8 @@ ShellRoot {
     }
 
     DynamicFrame {}
+
+    EdgeOsd {}
 
     SideOverlay {
         notificationService: globalNotificationService
