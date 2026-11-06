@@ -1,8 +1,56 @@
-# Minflair
+<div align="center">
 
-A Quickshell shell and a Hyprland (Lua) config for **Arch Linux** and **Debian 13 (trixie)**. One installer puts
-everything in `~/.minflair`, so your own `~/.config/hypr`, `~/.config/quickshell` and other dotfiles are never read,
-replaced or changed, and your other desktops keep running as they are.
+# Zenflair
+
+**A Minflair fork with a pinch of Caelestia.**
+
+Four switchable bars, a frame that panels grow out of, a round-avatar dashboard, and a settings window that stays out of your way.
+Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all inside `~/.minflair`.
+
+![Arch Linux](https://img.shields.io/badge/Arch_Linux-supported-1793d1?style=flat-square&logo=archlinux&logoColor=white)
+![Debian 13](https://img.shields.io/badge/Debian_13-supported-a80030?style=flat-square&logo=debian&logoColor=white)
+![Quickshell](https://img.shields.io/badge/Quickshell-0.3+-7c5cff?style=flat-square)
+![Hyprland](https://img.shields.io/badge/Hyprland-0.55+-58e1ff?style=flat-square)
+![Isolated](https://img.shields.io/badge/touches-~%2F.minflair_only-2ea44f?style=flat-square)
+
+[Install](#install) · [Bars](#bars) · [Dashboard](#dashboard) · [Settings](#settings) · [Keybinds](#keybinds) · [Troubleshooting](#troubleshooting)
+
+</div>
+
+---
+
+## Table of contents
+
+1. [Highlights](#highlights)
+2. [Install](#install)
+3. [Update and uninstall](#update-and-uninstall)
+4. [Isolation](#isolation)
+5. [Session](#session)
+6. [Hyprland config](#hyprland-config)
+7. [Keybinds](#keybinds)
+8. [Bars](#bars)
+   - [Convex and Island](#convex-and-island)
+   - [Side](#side)
+   - [Dynamic](#dynamic)
+9. [Dashboard](#dashboard)
+10. [Settings](#settings)
+11. [Packages](#packages)
+12. [Login screen](#login-screen)
+13. [Troubleshooting](#troubleshooting)
+14. [Credits](#credits)
+15. [License](#license)
+
+## Highlights
+
+| | |
+| :-- | :-- |
+| **Four bars, one keypress** | Convex, Island, Side and Dynamic, switched live with `Super+Alt+1..4`, no restart |
+| **Caelestia flavour** | a screen frame with rounded corners, panels that grow out of it, shape-shifting workspace indicators, a cookie-cover media player with synced lyrics |
+| **Dynamic everything** | the Side bar can shrink to a capsule, the Dynamic bar swaps between clock, music and notifications, widgets morph out of the island |
+| **Build your own bar** | put every Side entry in the start, centre or end of the bar and order it as you like |
+| **One settings window** | searchable, Profile first, a page per bar, GTK/Qt theme, cursor, icons and fonts remembered across sessions |
+| **Hands off your dotfiles** | everything lives in `~/.minflair`; your own Hyprland and Quickshell configs keep running |
+| **Own login entry** | shows as **Minflair** in SDDM, GDM, greetd and ly, not as "Hyprland" |
 
 | # | Bar | What it is | Switch |
 | :-: | :-- | :-- | :-- |
@@ -12,11 +60,6 @@ replaced or changed, and your other desktops keep running as they are.
 | 4 | Dynamic | a compact pill with the clock, now playing and notifications; widgets morph out of it | `Super+Alt+4` |
 
 `Super+Alt+B` cycles the bars, `Super+Alt+Shift+B` goes back, or use Settings > Bar. The default is Island.
-
-**Contents:** [Install](#install) · [Update and uninstall](#update-and-uninstall) · [Isolation](#isolation) ·
-[Session](#session) · [Hyprland config](#hyprland-config) · [Keybinds](#keybinds) · [Bars](#bars) ·
-[Dashboard](#dashboard) · [Settings](#settings) · [Packages](#packages) · [Login screen](#login-screen) ·
-[Troubleshooting](#troubleshooting)
 
 ## Install
 
@@ -360,6 +403,15 @@ from the Archcraft SDDM theme (GPLv3, see `greeter/assets/NOTICE`). On other dis
 | Theme, cursor or font did not change | apps already running keep the old look until restarted; check Settings > App Appearance > Status says "Active" |
 | One-command install fails to download | check that `git` is installed and `https://github.com` is reachable, then run it again |
 | Package updates | detected for pacman, AUR (paru/yay), apt and dnf |
+
+## Credits
+
+| | |
+| :-- | :-- |
+| **Minflair** | the shell and Hyprland config this project forks |
+| **Caelestia** | the look of the Side bar, frame, workspace indicators and dashboard are inspired by the [Caelestia](https://github.com/caelestia-dots) shell |
+| **Quickshell, Hyprland** | the toolkit and the compositor everything runs on |
+| **Archcraft SDDM theme** | layout and icons of the greeter (GPLv3, see `greeter/assets/NOTICE`) |
 
 ## License
 
