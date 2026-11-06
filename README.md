@@ -2,7 +2,7 @@
 
 # Zenflair
 
-**A Minflair fork with a pinch of Caelestia.**
+**🌸 A Minflair fork with a pinch of Caelestia.**
 
 Four switchable bars, a frame that panels grow out of, a round-avatar dashboard, and a settings window that stays out of your way.
 Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all inside `~/.minflair`.
@@ -13,55 +13,61 @@ Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all insid
 ![Hyprland](https://img.shields.io/badge/Hyprland-0.55+-58e1ff?style=flat-square)
 ![Isolated](https://img.shields.io/badge/touches-~%2F.minflair_only-2ea44f?style=flat-square)
 
-[Install](#install) · [Bars](#bars) · [Dashboard](#dashboard) · [Settings](#settings) · [Keybinds](#keybinds) · [Troubleshooting](#troubleshooting)
+📦 [Install](#install) · 🎛️ [Bars](#bars) · 📊 [Dashboard](#dashboard) · ⚙️ [Settings](#settings) · ⌨️ [Keybinds](#keybinds) · 🛠️ [Troubleshooting](#troubleshooting)
 
 </div>
 
 ---
 
-## Table of contents
+<a id="table-of-contents"></a>
 
-1. [Highlights](#highlights)
-2. [Install](#install)
-3. [Update and uninstall](#update-and-uninstall)
-4. [Isolation](#isolation)
-5. [Session](#session)
-6. [Hyprland config](#hyprland-config)
-7. [Keybinds](#keybinds)
-8. [Bars](#bars)
-   - [Convex and Island](#convex-and-island)
-   - [Side](#side)
-   - [Dynamic](#dynamic)
-9. [Dashboard](#dashboard)
-10. [Settings](#settings)
-11. [Packages](#packages)
-12. [Login screen](#login-screen)
-13. [Troubleshooting](#troubleshooting)
-14. [Credits](#credits)
-15. [License](#license)
+## 📖 Table of contents
 
-## Highlights
+1. ✨ [Highlights](#highlights)
+2. 📦 [Install](#install)
+3. 🔄 [Update and uninstall](#update-and-uninstall)
+4. 🧱 [Isolation](#isolation)
+5. 🖥️ [Session](#session)
+6. 🌿 [Hyprland config](#hyprland-config)
+7. ⌨️ [Keybinds](#keybinds)
+8. 🎛️ [Bars](#bars)
+   - 🏝️ [Convex and Island](#convex-and-island)
+   - 🪟 [Side](#side)
+   - 💊 [Dynamic](#dynamic)
+9. 📊 [Dashboard](#dashboard)
+10. ⚙️ [Settings](#settings)
+11. 🧩 [Packages](#packages)
+12. 🔐 [Login screen](#login-screen)
+13. 🛠️ [Troubleshooting](#troubleshooting)
+14. 💜 [Credits](#credits)
+15. 📄 [License](#license)
+
+<a id="highlights"></a>
+
+## ✨ Highlights
 
 | | |
 | :-- | :-- |
-| **Four bars, one keypress** | Convex, Island, Side and Dynamic, switched live with `Super+Alt+1..4`, no restart |
-| **Caelestia flavour** | a screen frame with rounded corners, panels that grow out of it, shape-shifting workspace indicators, a cookie-cover media player with synced lyrics |
-| **Dynamic everything** | the Side bar can shrink to a capsule, the Dynamic bar swaps between clock, music and notifications, widgets morph out of the island |
-| **Build your own bar** | put every Side entry in the start, centre or end of the bar and order it as you like |
-| **One settings window** | searchable, Profile first, a page per bar, GTK/Qt theme, cursor, icons and fonts remembered across sessions |
-| **Hands off your dotfiles** | everything lives in `~/.minflair`; your own Hyprland and Quickshell configs keep running |
-| **Own login entry** | shows as **Minflair** in SDDM, GDM, greetd and ly, not as "Hyprland" |
+| 🎛️ **Four bars, one keypress** | Convex, Island, Side and Dynamic, switched live with `Super+Alt+1..4`, no restart |
+| 🌌 **Caelestia flavour** | a screen frame with rounded corners, panels that grow out of it, shape-shifting workspace indicators, a cookie-cover media player with synced lyrics |
+| 💊 **Dynamic everything** | the Side bar can shrink to a capsule, the Dynamic bar swaps between clock, music and notifications, widgets morph out of the island |
+| 🧩 **Build your own bar** | put every Side entry in the start, centre or end of the bar and order it as you like |
+| ⚙️ **One settings window** | searchable, Profile first, a page per bar, GTK/Qt theme, cursor, icons and fonts remembered across sessions |
+| 🧱 **Hands off your dotfiles** | everything lives in `~/.minflair`; your own Hyprland and Quickshell configs keep running |
+| 🔐 **Own login entry** | shows as **Minflair** in SDDM, GDM, greetd and ly, not as "Hyprland" |
 
 | # | Bar | What it is | Switch |
 | :-: | :-- | :-- | :-- |
-| 1 | Convex | the original top bar with a curved centre | `Super+Alt+1` |
-| 2 | Island | a floating island at the top centre; widgets expand out of it | `Super+Alt+2` |
-| 3 | Side | a frame around the screen with the bar on one edge; panels grow out of it; can shrink to a small capsule | `Super+Alt+3` |
-| 4 | Dynamic | a compact pill with the clock, now playing and notifications; widgets morph out of it | `Super+Alt+4` |
+| 1 | 🌙 Convex | the original top bar with a curved centre | `Super+Alt+1` |
+| 2 | 🏝️ Island | a floating island at the top centre; widgets expand out of it | `Super+Alt+2` |
+| 3 | 🪟 Side | a frame around the screen with the bar on one edge; panels grow out of it; can shrink to a small capsule | `Super+Alt+3` |
+| 4 | 💊 Dynamic | a compact pill with the clock, now playing and notifications; widgets morph out of it | `Super+Alt+4` |
 
 `Super+Alt+B` cycles the bars, `Super+Alt+Shift+B` goes back, or use Settings > Bar. The default is Island.
 
-## Install
+<a id="install"></a>
+
+## 📦 Install
 
 Requirements: Arch Linux or Debian 13, `git`, `sudo`, and a normal user (not root). Run it from a terminal.
 
@@ -119,7 +125,9 @@ Environment variables for the one-command install: `MINFLAIR_REF` (branch, defau
 (where the repository is downloaded, default `~/.minflair/src`), `MINFLAIR_HOME` (install location, default
 `~/.minflair`).
 
-## Update and uninstall
+<a id="update-and-uninstall"></a>
+
+## 🔄 Update and uninstall
 
 | Task | Command |
 | :-- | :-- |
@@ -129,7 +137,9 @@ Environment variables for the one-command install: `MINFLAIR_REF` (branch, defau
 Reinstalling moves the previous `~/.minflair/quickshell` and `~/.minflair/hypr` to `~/.minflair/backup/<date>`.
 The uninstaller removes the session entry and `~/.minflair`. It never touches `~/.config` and never removes packages.
 
-## Isolation
+<a id="isolation"></a>
+
+## 🧱 Isolation
 
 | What | Where | Your setup |
 | :-- | :-- | :-- |
@@ -143,7 +153,9 @@ The uninstaller removes the session entry and `~/.minflair`. It never touches `~
 fonts, monitor scale and keyboard layout, are saved under `~/.minflair` and restored on the next start. The shell keeps
 its other preferences in `~/.cache/quickshell/settings_prefs.json`.
 
-## Session
+<a id="session"></a>
+
+## 🖥️ Session
 
 The installer adds `/usr/share/wayland-sessions/minflair.desktop`, so **Minflair** shows in SDDM, GDM, greetd, ly and
 other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-session`, which puts
@@ -157,7 +169,9 @@ other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-
 | `XDG_CURRENT_DESKTOP` | `Hyprland`, so portals pick the Hyprland backend |
 | Extra variables | `~/.minflair/session.env` |
 
-## Hyprland config
+<a id="hyprland-config"></a>
+
+## 🌿 Hyprland config
 
 `hyprland.lua` loads `animations`, `autostart`, `envs`, `keybinds`, `monitors`, `userprefs` and `windowrules`.
 Autostart skips anything that is not installed.
@@ -172,11 +186,13 @@ Autostart skips anything that is not installed.
 | `windowrules.lua`, `animations.lua` | window rules and animations |
 | `scripts/` | volume, brightness, media, touchpad, lock-key and polkit helpers |
 
-## Keybinds
+<a id="keybinds"></a>
+
+## ⌨️ Keybinds
 
 `Super` is the logo key. `Super+K` shows them in the shell.
 
-**Apps and tools**
+**🚀 Apps and tools**
 
 | Key | Action |
 | :-- | :-- |
@@ -187,7 +203,7 @@ Autostart skips anything that is not installed.
 | `Super+R` | restart the shell |
 | `Super+Ctrl+T` | toggle touchpad |
 
-**Shell**
+**🐚 Shell**
 
 | Key | Action |
 | :-- | :-- |
@@ -207,7 +223,7 @@ Autostart skips anything that is not installed.
 | `Super+S` / `Super+Ctrl+S` | settings / settings on the Bar page |
 | `Super+L` | lock screen |
 
-**Windows**
+**🪟 Windows**
 
 | Key | Action |
 | :-- | :-- |
@@ -220,7 +236,7 @@ Autostart skips anything that is not installed.
 | `Super+G` / `Super+Tab` / `Super+Shift+G` | group / cycle group / lock group |
 | `Super+Shift+M` | exit Hyprland |
 
-**Navigation**
+**🧭 Navigation**
 
 | Key | Action |
 | :-- | :-- |
@@ -232,7 +248,7 @@ Autostart skips anything that is not installed.
 | `Super+Ctrl+Left/Right`, `Super+Scroll` | previous / next workspace |
 | `Super+Mouse left/right drag` | move / resize window |
 
-**Bars**
+**🎛️ Bars**
 
 | Key | Action |
 | :-- | :-- |
@@ -250,16 +266,22 @@ through sockets, so any keybinding tool can use `socat - UNIX-CONNECT:/tmp/quick
 | `qs ipc call bar set <convex\|island\|side\|dynamic>` | switch bar |
 | `qs ipc call settings open <page>` | open Settings on a page (`bar`, `side`, `dynamic`, `profile`, ...) |
 
-## Bars
+<a id="bars"></a>
 
-### Convex and Island
+## 🎛️ Bars
+
+<a id="convex-and-island"></a>
+
+### 🏝️ Convex and Island
 
 Convex is the classic curved top bar: workspaces and the focused window on the left, the clock pill in the centre,
 network and status icons on the right. Island floats at the top centre and grows when a widget opens (media, launcher,
 wallpaper, dashboard), then shrinks back. Settings > Island can collapse it to a single pill, choose what the right
 circle shows and show or hide workspaces and the tray.
 
-### Side
+<a id="side"></a>
+
+### 🪟 Side
 
 A solid frame around the screen, thick on the bar's edge, with panels that grow out of it. It has its own palette
 (AMOLED by default; Mode under Settings > Side · Frame switches to Dark, Light or follow-theme), the Caelestia
@@ -272,7 +294,7 @@ dashboard, launcher, power panel and Wi-Fi / Bluetooth / sound popouts.
 | Space | the frame reserves its thickness |
 | Scrolling | first half of the bar changes volume, second half brightness, over the workspaces switches workspace |
 
-**Entries.** Each can be turned off in Settings > Side.
+**🧷 Entries.** Each can be turned off in Settings > Side.
 
 | Entry | Shows |
 | :-- | :-- |
@@ -285,7 +307,7 @@ dashboard, launcher, power panel and Wi-Fi / Bluetooth / sound popouts.
 | Now playing | the song with its cover (only while a player runs), in the middle of the bar; hover or click opens the player |
 | Power | hover or click opens the power panel |
 
-**Layout.** Settings > Side · Layout puts every entry in the **Start**, **Centre** or **End** part of the bar and sets
+**📐 Layout.** Settings > Side · Layout puts every entry in the **Start**, **Centre** or **End** part of the bar and sets
 its order inside that part (lowest first). The centre part is centred on the screen edge, so the song stays in the
 middle.
 
@@ -300,7 +322,7 @@ middle.
 | Clock | End | 3 |
 | Power button | End | 4 |
 
-**Dynamic mode.** Off by default. The bar shrinks to a small capsule and grows back on demand.
+**💊 Dynamic mode.** Off by default. The bar shrinks to a small capsule and grows back on demand.
 
 | | Behaviour |
 | :-- | :-- |
@@ -316,7 +338,9 @@ middle.
 | Keep expanded | always show the whole bar |
 | Music card on hover | hover the song to open the player; click always works |
 
-### Dynamic
+<a id="dynamic"></a>
+
+### 💊 Dynamic
 
 A floating pill at the top centre. Scroll or drag it to switch between the clock, now playing and notifications; hover
 to peek at the song. Workspaces sit in their own chip on the left and a round music button on the right opens the
@@ -333,7 +357,9 @@ island, and arrow keys browse the wallpaper list.
 | Views | clock, workspaces, music, notifications |
 | Screen frame | optional border like the Side bar; thickness, rounding and colours come from Side |
 
-## Dashboard
+<a id="dashboard"></a>
+
+## 📊 Dashboard
 
 Tabs: Dashboard, Media, Performance, Weather. Left/Right, Tab and Home/End switch, Escape closes.
 
@@ -347,7 +373,9 @@ Tabs: Dashboard, Media, Performance, Weather. Left/Right, Tab and Home/End switc
 Wallpapers come from `~/Pictures/Wallpapers` and `/usr/share/backgrounds`, subfolders included; the folder list is
 editable in Settings > Wallpaper. Arrow keys browse, Enter sets.
 
-## Settings
+<a id="settings"></a>
+
+## ⚙️ Settings
 
 `Super+S` opens one window with a search box and a grouped sidebar. Each bar has its own page.
 
@@ -365,7 +393,9 @@ and restored on every start. Apps started from the launcher or the Minflair sess
 keep their old look until restarted. The shell font is separate from the app font. The GitHub token is passed to the
 fetch scripts through the environment, never on a command line.
 
-## Packages
+<a id="packages"></a>
+
+## 🧩 Packages
 
 `./install.sh --check` lists what is missing. Quickshell must be 0.3 or newer; on Arch use `quickshell-git` from the AUR
 if the repository version is older.
@@ -382,7 +412,9 @@ The cursor theme `Vimix-cursors` is optional and not packaged on Debian
 (`git clone https://github.com/vinceliuice/Vimix-cursors && cd Vimix-cursors && ./install.sh`); Adwaita is used until
 then.
 
-## Login screen
+<a id="login-screen"></a>
+
+## 🔐 Login screen
 
 Debian/FlickOS only, optional. `./install.sh --greeter` (or `sudo tools/install-greeter.sh`) installs a Quickshell
 greeter on greetd inside cage: user, password and a session picker with readable names from
@@ -391,7 +423,9 @@ greeter on greetd inside cage: user, password and a session picker with readable
 from the Archcraft SDDM theme (GPLv3, see `greeter/assets/NOTICE`). On other display managers (SDDM, GDM, ly) the
 **Minflair** session entry is enough.
 
-## Troubleshooting
+<a id="troubleshooting"></a>
+
+## 🛠️ Troubleshooting
 
 | Symptom | What to do |
 | :-- | :-- |
@@ -404,15 +438,19 @@ from the Archcraft SDDM theme (GPLv3, see `greeter/assets/NOTICE`). On other dis
 | One-command install fails to download | check that `git` is installed and `https://github.com` is reachable, then run it again |
 | Package updates | detected for pacman, AUR (paru/yay), apt and dnf |
 
-## Credits
+<a id="credits"></a>
+
+## 💜 Credits
 
 | | |
 | :-- | :-- |
-| **Minflair** | the shell and Hyprland config this project forks |
-| **Caelestia** | the look of the Side bar, frame, workspace indicators and dashboard are inspired by the [Caelestia](https://github.com/caelestia-dots) shell |
-| **Quickshell, Hyprland** | the toolkit and the compositor everything runs on |
-| **Archcraft SDDM theme** | layout and icons of the greeter (GPLv3, see `greeter/assets/NOTICE`) |
+| 💠 **Minflair** | the shell and Hyprland config this project forks |
+| 🌌 **Caelestia** | the look of the Side bar, frame, workspace indicators and dashboard are inspired by the [Caelestia](https://github.com/caelestia-dots) shell |
+| ⚡ **Quickshell, Hyprland** | the toolkit and the compositor everything runs on |
+| 🎨 **Archcraft SDDM theme** | layout and icons of the greeter (GPLv3, see `greeter/assets/NOTICE`) |
 
-## License
+<a id="license"></a>
+
+## 📄 License
 
 See `LICENSE`.
