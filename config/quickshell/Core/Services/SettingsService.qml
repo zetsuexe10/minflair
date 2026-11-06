@@ -28,6 +28,7 @@ Item {
     property string cursorTheme: "Vimix-cursors"
     property int cursorSize: 16
     property string barStyle: "island"
+    property string profileImage: ""
     // Side bar style (third style): its own placement and options
     property string sideBarPosition: "left"
     property bool sideBarPopouts: true
@@ -53,6 +54,36 @@ Item {
             "hover": {"dashboard": true, "session": true, "launcher": false, "dynamic": true, "music": true}
         })
     property var sideBarConfig: sideBarDefaults
+    readonly property var dynamicBarDefaults: ({
+            "musicButton": true,
+            "glance": true,
+            "reserve": true,
+            "swipe": true,
+            "frame": false,
+            "idle": "auto",
+            "views": {"clock": true, "workspaces": true, "music": true, "notifications": true}
+        })
+    property var dynamicBarConfig: dynamicBarDefaults
+
+    function dynCfg(group, key) {
+        const c = dynamicBarConfig;
+        if (key === undefined)
+            return (c && c[group] !== undefined) ? c[group] : dynamicBarDefaults[group];
+        const g = (c && c[group]) ? c[group] : {};
+        return g[key] !== undefined ? g[key] : dynamicBarDefaults[group][key];
+    }
+
+    function setDynCfg(group, key, value) {
+        const next = JSON.parse(JSON.stringify(dynamicBarConfig || {}));
+        if (key === undefined) {
+            next[group] = value;
+        } else {
+            if (!next[group])
+                next[group] = {};
+            next[group][key] = value;
+        }
+        dynamicBarConfig = next;
+    }
 
     function sideCfg(group, key) {
         const c = sideBarConfig;
@@ -78,11 +109,12 @@ Item {
     // folders searched for wallpapers (recursively); ~ is expanded
     property var wallpaperDirs: ["~/Pictures/Wallpapers", "/usr/share/backgrounds"]
     property int sideDashTab: 0
-    readonly property var barStyles: ["convex", "island", "side"]
+    readonly property var barStyles: ["convex", "island", "side", "dynamic"]
     readonly property var barStyleNames: ({
         "convex": "Convex",
         "island": "Island",
-        "side": "Side"
+        "side": "Side",
+        "dynamic": "Dynamic"
     })
     readonly property bool sideFamily: barStyle === "side"
     property bool barIslandMode: barStyle === "island"
@@ -250,6 +282,14 @@ Item {
         if (settingsLoaded)
             saveSettings();
     }
+    onDynamicBarConfigChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+    onProfileImageChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
     onOsNameOverrideChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -369,6 +409,8 @@ Item {
                 "osNameOverride": settingsService.osNameOverride,
                 "weatherFahrenheit": settingsService.weatherFahrenheit,
                 "sideBarConfig": settingsService.sideBarConfig,
+                "dynamicBarConfig": settingsService.dynamicBarConfig,
+                "profileImage": settingsService.profileImage,
                 "sideScrollStep": settingsService.sideScrollStep,
                 "wallpaperDirs": settingsService.wallpaperDirs,
                 "sideDashTab": settingsService.sideDashTab,
@@ -546,6 +588,10 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.sideBarConfig && typeof prefs.sideBarConfig === "object")
                             settingsService.sideBarConfig = prefs.sideBarConfig;
+                        if (prefs.dynamicBarConfig && typeof prefs.dynamicBarConfig === "object")
+                            settingsService.dynamicBarConfig = prefs.dynamicBarConfig;
+                        if (typeof prefs.profileImage === "string")
+                            settingsService.profileImage = prefs.profileImage;
 
                         if (typeof prefs.osNameOverride === "string")
                             settingsService.osNameOverride = prefs.osNameOverride;

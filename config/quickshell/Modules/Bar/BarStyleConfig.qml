@@ -25,6 +25,12 @@ QtObject {
             "usesFloatingPopups": true,
             "isPill": false
         },
+        "dynamic": {
+            "hasFrame": false,
+            "hasExpandableHost": false,
+            "usesFloatingPopups": true,
+            "isPill": false
+        },
         "gaming": {
             "hasFrame": false,
             "hasExpandableHost": false,
@@ -38,8 +44,8 @@ QtObject {
     }
 
     function barHeight(style) {
-        if (style === "side")
-            return 0; // vertical bar: nothing is reserved at the top
+        if (style === "side" || style === "dynamic")
+            return 0;
 
         if (style === "gaming")
             return Constants.gamingBarHeight;
@@ -51,7 +57,7 @@ QtObject {
     }
 
     function barMarginTop(style) {
-        if (style === "side")
+        if (style === "side" || style === "dynamic")
             return 0;
 
         if (style === "gaming")

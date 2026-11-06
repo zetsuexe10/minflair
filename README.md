@@ -9,7 +9,8 @@ other Hyprland and Quickshell setups keep running as they are.
 | :-: | :-- | :-- | :-- |
 | 1 | Convex | the original top bar with a curved centre | `Super+Alt+1` |
 | 2 | Island | the dynamic-island top bar, widgets expand out of it | `Super+Alt+2` |
-| 3 | Side | a Caelestia-style frame around the screen, bar on one edge, panels grow out of it | `Super+Alt+3` |
+| 3 | Side | a Caelestia-style frame around the screen, bar on one edge, panels grow out of it; can shrink to a dynamic capsule | `Super+Alt+3` |
+| 4 | Dynamic | a compact pill at the top with a clock, workspaces, now playing and notifications; widgets morph out of it | `Super+Alt+4` |
 
 `Super+Alt+B` cycles the styles, `Super+Alt+Shift+B` goes back, or use Settings > Bar. The default is Island.
 
@@ -26,7 +27,7 @@ The installer detects pacman or apt and asks before each step and takes the brac
 | Option | Effect |
 | :-- | :-- |
 | `-y`, `--yes` | answer yes to everything and use the defaults |
-| `--style convex\|island\|side` | starting bar style |
+| `--style convex\|island\|side\|dynamic` | starting bar style |
 | `--terminal foot\|kitty\|alacritty\|wezterm` | terminal for `Super+Return` |
 | `--files nautilus\|thunar\|dolphin` | file manager for `Super+E` |
 | `--layout us,es` | keyboard layouts |
@@ -125,7 +126,7 @@ other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-
 | `Ctrl+Alt+X` or `Super+Shift+X` | power menu |
 | `Super+V` | clipboard history |
 | `Super+Shift+S` | screenshot / recording |
-| `Super+S` / `Super+Ctrl+S` | Minflair settings / shell settings |
+| `Super+S` / `Super+Ctrl+S` | settings / settings on the Bar page |
 | `Super+L` | lock screen |
 
 **Windows**
@@ -158,18 +159,20 @@ other display managers instead of "Hyprland". It runs `~/.minflair/bin/minflair-
 | Key | Action |
 | :-- | :-- |
 | `Super+Alt+B` / `Super+Alt+Shift+B` | next / previous style |
-| `Super+Alt+1` ... `3` | Convex / Island / Side |
+| `Super+Alt+1` ... `4` | Convex / Island / Side / Dynamic |
+| `Super+Shift+I` | GitHub widget |
+| `Super+X` | power menu (Dynamic bar) |
 
 Media, volume, brightness, mic-mute, touchpad and Caps/Num-lock keys work with an on-screen display. The panels are
 toggled through sockets, so any other keybinding tool can use `socat - UNIX-CONNECT:/tmp/quickshell_<panel>` with
 `launcher`, `clipboard`, `wallpaper`, `powerMenu`, `controlCenter`, `dashboard`, `notificationsCenter`, `calendar`,
-`music`, `systemUsage` or `screenshot`. The style command is `qs ipc call bar cycle|prev|get|set <convex|island|side>`.
+`music`, `systemUsage` or `screenshot`. The style command is `qs ipc call bar cycle|prev|get|set <convex|island|side|dynamic>`.
 
 ## Side
 
 A solid frame around the screen, thick on the bar's edge, with panels that grow out of it. It has its own palette
-(AMOLED by default; Mode in Shell settings switches to Dark, Light or follow-theme), the Caelestia dashboard,
-launcher, power panel, Wi-Fi / Bluetooth / sound popouts and the shell settings.
+(AMOLED by default; Mode under Settings > Side switches to Dark, Light or follow-theme), the Caelestia dashboard,
+launcher, power panel, Wi-Fi / Bluetooth / sound popouts and its page in Settings.
 
 | Part | Details |
 | :-- | :-- |
@@ -245,16 +248,28 @@ Tabs: Dashboard, Media, Performance, Weather. Left/Right, Tab and Home/End switc
 `~/Pictures/Wallpapers` and `/usr/share/backgrounds`, subfolders included; the folder list is editable in settings.
 Arrow keys browse, Enter sets.
 
-## Shell settings (`Super+Ctrl+S`)
+## Dynamic
 
-| Page | Covers |
+A floating pill at the top centre. Scroll or drag it to switch between the clock, now playing and notifications;
+hovering peeks at the song. Workspaces sit in their own chip on the left and a round music button on the right opens
+the player. The wallpaper picker, screenshot, clipboard, power, launcher, dashboard and GitHub widgets open inside the
+island. Reserve space, hover peek, swipe, idle view, the views and an optional screen frame are under Settings > Dynamic.
+
+## Settings (`Super+S`, `Super+Ctrl+S` for the Bar page)
+
+One window with a search box, grouped in the sidebar. Each bar has its own page.
+
+| Section | Pages |
 | :-- | :-- |
-| Bar | position, workspaces, dashboard logo and OS name, dynamic bar, entries, layout, scrolling, hover popouts |
-| Frame & Style | mode, frame, border, rounding |
-| App Appearance | GTK theme, app font and size, icon theme, cursor theme and size |
-| Wallpapers | wallpaper folders, random wallpaper |
-| Panels | hover panels, dashboard, weather |
-| GitHub, Shortcuts | account widget, keybinds |
+| Profile | account, host, distro and the picture used by the lock screen |
+| Desktop | Appearance, Wallpaper, Bar (active style, clock, workspaces), Panels (dashboard, weather), Visual Effects, Windows & Display |
+| Bar styles | Convex, Island, Side, Dynamic, each with its own options |
+| Input & hardware | Mouse & Touchpad, Keyboard & Clipboard |
+| Management | App Appearance, Integrations & Apps (default apps, GitHub account, token and overview) |
+| About | Shortcuts, About System |
+
+The Side page holds everything for bar 3: edge, dynamic mode, entries, layout, hover panels, scrolling, clock and the
+screen frame with its colour Mode. The Dynamic page has its own options for bar 4.
 
 **App Appearance** is written to `~/.minflair` only. Apps started from the launcher or the Minflair session pick it
 up; apps already running keep their old look until restarted. The shell font is separate from the app font.

@@ -353,11 +353,6 @@ PanelWindow {
                 Layout.alignment: Qt.AlignCenter
             }
 
-            SideClock {
-                vertical: root.vertical
-                Layout.alignment: Qt.AlignCenter
-            }
-
             SideMusicChip {
                 id: chip
 
@@ -365,6 +360,11 @@ PanelWindow {
                 vertical: root.vertical
                 Layout.alignment: Qt.AlignCenter
                 onHoverChanged: (on) => SideState.musicHover = on
+            }
+
+            SideClock {
+                vertical: root.vertical
+                Layout.alignment: Qt.AlignCenter
             }
 
         }

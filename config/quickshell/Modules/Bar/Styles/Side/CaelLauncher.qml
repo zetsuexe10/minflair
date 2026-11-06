@@ -36,8 +36,7 @@ Item {
         { "name": "Suspend", "sub": "Sleep", "icon": "moon", "run": () => shell("systemctl suspend") },
         { "name": "Reboot", "sub": "Restart the computer", "icon": "reload", "run": () => shell("systemctl reboot") },
         { "name": "Shut down", "sub": "Power off", "icon": "power", "run": () => shell("systemctl poweroff") },
-        { "name": "Settings", "sub": "Minflair settings", "icon": "star", "run": () => open("minflair_settings") },
-        { "name": "Shell settings", "sub": "Bar, frame and dashboard", "icon": "bar", "run": () => open("minflair_side_settings") },
+        { "name": "Settings", "sub": "Themes, bars, panels and apps", "icon": "star", "run": () => open("minflair_settings") },
         { "name": "Wallpaper", "sub": "Pick a wallpaper", "icon": "star", "run": () => open("wallpaper") },
         { "name": "Clipboard", "sub": "Clipboard history", "icon": "star", "run": () => open("clipboard") },
         { "name": "Screenshot", "sub": "Capture the screen", "icon": "star", "run": () => open("screenshot") }

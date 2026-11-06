@@ -217,6 +217,89 @@ AppContainer {
                 wrapMode: Text.WordWrap
             }
 
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Constants.sizeSm
+                visible: GithubService.hasToken
+                columns: 3
+                columnSpacing: Constants.size2Xl
+                rowSpacing: Constants.sizeMd
+
+                Repeater {
+                    model: [
+                        { "label": "Repositories", "value": GithubService.repos.length + (GithubService.privateRepos > 0 ? " · " + GithubService.privateRepos + " private" : "") },
+                        { "label": "Stars", "value": String(GithubService.totalStars) },
+                        { "label": "Forks", "value": String(GithubService.totalForks) },
+                        { "label": "Open PRs", "value": String(GithubService.openPRs) },
+                        { "label": "Open issues", "value": String(GithubService.openIssues) },
+                        { "label": "Top language", "value": GithubService.topLanguage || "None" }
+                    ]
+
+                    ColumnLayout {
+                        required property var modelData
+
+                        spacing: 0
+
+                        ThemedText {
+                            text: parent.modelData.value
+                            customSize: Constants.sizeLg
+                            font.weight: Font.Bold
+                            color: Theme.fg
+                        }
+
+                        ThemedText {
+                            text: parent.modelData.label
+                            customSize: Constants.sizeXs
+                            color: Theme.muted
+                        }
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Constants.sizeXs
+                spacing: Constants.sizeMd
+
+                ThemedText {
+                    Layout.fillWidth: true
+                    text: GithubService.isFetching ? "Fetching the latest data..." : (GithubService.hasToken ? "Refreshing updates the dashboard, widgets and these numbers." : "Add a username and token to load your GitHub profile.")
+                    customSize: Constants.sizeXs + 1
+                    color: Theme.muted
+                    wrapMode: Text.WordWrap
+                }
+
+                Rectangle {
+                    implicitWidth: refreshLabel.implicitWidth + 30
+                    implicitHeight: 34
+                    radius: 17
+                    color: refreshArea.containsMouse && !GithubService.isFetching ? Theme.accent : Theme.bgSecondary
+                    border.width: 1
+                    border.color: refreshArea.containsMouse ? Theme.accent : Theme.border
+                    opacity: GithubService.isFetching ? 0.6 : 1
+
+                    ThemedText {
+                        id: refreshLabel
+
+                        anchors.centerIn: parent
+                        text: GithubService.isFetching ? "Refreshing" : "Refresh"
+                        color: refreshArea.containsMouse ? Theme.bg : Theme.fg
+                        customSize: Constants.sizeXs + 1
+                        font.weight: Font.Bold
+                    }
+
+                    MouseArea {
+                        id: refreshArea
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        enabled: !GithubService.isFetching
+                        onClicked: GithubService.fetchData()
+                    }
+                }
+            }
+
         }
 
     }

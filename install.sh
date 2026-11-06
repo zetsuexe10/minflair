@@ -52,7 +52,7 @@ usage: ./install.sh [options]
       --no-services       do not touch services
       --greeter           install the greetd login screen (Debian/FlickOS only)
       --no-greeter        skip the login screen
-      --style <name>      starting bar style: convex, island or side
+      --style <name>      starting bar style: convex, island, side or dynamic
       --terminal <name>   terminal: foot, kitty, alacritty or wezterm
       --files <name>      file manager: nautilus, thunar or dolphin
       --layout <code>     keyboard layout, for example us or us,es
@@ -182,8 +182,8 @@ load_packages() {
 
 pick_choices() {
   local default_style=island
-  [ -n "$STYLE" ] || STYLE="$(choose "Bar style:" "$default_style" convex island side)"
-  case "$STYLE" in convex|island|side) ;; *) die "unknown bar style: $STYLE (use convex, island or side)" ;; esac
+  [ -n "$STYLE" ] || STYLE="$(choose "Bar style:" "$default_style" convex island side dynamic)"
+  case "$STYLE" in convex|island|side|dynamic) ;; *) die "unknown bar style: $STYLE (use convex, island, side or dynamic)" ;; esac
 
   [ -n "$TERMINAL" ] || TERMINAL="$(choose "Terminal:" foot foot kitty alacritty wezterm)"
   case "$TERMINAL" in foot|kitty|alacritty|wezterm) ;; *) die "unknown terminal: $TERMINAL" ;; esac

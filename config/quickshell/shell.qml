@@ -9,6 +9,7 @@ import qs.Core.Windows
 import qs.Modules.Bar
 import qs.Modules.Bar.Styles.Convex
 import qs.Modules.Bar.Styles.Gaming
+import qs.Modules.Bar.Styles.Dynamic
 import qs.Modules.Bar.Styles.Side
 
 ShellRoot {
@@ -35,6 +36,15 @@ ShellRoot {
         }
 
         target: "widgets"
+    }
+
+    IpcHandler {
+        function open(page: string) {
+            AppState.pendingSettingsPage = page;
+            AppState.openWidget("minflair_settings");
+        }
+
+        target: "settings"
     }
 
     IpcHandler {
@@ -82,6 +92,13 @@ ShellRoot {
 
         function get(): string {
             return SettingsService.barStyle;
+        }
+
+        function powermenu(): string {
+            if (SettingsService.barStyle !== "dynamic")
+                return "ignored";
+            AppState.toggleWidget("powerMenu");
+            return "toggled";
         }
 
         target: "bar"
@@ -175,6 +192,14 @@ ShellRoot {
 
         notificationService: globalNotificationService
     }
+
+    DynamicBarWindow {
+        id: dynamicBarSurface
+
+        notificationService: globalNotificationService
+    }
+
+    DynamicFrame {}
 
     SideOverlay {
         notificationService: globalNotificationService

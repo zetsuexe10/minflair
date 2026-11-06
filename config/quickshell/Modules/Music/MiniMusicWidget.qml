@@ -114,7 +114,7 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             enabled: (!SettingsService.musicPlayer || SettingsService.musicPlayer === "" || SettingsService.musicPlayer === "none")
                             onClicked: {
-                                AppState.pendingSettingsTab = 4;
+                                AppState.pendingSettingsPage = "integrations";
                                 AppState.openWidget("minflair_settings");
                             }
                         }

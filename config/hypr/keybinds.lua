@@ -128,6 +128,7 @@ hl.bind("CTRL + ALT + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 hl.bind("CTRL + ALT + X", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_powerMenu"))
 -- # Toggle Clipboard History
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_clipboard"))
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call bar powermenu"))
 -- # Toggle Wallpaper Selector
 hl.bind("CTRL + ALT + W", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_wallpaper"))
 -- # Toggle Screenshot
@@ -137,6 +138,8 @@ hl.bind("CTRL + ALT + D", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 
 -- # Toggle Dashboard (Super)
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_dashboard"))
+-- # Toggle GitHub widget
+hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_github"))
 -- # Toggle Control Center (Super)
 hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_controlCenter"))
 -- # Toggle Wallpaper Selector (Super)
@@ -158,8 +161,8 @@ hl.bind("CTRL + ALT + C", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 
 -- # Toggle Settings
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_settings"))
--- # Toggle Shell Settings (side bar, dashboard, GitHub)
-hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_side_settings"))
+-- # Open Settings on the Bar page
+hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("qs ipc call settings open bar"))
 -- # Toggle Keybinds Cheat Sheet
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_minflair_keybinds"))
 -- # Toggle Pomodoro
@@ -177,6 +180,8 @@ hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd("qs ipc call bar set convex"))
 hl.bind(mainMod .. " + ALT + 2", hl.dsp.exec_cmd("qs ipc call bar set island"))
 -- # Side Bar
 hl.bind(mainMod .. " + ALT + 3", hl.dsp.exec_cmd("qs ipc call bar set side"))
+-- # Dynamic Bar
+hl.bind(mainMod .. " + ALT + 4", hl.dsp.exec_cmd("qs ipc call bar set dynamic"))
 
 -- ## Window Groups
 

@@ -438,7 +438,7 @@ Card {
             text: "Configure"
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
-                AppState.pendingSettingsTab = 4;
+                AppState.pendingSettingsPage = "integrations";
                 AppState.openWidget("minflair_settings");
             }
         }

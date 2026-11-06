@@ -15,6 +15,18 @@ Item {
     property bool authFailed: false
     property bool authenticating: false
     property bool locked: true
+    readonly property string customSource: {
+        let p = String(SettingsService.profileImage || "").trim();
+        if (p === "")
+            return "";
+
+        if (p.startsWith("~/"))
+            p = Quickshell.env("HOME") + p.substring(1);
+
+        return p.startsWith("file://") ? p : "file://" + p;
+    }
+    readonly property string profileSource: customSource !== "" ? customSource : "file://" + Quickshell.env("HOME") + "/.face"
+    readonly property string distroSource: Quickshell.iconPath(SystemInfoService.osLogoName !== "" ? SystemInfoService.osLogoName : ("distributor-logo-" + SystemInfoService.osId), true)
 
     signal passwordChanged(string text)
     signal submitPassword(string pwd)
@@ -209,7 +221,7 @@ Item {
                         id: faceImage
 
                         anchors.fill: parent
-                        source: "file://" + Quickshell.env("HOME") + "/.face"
+                        source: rootBox.profileSource
                         fillMode: Image.PreserveAspectCrop
                         mipmap: true
                         visible: status === Image.Ready
@@ -242,13 +254,25 @@ Item {
 
                     }
 
+                    Image {
+                        id: osImage
+
+                        anchors.centerIn: parent
+                        width: 28
+                        height: 28
+                        source: faceImage.visible ? "" : rootBox.distroSource
+                        fillMode: Image.PreserveAspectFit
+                        sourceSize: Qt.size(56, 56)
+                        visible: status === Image.Ready && !faceImage.visible
+                    }
+
                     ThemedText {
                         anchors.centerIn: parent
                         text: (SystemStats.username ? SystemStats.username.charAt(0).toUpperCase() : "U")
                         customSize: Constants.sizeLg
                         font.bold: true
                         color: Theme.accent
-                        visible: !faceImage.visible
+                        visible: !faceImage.visible && !osImage.visible
                     }
 
                 }
