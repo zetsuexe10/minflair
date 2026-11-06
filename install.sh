@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
 set -u
 
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]:-.}")" && pwd)"
+
+if [ ! -d "$SRC/config/quickshell" ]; then
+  [ "$(id -u)" -ne 0 ] || { printf 'error: do not run this as root\n' >&2; exit 1; }
+  command -v git >/dev/null 2>&1 || { printf 'error: git is required (sudo pacman -S git, or sudo apt install git)\n' >&2; exit 1; }
+  CLONE="${MINFLAIR_SRC:-$HOME/.minflair/src}"
+  REF="${MINFLAIR_REF:-minflair}"
+  mkdir -p "$(dirname "$CLONE")"
+  if [ -d "$CLONE/.git" ]; then
+    git -C "$CLONE" fetch --depth 1 origin "$REF" && git -C "$CLONE" checkout -q -B "$REF" FETCH_HEAD || exit 1
+  else
+    git clone --depth 1 -b "$REF" https://github.com/zetsuexe10/minflair "$CLONE" || exit 1
+  fi
+  if [ -r /dev/tty ]; then
+    exec bash "$CLONE/install.sh" "$@" </dev/tty
+  fi
+  exec bash "$CLONE/install.sh" "$@"
+fi
 HOME_DIR="${MINFLAIR_HOME:-$HOME/.minflair}"
 SESSION_FILE="/usr/share/wayland-sessions/minflair.desktop"
 BACKUP="$HOME_DIR/backup/$(date +%Y%m%d-%H%M%S)"
