@@ -92,7 +92,7 @@ def apply(home, colors):
         _write(os.path.join(XDG, d, "gtk.css"), css)
         _settings_ini(os.path.join(XDG, d, "settings.ini"), theme, extra)
 
-    prev.update({"is_dark": bool(is_dark), "gtk_theme": theme})
+    prev.update({"is_dark": bool(is_dark)})
     os.makedirs(ROOT, exist_ok=True)
     with open(STATE, "w") as f:
         json.dump(prev, f, indent=2)

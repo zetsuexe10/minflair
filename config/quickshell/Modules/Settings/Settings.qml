@@ -64,7 +64,7 @@ AppWindow {
 
             { "key": "appearance", "title": "Appearance", "icon": "color-palette", "section": "DESKTOP", "sub": "Themes, palette, dynamic colors and shell typography", "component": personalizationComp },
             { "key": "wallpaper", "title": "Wallpaper", "icon": "picture", "section": "DESKTOP", "sub": "Folders, crop preview and scaling", "component": wallpaperComp },
-            { "key": "bar", "title": "Bar", "icon": "bar", "section": "DESKTOP", "sub": "Active style, clock and workspaces", "sections": [
+            { "key": "bar", "title": "Bar", "icon": "bar", "section": "DESKTOP", "sub": "Active style, clock and workspaces shared by every bar", "sections": [
                 { "name": "Style", "rows": [
                     { "kind": "select", "label": "Bar style", "desc": "Super+Alt+1..4 switches directly; Super+Alt+B cycles", "prop": "barStyle", "options": root.styleOptions },
                     { "kind": "info", "label": "Active style", "desc": "", "text": SettingsService.barStyleNames[SettingsService.barStyle] || SettingsService.barStyle }
@@ -75,8 +75,8 @@ AppWindow {
                     { "kind": "button", "label": "Side (bar 3)", "desc": "", "action": "gotoPage", "page": "side", "value": "Open" },
                     { "kind": "button", "label": "Dynamic (bar 4)", "desc": "", "action": "gotoPage", "page": "dynamic", "value": "Open" }
                 ] },
-                { "name": "Clock", "rows": root.clockRows },
-                { "name": "Workspaces", "rows": root.workspaceRows }
+                { "name": "Clock (all bars)", "rows": root.clockRows },
+                { "name": "Workspaces (all bars)", "rows": root.workspaceRows }
             ] },
             { "key": "panels", "title": "Panels", "icon": "widgets", "section": "DESKTOP", "sub": "Hover panels, dashboard, OSD and weather", "sections": [
                 { "name": "Dashboard", "rows": [
@@ -102,10 +102,8 @@ AppWindow {
                     { "kind": "info", "label": "Workspaces", "desc": "", "text": "Left, with the focused window" },
                     { "kind": "info", "label": "Clock", "desc": "", "text": "Centre pill" },
                     { "kind": "info", "label": "Status", "desc": "", "text": "Tray and status icons on the right" },
-                    { "kind": "button", "label": "General bar settings", "desc": "Style, edge, clock and workspaces", "action": "gotoPage", "page": "bar", "value": "Open" }
+                    { "kind": "button", "label": "Clock and workspaces", "desc": "Shared by every bar", "action": "gotoPage", "page": "bar", "value": "Open" }
                 ] },
-                { "name": "Clock", "rows": root.clockRows },
-                { "name": "Workspaces", "rows": root.workspaceRows }
             ] },
             { "key": "island", "title": "Island (bar 2)", "icon": "box", "section": "BAR STYLES", "sub": "The expanding top-centre island", "sections": [
                 { "name": "Island", "rows": [
@@ -114,13 +112,10 @@ AppWindow {
                     { "kind": "toggle", "label": "Show workspaces", "desc": "Interactive workspace indicators on the left", "prop": "islandShowWorkspaces" },
                     { "kind": "toggle", "label": "Show system tray", "desc": "Tray icons on the right", "prop": "islandShowTray" }
                 ] },
-                { "name": "Clock", "rows": root.clockRows },
-                { "name": "Workspaces", "rows": root.workspaceRows }
             ] },
             { "key": "side", "title": "Side (bar 3)", "icon": "layout-filled", "section": "BAR STYLES", "sub": "Frame bar, dynamic mode, entries, layout and frame", "sections": [
                 { "name": "Position", "rows": [
-                    { "kind": "select", "label": "Edge", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": root.positionOptions },
-                    { "kind": "stepper", "label": "Number of workspaces", "desc": "Total shown on the bar", "prop": "numberOfWorkspaces", "from": 1, "to": 20, "step": 1 }
+                    { "kind": "select", "label": "Edge", "desc": "Which screen edge the bar sits on", "prop": "sideBarPosition", "options": root.positionOptions }
                 ] },
                 { "name": "Dynamic mode", "rows": [
                     { "kind": "toggle", "label": "Dynamic bar", "desc": "The bar shrinks to workspaces, the clock and the song playing, and grows back when you hover it", "cfg": ["dynamic"] },
@@ -153,7 +148,6 @@ AppWindow {
                     { "kind": "toggle", "label": "Scroll brightness", "desc": "Scroll the second half of the bar", "cfg": ["scroll", "brightness"] },
                     { "kind": "stepper", "label": "Scroll step", "desc": "Percent per notch for volume and brightness", "prop": "sideScrollStep", "from": 1, "to": 20, "step": 1, "suffix": "%" }
                 ] },
-                { "name": "Clock", "rows": root.clockRows },
                 { "name": "Frame and colours", "rows": [
                     { "kind": "toggle", "label": "Screen frame", "desc": "Border around the screen with rounded inner corners", "cfg": ["frame"] },
                     { "kind": "stepper", "label": "Border thickness", "desc": "Width of the frame on edges without the bar", "cfg": ["border"], "from": 4, "to": 24, "step": 1, "suffix": " px" },
@@ -175,8 +169,6 @@ AppWindow {
                     { "kind": "toggle", "label": "Music", "desc": "Now playing in the centre; click it or the music button to open the player", "dyn": ["views", "music"] },
                     { "kind": "toggle", "label": "Notifications", "desc": "Latest notification page; arriving notifications expand the pill", "dyn": ["views", "notifications"] }
                 ] },
-                { "name": "Clock", "rows": root.clockRows },
-                { "name": "Workspaces", "rows": root.workspaceRows },
                 { "name": "Frame", "rows": [
                     { "kind": "toggle", "label": "Screen frame", "desc": "Border around the screen with rounded inner corners", "dyn": ["frame"] },
                     { "kind": "info", "label": "Frame size and colours", "desc": "The frame thickness, corner rounding and colour mode are shared with the Side bar", "text": "Set under Side (bar 3)" }
@@ -285,6 +277,10 @@ AppWindow {
     }
 
     function getValue(row) {
+        if (row.app === "cursor")
+            return SettingsService.cursorTheme;
+        if (row.app === "cursor_size")
+            return SettingsService.cursorSize;
         if (row.app)
             return AppearanceService.values[row.app];
         if (row.dyn)
@@ -312,7 +308,11 @@ AppWindow {
     }
 
     function setValue(row, v) {
-        if (row.app)
+        if (row.app === "cursor")
+            SettingsService.cursorTheme = v;
+        else if (row.app === "cursor_size")
+            SettingsService.cursorSize = v;
+        else if (row.app)
             AppearanceService.set(row.app, v);
         else if (row.dyn)
             SettingsService.setDynCfg(row.dyn[0], row.dyn[1], v);

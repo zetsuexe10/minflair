@@ -3,6 +3,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -17,17 +18,12 @@ def main():
     size = sys.argv[2]
     home = Path.home()
 
-    # 1. Remember the cursor for the Minflair GTK settings (no gsettings, no ~/.icons)
-    from minflair_paths import ROOT, STATE
-    import json
-    st = {}
-    try:
-        st = json.loads(Path(STATE).read_text())
-    except Exception:
-        pass
-    st["cursor"] = theme_name
-    Path(ROOT).mkdir(parents=True, exist_ok=True)
-    Path(STATE).write_text(json.dumps(st, indent=2))
+    appearance = Path(__file__).resolve().parent / "appearance.py"
+    subprocess.run(
+        [sys.executable, str(appearance), "set", json.dumps({"cursor": theme_name, "cursor_size": int(size)})],
+        capture_output=True,
+        timeout=30,
+    )
 
     # 3. Update ~/.minflair/hypr/envs.lua for persistence across reboots
     envs_lua = home / ".minflair" / "hypr" / "envs.lua"
@@ -58,8 +54,6 @@ def main():
         except Exception as e:
             print(f"Warning: Failed to update envs.lua: {e}", file=sys.stderr)
 
-    # 4. Apply via hyprctl (runtime)
-    subprocess.run(["hyprctl", "setcursor", theme_name, size], capture_output=True)
 
 
 if __name__ == "__main__":
