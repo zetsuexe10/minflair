@@ -8,65 +8,89 @@ Item {
     property real value: 0
     property string icon: "sun"
     property bool muted: false
-    property color fillColor: Theme.fg
+    property color fillColor: Theme.accent
     property real step: 4
-    property real cornerRadius: 28
     readonly property bool pressed: drag.pressed
     readonly property real shown: muted ? 0 : Math.max(0, Math.min(100, value))
+    readonly property real travel: Math.max(1, height - width)
+    property bool showNumber: false
+    property real _last: -1
+    property bool _dragged: false
 
     signal moved(real v)
     signal iconClicked()
 
-    implicitWidth: 88
-    implicitHeight: 190
+    implicitWidth: 44
+    implicitHeight: 180
+
+    onValueChanged: {
+        if (_last >= 0 && Math.abs(value - _last) >= 1) {
+            showNumber = true;
+            numberTimer.restart();
+        }
+        _last = value;
+    }
+
+    Timer {
+        id: numberTimer
+
+        interval: 600
+        onTriggered: root.showNumber = false
+    }
 
     Rectangle {
         id: track
 
         anchors.fill: parent
-        radius: root.cornerRadius
+        radius: width / 2
         color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
-        border.width: 1
-        border.color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.08)
-        clip: true
 
         Rectangle {
             id: fill
 
             anchors.bottom: parent.bottom
             width: parent.width
-            height: Math.max(radius * 2, parent.height * root.shown / 100)
-            radius: track.radius
+            height: root.width + root.travel * root.shown / 100
+            radius: width / 2
             color: root.fillColor
-            opacity: root.shown > 0 ? 0.92 : 0
-            visible: root.shown > 0
 
             Behavior on height {
                 enabled: !root.pressed
-                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
             }
         }
 
-        SvgIcon {
-            id: glyph
+        Rectangle {
+            id: handle
 
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 16
-            icon: root.icon
-            iconSize: 24
-            flat: true
-            iconColor: (root.shown > 14) ? Theme.opaqueBg : Theme.fg
-        }
+            width: root.width
+            height: root.width
+            radius: width / 2
+            y: fill.y
+            color: Theme.fg
+            scale: drag.pressed ? 1.06 : 1
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.topMargin: 14
-            text: root.muted ? "Muted" : Math.round(root.value) + "%"
-            font.pixelSize: 12
-            font.bold: true
-            color: Theme.muted
+            Behavior on scale {
+                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+            }
+
+            SvgIcon {
+                anchors.centerIn: parent
+                visible: !(root.pressed || root.showNumber)
+                icon: root.icon
+                iconSize: Math.round(root.width * 0.46)
+                flat: true
+                iconColor: Theme.opaqueBg
+            }
+
+            Text {
+                anchors.centerIn: parent
+                visible: root.pressed || root.showNumber
+                text: Math.round(root.value)
+                font.pixelSize: Math.max(11, Math.round(root.width * 0.3))
+                font.bold: true
+                color: Theme.opaqueBg
+            }
         }
     }
 
@@ -75,24 +99,29 @@ Item {
 
         anchors.fill: parent
         preventStealing: true
-        onPressed: (m) => root.moved(root._at(m.y))
-        onPositionChanged: (m) => {
-            if (pressed)
+        cursorShape: Qt.PointingHandCursor
+        onPressed: (m) => {
+            root._dragged = false;
+            const onHandle = m.y >= handle.y && m.y <= handle.y + handle.height;
+            if (!onHandle) {
+                root._dragged = true;
                 root.moved(root._at(m.y));
+            }
+        }
+        onPositionChanged: (m) => {
+            if (!pressed)
+                return;
+            root._dragged = true;
+            root.moved(root._at(m.y));
+        }
+        onReleased: {
+            if (!root._dragged)
+                root.iconClicked();
         }
         onWheel: (w) => root.moved(Math.max(0, Math.min(100, root.value + (w.angleDelta.y > 0 ? root.step : -root.step))))
     }
 
-    MouseArea {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        width: 52
-        height: 52
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.iconClicked()
-    }
-
     function _at(y) {
-        return Math.max(0, Math.min(100, (1 - y / Math.max(1, root.height)) * 100));
+        return Math.max(0, Math.min(100, (1 - (y - root.width / 2) / root.travel) * 100));
     }
 }

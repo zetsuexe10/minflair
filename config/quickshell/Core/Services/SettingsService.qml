@@ -34,10 +34,10 @@ Item {
     property bool sideBarPopouts: true
     property bool sideBarWindowTitle: true
     property bool sideOsd: true
-    property var osdBars: ({"convex": true, "island": true, "side": true, "dynamic": true})
+    property var osdBars: ({"convex": false, "island": true, "side": false, "dynamic": true})
     property bool osdMicrophone: false
     property int osdHideDelay: 1800
-    readonly property bool edgeOsdActive: osdBars[barStyle] !== false
+    readonly property bool edgeOsdActive: (barStyle === "island" || barStyle === "dynamic") && osdBars[barStyle] !== false
 
     function setOsdBar(style, value) {
         const next = JSON.parse(JSON.stringify(osdBars || {}));

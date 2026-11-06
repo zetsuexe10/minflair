@@ -12,7 +12,7 @@ PanelWindow {
 
     property bool shown: false
     readonly property bool allowed: SettingsService.settingsLoaded && SettingsService.edgeOsdActive && !HyprlandService.isTrueFullscreen
-    readonly property bool hovered: panelHover.hovered || volSlider.pressed || briSlider.pressed || micSlider.pressed
+    readonly property bool hovered: panelHover.hovered || stripHover.hovered || volSlider.pressed || briSlider.pressed || micSlider.pressed
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
@@ -39,7 +39,7 @@ PanelWindow {
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     color: "transparent"
-    visible: allowed && (shown || card.opacity > 0.01)
+    visible: allowed
     implicitWidth: card.width + railInset + 24
 
     anchors {
@@ -50,6 +50,10 @@ PanelWindow {
 
     mask: Region {
         item: card
+
+        Region {
+            item: hoverStrip
+        }
     }
 
     PwObjectTracker {
@@ -78,6 +82,24 @@ PanelWindow {
 
     onShownChanged: BrightnessService.watchers += shown ? 1 : -1
 
+    Item {
+        id: hoverStrip
+
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: 5
+        height: Math.round(parent.height * 0.5)
+
+        HoverHandler {
+            id: stripHover
+
+            onHoveredChanged: {
+                if (hovered)
+                    root.bump();
+            }
+        }
+    }
+
     Rectangle {
         id: card
 
@@ -86,9 +108,9 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: root.railInset - slide * (width + root.railInset + 12)
-        width: row.implicitWidth + 24
-        height: row.implicitHeight + 24
-        radius: 34
+        width: row.implicitWidth + 26
+        height: row.implicitHeight + 26
+        radius: 36
         color: Qt.rgba(Theme.opaqueBg.r, Theme.opaqueBg.g, Theme.opaqueBg.b, 0.94)
         border.width: 1
         border.color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
@@ -110,14 +132,13 @@ PanelWindow {
             id: row
 
             anchors.centerIn: parent
-            spacing: 10
+            spacing: 12
 
             PanelSlider {
                 id: volSlider
 
-                width: 62
-                height: 188
-                cornerRadius: 24
+                width: 46
+                height: 190
                 icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
                 muted: root.volumeMuted
                 fillColor: Theme.accent
@@ -133,11 +154,10 @@ PanelWindow {
             PanelSlider {
                 id: briSlider
 
-                width: 62
-                height: 188
-                cornerRadius: 24
+                width: 46
+                height: 190
                 icon: "sun"
-                fillColor: Theme.fg
+                fillColor: Theme.accent
                 value: BrightnessService.percent
                 onMoved: (v) => {
                     BrightnessService.set(Math.max(1, v));
@@ -150,9 +170,8 @@ PanelWindow {
                 id: micSlider
 
                 visible: SettingsService.osdMicrophone
-                width: visible ? 62 : 0
-                height: 188
-                cornerRadius: 24
+                width: visible ? 46 : 0
+                height: 190
                 icon: AudioService.micMuted ? "microphone-off" : "microphone"
                 muted: AudioService.micMuted
                 fillColor: Theme.accentComplementary

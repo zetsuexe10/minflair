@@ -421,15 +421,16 @@ island, and arrow keys browse the wallpaper list.
 
 ### 🎚️ On-screen display
 
-Volume and brightness changes show a Caelestia-style slider card on the right edge of the screen. It works with every
-bar, can be switched off per bar in Settings (each bar page has an On-screen display toggle) and you can drag the
-sliders while it is visible. Settings > Panels sets the hide delay and an optional microphone slider. With it off, the
-bar's own native indicator is used. Trigger it from scripts with `qs ipc call osd showVolume` or `showBrightness`.
+Volume and brightness changes show a Caelestia-style slider card on the right edge: round pill sliders with a handle
+that shows the icon and turns into the percentage while you drag. Hover the right edge of the screen to bring it up any
+time. It is available on the Island and Dynamic bars (switch it off per bar in their Settings pages); Convex and Side
+keep their own native indicators. Settings > Panels sets the hide delay and an optional microphone slider. Trigger it
+from scripts with `qs ipc call osd showVolume` or `showBrightness`.
 
 ### 🎛️ Quick panel
 
 `Super+Z` opens an iPhone-style control panel: a Wi-Fi tile (toggle the radio, open the network list to scan, connect
-with a password, disconnect or forget), Sound and Mic toggles and draggable brightness and volume sliders. On the
+with a password, disconnect or forget), Sound and Mic toggles; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the
 Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
 centred popup.
 

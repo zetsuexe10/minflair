@@ -14,7 +14,7 @@ Item {
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
-    readonly property real pageHeight: page === "main" ? 322 : 430
+    readonly property real pageHeight: page === "main" ? 236 : 430
     property string passwordFor: ""
     readonly property color soft: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
     readonly property color softBorder: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.08)
@@ -117,6 +117,30 @@ Item {
             anchors.fill: parent
             spacing: 12
 
+            PanelSlider {
+                Layout.preferredWidth: 60
+                Layout.fillHeight: true
+                icon: "sun"
+                fillColor: Theme.accent
+                value: BrightnessService.percent
+                onMoved: (v) => BrightnessService.set(Math.max(1, v))
+                onIconClicked: BrightnessService.set(BrightnessService.percent <= 5 ? 100 : 5)
+            }
+
+            PanelSlider {
+                Layout.preferredWidth: 60
+                Layout.fillHeight: true
+                icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
+                muted: root.volumeMuted
+                fillColor: Theme.accent
+                value: root.volume
+                onMoved: (v) => root.setVolume(v)
+                onIconClicked: {
+                    if (root.sink && root.sink.audio)
+                        root.sink.audio.muted = !root.sink.audio.muted;
+                }
+            }
+
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -126,8 +150,8 @@ Item {
                     id: wifiTile
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 150
-                    radius: 28
+                    Layout.preferredHeight: 112
+                    radius: 26
                     color: wifi.radio ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
                     border.width: 1
                     border.color: wifi.radio ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.45) : root.softBorder
@@ -155,16 +179,16 @@ Item {
 
                         anchors.left: parent.left
                         anchors.top: parent.top
-                        anchors.margins: 16
-                        width: 52
-                        height: 52
-                        radius: 26
+                        anchors.margins: 14
+                        width: 40
+                        height: 40
+                        radius: 20
                         color: wifi.radio ? Theme.accent : Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.16)
 
                         SvgIcon {
                             anchors.centerIn: parent
                             icon: wifi.radio ? "wifi" : "wifi-off"
-                            iconSize: 26
+                            iconSize: 20
                             flat: true
                             iconColor: wifi.radio ? Theme.opaqueBg : Theme.fg
                         }
@@ -195,7 +219,7 @@ Item {
 
                         Text {
                             text: "Wi-Fi"
-                            font.pixelSize: 17
+                            font.pixelSize: 16
                             font.bold: true
                             color: Theme.fg
                         }
@@ -281,29 +305,6 @@ Item {
                 }
             }
 
-            PanelSlider {
-                Layout.preferredWidth: 88
-                Layout.fillHeight: true
-                icon: "sun"
-                fillColor: Theme.fg
-                value: BrightnessService.percent
-                onMoved: (v) => BrightnessService.set(Math.max(1, v))
-                onIconClicked: BrightnessService.set(BrightnessService.percent <= 5 ? 100 : 5)
-            }
-
-            PanelSlider {
-                Layout.preferredWidth: 88
-                Layout.fillHeight: true
-                icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
-                muted: root.volumeMuted
-                fillColor: Theme.accent
-                value: root.volume
-                onMoved: (v) => root.setVolume(v)
-                onIconClicked: {
-                    if (root.sink && root.sink.audio)
-                        root.sink.audio.muted = !root.sink.audio.muted;
-                }
-            }
         }
     }
 

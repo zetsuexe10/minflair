@@ -109,9 +109,6 @@ AppWindow {
                     { "kind": "info", "label": "Status", "desc": "", "text": "Tray and status icons on the right" },
                     { "kind": "button", "label": "Clock and workspaces", "desc": "Shared by every bar", "action": "gotoPage", "page": "bar", "value": "Open" }
                 ] },
-                { "name": "On-screen display", "rows": [
-                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "convex" }
-                ] },
             ] },
             { "key": "island", "title": "Island (bar 2)", "icon": "box", "section": "BARS", "sub": "The expanding top-centre island", "sections": [
                 { "name": "Island", "rows": [
@@ -121,7 +118,7 @@ AppWindow {
                     { "kind": "toggle", "label": "Show system tray", "desc": "Tray icons on the right", "prop": "islandShowTray" }
                 ] },
                 { "name": "On-screen display", "rows": [
-                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "island" }
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Right-edge sliders: appear when volume or brightness changes, or when you hover the right edge", "osd": "island" }
                 ] },
             ] },
             { "key": "side", "title": "Side (bar 3)", "icon": "layout-filled", "section": "BARS", "sub": "Frame bar, dynamic mode, entries and scrolling", "sections": [
@@ -150,9 +147,6 @@ AppWindow {
                     { "kind": "toggle", "label": "Power panel", "desc": "Hover the power button on the bar", "cfg": ["hover", "session"] },
                     { "kind": "toggle", "label": "Dashboard", "desc": "Hover the top edge, centre", "cfg": ["hover", "dashboard"] },
                     { "kind": "toggle", "label": "Launcher", "desc": "Hover the bottom edge, centre", "cfg": ["hover", "launcher"] }
-                ] },
-                { "name": "On-screen display", "rows": [
-                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "side" }
                 ] },
                 { "name": "Popouts and scrolling", "rows": [
                     { "kind": "toggle", "label": "Hover popouts", "desc": "Open the Wi-Fi, Bluetooth, sound, calendar and notification panels from their icons", "prop": "sideBarPopouts" },
@@ -199,7 +193,7 @@ AppWindow {
                     { "kind": "info", "label": "Frame size and colours", "desc": "The frame thickness, corner rounding and colour mode are shared with the Side bar", "text": "Set under Side (bar 3)" }
                 ] },
                 { "name": "On-screen display", "rows": [
-                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Slide in from the right edge when volume or brightness changes; drag or scroll them", "osd": "dynamic" }
+                    { "kind": "toggle", "label": "Volume and brightness sliders", "desc": "Right-edge sliders: appear when volume or brightness changes, or when you hover the right edge", "osd": "dynamic" }
                 ] },
                 { "name": "Reset", "rows": [
                     { "kind": "button", "label": "Reset the Dynamic bar", "desc": "Back to the default behaviour and views", "action": "resetDynamic", "value": "Reset" }
