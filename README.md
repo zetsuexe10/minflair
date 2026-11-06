@@ -1,8 +1,10 @@
 <div align="center">
 
-# Zenflair
+<img src="docs/screenshots/hero.png" alt="Minflair" width="100%">
 
-**🌸 A Minflair fork with a pinch of Caelestia.**
+# Minflair
+
+**🌸 A Caelestia-flavoured desktop for Arch and Debian.**
 
 Four switchable bars, a frame that panels grow out of, a round-avatar dashboard, and a settings window that stays out of your way.
 Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all inside `~/.minflair`.
@@ -627,7 +629,7 @@ from the Archcraft SDDM theme (GPLv3, see `greeter/assets/NOTICE`). On other dis
 
 | | |
 | :-- | :-- |
-| 💠 **Minflair** | the shell and Hyprland config this project forks |
+| 💠 **Minflair (Debian)** | the original shell and Hyprland config this unified branch builds on |
 | 🌌 **Caelestia** | the look of the Side bar, frame, workspace indicators and dashboard are inspired by the [Caelestia](https://github.com/caelestia-dots) shell |
 | ⚡ **Quickshell, Hyprland** | the toolkit and the compositor everything runs on |
 | 🎨 **Archcraft SDDM theme** | layout and icons of the greeter (GPLv3, see `greeter/assets/NOTICE`) |
