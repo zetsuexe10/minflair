@@ -41,7 +41,7 @@ convert -size ${W}x${H} gradient:'#08050f-#140b28' \
 
 card $S/convex-aurora.png 700 "$T/a.png"
 card $S/style-side.jpg 760 "$T/b.png"
-card $S/dynamic-music.jpg 640 "$T/c.png"
+card $S/dynamic-pastel.png 640 "$T/c.png"
 
 convert "$T/bg.png" \
   "$T/a.png" -geometry +1010+40 -composite \

@@ -136,7 +136,15 @@ Item {
                         ColorAnimation { duration: Constants.animFast }
                     }
 
+                    scale: wifiTileArea.pressed ? 0.97 : 1
+
+                    Behavior on scale {
+                        NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                    }
+
                     MouseArea {
+                        id: wifiTileArea
+
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.page = "wifi"
@@ -248,7 +256,15 @@ Item {
                                 }
                             }
 
+                            scale: toggleArea.pressed ? 0.95 : 1
+
+                            Behavior on scale {
+                                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                            }
+
                             MouseArea {
+                                id: toggleArea
+
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
