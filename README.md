@@ -103,8 +103,6 @@ Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all insid
 
 ![Side bar on the left edge](docs/screenshots/style-side.jpg)
 
-![Launcher opened from the Side bar](docs/screenshots/side-launcher.jpg)
-
 </details>
 
 <details>
@@ -127,20 +125,6 @@ Quickshell 0.3 and Hyprland (Lua) on **Arch Linux** and **Debian 13**, all insid
 ![Dynamic bar without the screen frame](docs/screenshots/dynamic-no-frame.jpg)
 
 </details>
-
-<details>
-<summary><b>⚙️ Settings</b> — one searchable window</summary>
-
-![Settings overview](docs/screenshots/settings-overview.jpg)
-
-![Side bar settings](docs/screenshots/settings-side.jpg)
-
-![Integrations and GitHub](docs/screenshots/settings-integrations.jpg)
-
-</details>
-
-> The screenshots come from the Debian build this fork started from. Pages and options have since been regrouped, so
-> labels in Settings can differ slightly.
 
 <a id="install"></a>
 
