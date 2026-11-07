@@ -108,9 +108,9 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: root.railInset - slide * (width + root.railInset + 12)
-        width: row.implicitWidth + 26
-        height: row.implicitHeight + 26
-        radius: 36
+        width: row.implicitWidth + 20
+        height: row.implicitHeight + 20
+        radius: 28
         color: Qt.rgba(Theme.opaqueBg.r, Theme.opaqueBg.g, Theme.opaqueBg.b, 0.94)
         border.width: 1
         border.color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
@@ -132,13 +132,13 @@ PanelWindow {
             id: row
 
             anchors.centerIn: parent
-            spacing: 12
+            spacing: 10
 
             PanelSlider {
                 id: volSlider
 
-                width: 46
-                height: 190
+                width: 34
+                height: 176
                 icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
                 muted: root.volumeMuted
                 fillColor: Theme.accent
@@ -154,9 +154,9 @@ PanelWindow {
             PanelSlider {
                 id: briSlider
 
-                width: 46
-                height: 190
-                icon: "sun"
+                width: 34
+                height: 176
+                icon: BrightnessService.percent <= 20 ? "moon" : "sun"
                 fillColor: Theme.accent
                 value: BrightnessService.percent
                 onMoved: (v) => {
@@ -170,8 +170,8 @@ PanelWindow {
                 id: micSlider
 
                 visible: SettingsService.osdMicrophone
-                width: visible ? 46 : 0
-                height: 190
+                width: visible ? 34 : 0
+                height: 176
                 icon: AudioService.micMuted ? "microphone-off" : "microphone"
                 muted: AudioService.micMuted
                 fillColor: Theme.accentComplementary

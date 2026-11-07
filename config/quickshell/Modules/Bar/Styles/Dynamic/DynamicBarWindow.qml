@@ -9,6 +9,7 @@ import qs.Core.Components
 import qs.Core.Services
 import qs.Modules.Bar.Styles.Side
 import qs.Modules.ControlPanel
+import qs.Modules.SystemMonitor
 import qs.Modules.Clipboard
 import qs.Modules.ControlCenter
 import qs.Modules.Dashboard
@@ -94,7 +95,7 @@ PanelWindow {
     readonly property int cornerPad: 12
 
     readonly property bool toolsOpen: toolsView !== ""
-    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard" || toolsView === "quickPanel"
+    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard" || toolsView === "quickPanel" || toolsView === "sysMonitor" || toolsView === "speedTest"
     readonly property bool orbsVisible: shown && !toolFocus
     readonly property bool musicButtonVisible: orbsVisible && showMusicButton
     readonly property bool workspacesVisible: shown && showWorkspaces
@@ -106,7 +107,7 @@ PanelWindow {
     property real netLastRx: -1
     property real netLastTime: 0
 
-    readonly property int toolsMenuW: 700
+    readonly property int toolsMenuW: 560
     readonly property int toolsMenuH: 92
     readonly property real ccW: (ccLoader.item && ccLoader.item.implicitWidth > 0) ? ccLoader.item.implicitWidth + 32 : 532
     readonly property real ccH: (ccLoader.item && ccLoader.item.implicitHeight > 0) ? ccLoader.item.implicitHeight + 32 : 632
@@ -181,6 +182,8 @@ PanelWindow {
             return Math.min(width - 32, clipboardView.preferredContentWidth + 60);
         if (toolsView === "quickPanel")
             return Math.min(width - 32, quickView.implicitWidth + 48);
+        if (toolsView === "sysMonitor" || toolsView === "speedTest")
+            return Math.min(width - 32, monView.implicitWidth + 48);
         if (toolsView === "menu")
             return Math.min(width - 120, toolsMenuW);
         return Math.min(width - 120, glanceActive ? glanceWidth : pageWidth);
@@ -206,6 +209,8 @@ PanelWindow {
             return clipboardView.implicitHeight + 24;
         if (toolsView === "quickPanel")
             return quickView.implicitHeight + 36;
+        if (toolsView === "sysMonitor" || toolsView === "speedTest")
+            return monView.implicitHeight + 36;
         if (toolsView === "menu")
             return toolsMenuH;
         return pillH;
@@ -270,6 +275,10 @@ PanelWindow {
             AppState.openWidget("clipboard");
         else if (id === "quickPanel")
             AppState.openWidget("quickPanel");
+        else if (id === "sysMonitor")
+            AppState.openWidget("sysMonitor");
+        else if (id === "speedTest")
+            AppState.openWidget("speedTest");
     }
 
     function togglePower() {
@@ -316,6 +325,10 @@ PanelWindow {
             AppState.closeWidget("clipboard");
         else if (toolsView === "quickPanel")
             AppState.closeWidget("quickPanel");
+        else if (toolsView === "sysMonitor")
+            AppState.closeWidget("sysMonitor");
+        else if (toolsView === "speedTest")
+            AppState.closeWidget("speedTest");
         root.toolsView = "";
     }
 
@@ -323,12 +336,16 @@ PanelWindow {
         if (!isActive)
             return;
         const open = AppState.isWidgetOpen(id);
-        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard" || id === "quickPanel") {
+        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard" || id === "quickPanel" || id === "sysMonitor" || id === "speedTest") {
             const view = id === "powerMenu" ? "power" : id;
             if (open) {
                 toolsView = view;
                 mediaOpen = false;
                 ccOpen = false;
+                if (id === "sysMonitor")
+                    AppState.closeWidget("speedTest");
+                else if (id === "speedTest")
+                    AppState.closeWidget("sysMonitor");
             } else if (toolsView === view) {
                 toolsView = "";
             }
@@ -357,6 +374,14 @@ PanelWindow {
     }
 
     onToolsViewChanged: {
+        monView.active = toolsView === "sysMonitor" || toolsView === "speedTest";
+        if (toolsView === "sysMonitor") {
+            monView.openPage("overview");
+            Qt.callLater(() => monView.initialFocusItem.forceActiveFocus());
+        } else if (toolsView === "speedTest") {
+            monView.openPage("speed");
+            Qt.callLater(() => monView.initialFocusItem.forceActiveFocus());
+        }
         quickView.active = toolsView === "quickPanel";
         if (toolsView === "quickPanel") {
             quickView.reset();
@@ -881,11 +906,16 @@ PanelWindow {
                 onActivated: root.openTool("clipboard")
             }
 
-            ToolCard {
-                icon: "tune"
-                label: "Controls"
-                onActivated: root.openTool("quickPanel")
-            }
+        }
+
+        SystemMonitorContent {
+            id: monView
+
+            x: 24
+            y: 18
+            active: false
+            visible: root.toolsView === "sysMonitor" || root.toolsView === "speedTest"
+            onCloseRequested: root.closeTools()
         }
 
         ControlPanelContent {

@@ -7,6 +7,7 @@ import qs.Modules.LockScreen
 import qs.Modules.Pomodoro
 import qs.Modules.Settings
 import qs.Modules.ControlPanel
+import qs.Modules.SystemMonitor
 import qs.Modules.Dashboard
 import qs.Modules.WallpaperSelector
 
@@ -66,6 +67,28 @@ Item {
 
         sourceComponent: Component {
             ControlPanelWindow {
+            }
+
+        }
+
+    }
+
+    WidgetLoader {
+        widgetId: "sysMonitor"
+
+        sourceComponent: Component {
+            SystemMonitorWindow {
+            }
+
+        }
+
+    }
+
+    WidgetLoader {
+        widgetId: "speedTest"
+
+        sourceComponent: Component {
+            SpeedTestWindow {
             }
 
         }

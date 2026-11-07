@@ -140,6 +140,12 @@ hl.bind("CTRL + ALT + D", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_dashboard"))
 -- # Toggle Quick panel (Wi-Fi, brightness, volume)
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_quickPanel"))
+
+-- # Toggle System monitor (network, recent apps)
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_sysMonitor"))
+
+-- # Toggle Speed test
+hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_speedTest"))
 -- # Toggle GitHub widget
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_github"))
 -- # Toggle Control Center (Super)

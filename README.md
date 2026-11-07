@@ -261,6 +261,8 @@ Autostart skips anything that is not installed.
 | `Super+E` / `Super+B` | file manager / browser |
 | `Super+Shift+C` | colour picker |
 | `Super+Z` | quick panel: Wi-Fi, brightness, volume |
+| `Super+I` | system monitor: live network speed, recent apps |
+| `Super+Shift+I` | speed test (fast.com servers: ping, download, upload) |
 | `Super+Space` | switch keyboard layout |
 | `Super+R` | restart the shell |
 | `Super+Ctrl+T` | toggle touchpad |
@@ -434,6 +436,13 @@ with a password, disconnect or forget), Sound and Mic toggles; the brightness an
 Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
 centred popup.
 
+### 📊 System monitor and speed test
+
+`Super+I` opens a three-tab monitor: live download/upload with graphs plus average, peak and session totals and CPU/memory;
+the apps you used recently with how long each was in focus (remembered between sessions); and a speed test.
+`Super+Shift+I` jumps straight to the speed test, which uses the same fast.com servers as the `fast` CLI and reports ping,
+download and upload. It needs only `python3`.
+
 <a id="dashboard"></a>
 
 ## 📊 Dashboard
@@ -573,6 +582,7 @@ config/
       WallpaperSelector, PowerMenu, Notifications, Pomodoro, LockScreen, ...
       ControlPanel/         quick panel (Wi-Fi, brightness, volume)
       Osd/                  right-edge volume and brightness display
+      SystemMonitor/        network graphs, recent apps, speed test
       Settings/             the settings window and its pages
     Scripts/                theme, system and helper scripts
 bin/                        qs shim and minflair-session

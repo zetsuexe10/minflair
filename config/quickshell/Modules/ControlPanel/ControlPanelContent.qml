@@ -14,7 +14,7 @@ Item {
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
-    readonly property real pageHeight: page === "main" ? 236 : 430
+    readonly property real pageHeight: page === "main" ? 212 : 400
     property string passwordFor: ""
     readonly property color soft: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
     readonly property color softBorder: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.08)
@@ -59,7 +59,7 @@ Item {
         sink.audio.volume = Math.max(0, Math.min(1, v / 100));
     }
 
-    implicitWidth: 408
+    implicitWidth: 372
     implicitHeight: pageHeight
     onActiveChanged: syncWatch()
     onPageChanged: {
@@ -118,9 +118,9 @@ Item {
             spacing: 12
 
             PanelSlider {
-                Layout.preferredWidth: 60
+                Layout.preferredWidth: 48
                 Layout.fillHeight: true
-                icon: "sun"
+                icon: BrightnessService.percent <= 20 ? "moon" : "sun"
                 fillColor: Theme.accent
                 value: BrightnessService.percent
                 onMoved: (v) => BrightnessService.set(Math.max(1, v))
@@ -128,7 +128,7 @@ Item {
             }
 
             PanelSlider {
-                Layout.preferredWidth: 60
+                Layout.preferredWidth: 48
                 Layout.fillHeight: true
                 icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
                 muted: root.volumeMuted
@@ -150,7 +150,7 @@ Item {
                     id: wifiTile
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 112
+                    Layout.preferredHeight: 98
                     radius: 26
                     color: wifi.radio ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
                     border.width: 1
