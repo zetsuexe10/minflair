@@ -242,6 +242,13 @@ AppWindow {
                     { "kind": "info", "label": "Super + Z", "desc": "", "text": "Quick panel: Wi-Fi, brightness, volume" },
                     { "kind": "info", "label": "Super + I", "desc": "", "text": "System monitor: network, recent apps, speed test" },
                     { "kind": "info", "label": "Super + T", "desc": "", "text": "Speed test" },
+                    { "kind": "info", "label": "Ctrl + Alt + I", "desc": "", "text": "System monitor (same as Super + I)" },
+                    { "kind": "info", "label": "Ctrl + Alt + C", "desc": "", "text": "Calendar" },
+                    { "kind": "info", "label": "Ctrl + Alt + N", "desc": "", "text": "Notification center" },
+                    { "kind": "info", "label": "Print", "desc": "", "text": "Screenshot of the whole screen" },
+                    { "kind": "info", "label": "Shift + Print", "desc": "", "text": "Screenshot of a selected area" },
+                    { "kind": "info", "label": "Ctrl + Print", "desc": "", "text": "Screenshot of the active window" },
+                    { "kind": "info", "label": "Super + Print", "desc": "", "text": "Copy text from a selected area (OCR)" },
                     { "kind": "info", "label": "Super + X", "desc": "", "text": "Power menu (Dynamic bar)" },
                     { "kind": "info", "label": "Super + V", "desc": "", "text": "Clipboard history (opens in the Dynamic island)" },
                     { "kind": "info", "label": "Ctrl + Alt + W", "desc": "", "text": "Wallpaper selector" }

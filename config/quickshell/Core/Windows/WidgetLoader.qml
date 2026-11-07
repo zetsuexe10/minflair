@@ -17,7 +17,7 @@ Item {
     readonly property bool isConvexHandled: !DisplayProfileService.gameModeActive && SettingsService.barConvexMode && isBarOverlayHandled
     readonly property bool isSideHandled: !DisplayProfileService.gameModeActive && SettingsService.sideFamily && isBarOverlayHandled
     readonly property bool isGamingHandled: DisplayProfileService.gameModeActive && isBarOverlayHandled
-    readonly property bool isDynamicHandled: !DisplayProfileService.gameModeActive && SettingsService.barStyle === "dynamic" && (widgetId === "wallpaper" || widgetId === "screenshot" || widgetId === "powerMenu" || widgetId === "music" || widgetId === "controlCenter" || widgetId === "launcher" || widgetId === "dashboard" || widgetId === "github" || widgetId === "clipboard" || widgetId === "quickPanel" || widgetId === "sysMonitor" || widgetId === "speedTest")
+    readonly property bool isDynamicHandled: !DisplayProfileService.gameModeActive && SettingsService.barStyle === "dynamic" && (widgetId === "wallpaper" || widgetId === "screenshot" || widgetId === "powerMenu" || widgetId === "music" || widgetId === "controlCenter" || widgetId === "launcher" || widgetId === "dashboard" || widgetId === "github" || widgetId === "clipboard" || widgetId === "quickPanel" || widgetId === "sysMonitor" || widgetId === "speedTest" || widgetId === "calendar" || widgetId === "notificationsCenter")
     readonly property bool shouldLoadWindow: enabled && !isIslandHandled && !isConvexHandled && !isSideHandled && !isGamingHandled && !isDynamicHandled
     readonly property bool _isActive: shouldLoadWindow && (exclusive ? AppState.isWidgetOpen(widgetId) : _isInternalActive)
     property bool _isClosing: false

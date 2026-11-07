@@ -10,6 +10,8 @@ import qs.Core.Services
 import qs.Modules.Bar.Styles.Side
 import qs.Modules.ControlPanel
 import qs.Modules.SystemMonitor
+import qs.Modules.Calendar
+import qs.Modules.NotificationCenter
 import qs.Modules.Clipboard
 import qs.Modules.ControlCenter
 import qs.Modules.Dashboard
@@ -95,7 +97,7 @@ PanelWindow {
     readonly property int cornerPad: 12
 
     readonly property bool toolsOpen: toolsView !== ""
-    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard" || toolsView === "quickPanel" || toolsView === "sysMonitor" || toolsView === "speedTest"
+    readonly property bool toolFocus: toolsView === "wallpaper" || toolsView === "screenshot" || toolsView === "power" || toolsView === "launcher" || toolsView === "dashboard" || toolsView === "github" || toolsView === "clipboard" || toolsView === "quickPanel" || toolsView === "sysMonitor" || toolsView === "speedTest" || toolsView === "calendar" || toolsView === "notificationsCenter"
     readonly property bool orbsVisible: shown && !toolFocus
     readonly property bool musicButtonVisible: orbsVisible && showMusicButton
     readonly property bool workspacesVisible: shown && showWorkspaces
@@ -184,6 +186,10 @@ PanelWindow {
             return Math.min(width - 32, quickView.implicitWidth + 48);
         if (toolsView === "sysMonitor" || toolsView === "speedTest")
             return Math.min(width - 32, monView.implicitWidth + 48);
+        if (toolsView === "calendar")
+            return Math.min(width - 32, calView.implicitWidth + 48);
+        if (toolsView === "notificationsCenter")
+            return Math.min(width - 32, notifHub.implicitWidth + 48);
         if (toolsView === "menu")
             return Math.min(width - 120, toolsMenuW);
         return Math.min(width - 120, glanceActive ? glanceWidth : pageWidth);
@@ -211,6 +217,10 @@ PanelWindow {
             return quickView.implicitHeight + 36;
         if (toolsView === "sysMonitor" || toolsView === "speedTest")
             return monView.implicitHeight + 36;
+        if (toolsView === "calendar")
+            return calView.implicitHeight + 36;
+        if (toolsView === "notificationsCenter")
+            return notifHub.implicitHeight + 36;
         if (toolsView === "menu")
             return toolsMenuH;
         return pillH;
@@ -279,6 +289,10 @@ PanelWindow {
             AppState.openWidget("sysMonitor");
         else if (id === "speedTest")
             AppState.openWidget("speedTest");
+        else if (id === "calendar")
+            AppState.openWidget("calendar");
+        else if (id === "notificationsCenter")
+            AppState.openWidget("notificationsCenter");
     }
 
     function togglePower() {
@@ -329,6 +343,10 @@ PanelWindow {
             AppState.closeWidget("sysMonitor");
         else if (toolsView === "speedTest")
             AppState.closeWidget("speedTest");
+        else if (toolsView === "calendar")
+            AppState.closeWidget("calendar");
+        else if (toolsView === "notificationsCenter")
+            AppState.closeWidget("notificationsCenter");
         root.toolsView = "";
     }
 
@@ -336,7 +354,7 @@ PanelWindow {
         if (!isActive)
             return;
         const open = AppState.isWidgetOpen(id);
-        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard" || id === "quickPanel" || id === "sysMonitor" || id === "speedTest") {
+        if (id === "wallpaper" || id === "screenshot" || id === "powerMenu" || id === "launcher" || id === "dashboard" || id === "github" || id === "clipboard" || id === "quickPanel" || id === "sysMonitor" || id === "speedTest" || id === "calendar" || id === "notificationsCenter") {
             const view = id === "powerMenu" ? "power" : id;
             if (open) {
                 toolsView = view;
@@ -374,6 +392,12 @@ PanelWindow {
     }
 
     onToolsViewChanged: {
+        if (toolsView === "calendar") {
+            calView.goToToday();
+            Qt.callLater(() => calView.forceActiveFocus());
+        } else if (toolsView === "notificationsCenter") {
+            Qt.callLater(() => notifHub.forceActiveFocus());
+        }
         monView.active = toolsView === "sysMonitor" || toolsView === "speedTest";
         if (toolsView === "sysMonitor") {
             monView.openPage("overview");
@@ -906,6 +930,29 @@ PanelWindow {
                 onActivated: root.openTool("clipboard")
             }
 
+        }
+
+        CalendarWidget {
+            id: calView
+
+            x: 24
+            y: 18
+            focus: true
+            visible: root.toolsView === "calendar"
+            Keys.onEscapePressed: root.closeTools()
+        }
+
+        NotificationCenter {
+            id: notifHub
+
+            x: 24
+            y: 18
+            width: implicitWidth
+            height: implicitHeight
+            notificationService: NotificationService
+            controlCenterOpen: true
+            visible: root.toolsView === "notificationsCenter"
+            Keys.onEscapePressed: root.closeTools()
         }
 
         SystemMonitorContent {

@@ -262,6 +262,11 @@ Autostart skips anything that is not installed.
 | `Super+Shift+C` | colour picker |
 | `Super+Z` | quick panel: Wi-Fi, brightness, volume |
 | `Super+I` | system monitor: live network speed, recent apps |
+| `Ctrl+Alt+I` | system monitor (alias of `Super+I`) |
+| `Ctrl+Alt+C` | calendar, grows out of the Dynamic island |
+| `Ctrl+Alt+N` | notification center with grouped, expandable notifications |
+| `Print` / `Shift+Print` / `Ctrl+Print` | instant screenshot: screen / selected area / active window (nothing is closed) |
+| `Super+Print` | copy text from a selected area (OCR) |
 | `Super+T` | speed test (fast.com servers: ping, download, upload) |
 | `Super+Space` | switch keyboard layout |
 | `Super+R` | restart the shell |

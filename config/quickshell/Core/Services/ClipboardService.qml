@@ -196,7 +196,7 @@ Item {
     Process {
         id: watcherProc
 
-        command: ["sh", "-c", "command -v wl-paste >/dev/null 2>&1 && command -v cliphist >/dev/null 2>&1 || exit 0; pgrep -f 'wl-paste --type text --watch' >/dev/null || setsid wl-paste --type text --watch cliphist store >/dev/null 2>&1 & pgrep -f 'wl-paste --type image --watch' >/dev/null || setsid wl-paste --type image --watch cliphist store >/dev/null 2>&1 &; exit 0"]
+        command: ["sh", "-c", "command -v wl-paste >/dev/null 2>&1 && command -v cliphist >/dev/null 2>&1 || exit 0; pgrep -f 'wl-paste --type text --watch' >/dev/null || setsid wl-paste --type text --watch cliphist store >/dev/null 2>&1 & pgrep -f 'wl-paste --type image --watch' >/dev/null || setsid wl-paste --type image --watch cliphist store >/dev/null 2>&1 & exit 0"]
     }
 
     Component.onCompleted: watcherProc.running = true
