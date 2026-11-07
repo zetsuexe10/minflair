@@ -9,6 +9,26 @@ ShellRoot {
 
     property string pendingPassword: ""
     property var sessionArgv: []
+    property bool listed: false
+    property bool launchQueued: false
+    property var queuedArgv: null
+
+    function remember() {
+        if (ui.currentUser === "" || ui.currentSession === "")
+            return;
+        saver.args = [ui.currentUser, ui.currentSession];
+        saver.running = false;
+        saver.running = true;
+    }
+
+    function finishLaunch() {
+        if (!shell.launchQueued)
+            return;
+        shell.launchQueued = false;
+        launchTimer.stop();
+        console.log("launching session:", JSON.stringify(shell.queuedArgv));
+        Greetd.launch(shell.queuedArgv, [], true);
+    }
 
     Process {
         id: lister
@@ -22,6 +42,7 @@ ShellRoot {
                     ui.users = d.users;
                     ui.sessions = d.sessions.map(s => s.name);
                     ui.sessionIndex = d.default;
+                    Qt.callLater(() => { shell.listed = true; });
                 } catch (e) {
                     console.warn("sessions.py output unreadable:", e);
                 }
@@ -38,6 +59,26 @@ ShellRoot {
         id: saver
         property var args: []
         command: ["python3", Quickshell.shellPath("sessions.py"), "--save"].concat(args)
+        onExited: shell.finishLaunch()
+    }
+
+    Timer {
+        id: launchTimer
+
+        interval: 1500
+        onTriggered: shell.finishLaunch()
+    }
+
+    Connections {
+        target: ui
+        function onCurrentSessionChanged() {
+            if (shell.listed)
+                shell.remember();
+        }
+        function onCurrentUserChanged() {
+            if (shell.listed)
+                shell.remember();
+        }
     }
 
     Connections {
@@ -51,12 +92,12 @@ ShellRoot {
         }
         function onReadyToLaunch() {
             shell.pendingPassword = "";
-            saver.args = [ui.currentUser, ui.currentSession];
-            saver.running = true;
             const argv = shell.sessionArgv[ui.sessionIndex];
-            console.log("launching session:", JSON.stringify(argv));
             if (!argv) { ui.fail("No session selected"); return; }
-            Greetd.launch(argv, [], true);
+            shell.queuedArgv = argv;
+            shell.launchQueued = true;
+            launchTimer.start();
+            shell.remember();
         }
     }
 

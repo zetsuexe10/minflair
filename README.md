@@ -432,7 +432,7 @@ from scripts with `qs ipc call osd showVolume` or `showBrightness`.
 ### 🎛️ Quick panel
 
 `Super+Z` opens an iPhone-style control panel: a Wi-Fi tile (toggle the radio, open the network list to scan, connect
-with a password, disconnect or forget), Sound and Mic toggles, quick switches for Do Not Disturb, Night Light and Caffeine; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the
+with a password, disconnect or forget), a Bluetooth tile beside Wi-Fi, Sound and Mic toggles; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the
 Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
 centred popup.
 
@@ -633,6 +633,10 @@ greeter on greetd inside cage: user, password and a session picker with readable
 --revert` restores the original greeter. Log: `/var/tmp/minflair-greeter/greeter.log`. Layout and icons are adapted
 from the Archcraft SDDM theme (GPLv3, see `greeter/assets/NOTICE`). On other display managers (SDDM, GDM, ly) the
 **Minflair** session entry is enough.
+
+The greeter remembers the last user and session you logged in with, and its clock follows Settings > Clock > 24-hour time
+(the shell writes the choice to `/var/tmp/minflair-greeter/clock.qml`). To reinstall the greeter after updating, run
+`sudo tools/install-greeter.sh` again so the new greeter files are copied.
 
 <a id="troubleshooting"></a>
 

@@ -256,9 +256,21 @@ Item {
             saveSettings();
 
     }
+    function syncGreeterClock() {
+        greeterClockProc.command = ["sh", "-c", "d=/var/tmp/minflair-greeter; [ -d \"$d\" ] || exit 0; printf 'import QtQuick\\nQtObject { property bool hour24: %s }\\n' \"$1\" > \"$d/clock.qml\" 2>/dev/null && chmod 666 \"$d/clock.qml\" 2>/dev/null; exit 0", "sh", settingsService.clock24h ? "true" : "false"];
+        greeterClockProc.running = false;
+        greeterClockProc.running = true;
+    }
+
+    Process {
+        id: greeterClockProc
+    }
+
     onClock24hChanged: {
-        if (settingsLoaded)
+        if (settingsLoaded) {
             saveSettings();
+            syncGreeterClock();
+        }
 
     }
     onClockSecondsChanged: {
@@ -674,6 +686,7 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
                 settingsService.applyFont(settingsService.fontFamily, Math.round(11 * settingsService.fontScale));
             }
             settingsService.settingsLoaded = true;
+            settingsService.syncGreeterClock();
             settingsService.syncLauncherBrowser();
             HyprlandService.triggerStartupTimer();
         }

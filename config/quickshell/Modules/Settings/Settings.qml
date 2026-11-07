@@ -38,7 +38,7 @@ AppWindow {
     readonly property var islandRightOptions: [{ "text": "Auto", "value": "auto" }, { "text": "Music", "value": "music" }, { "text": "Control centre", "value": "control_center" }]
 
     readonly property var clockRows: [
-        { "kind": "toggle", "label": "24-hour time", "desc": "Use 24-hour time instead of AM/PM", "prop": "clock24h" },
+        { "kind": "toggle", "label": "24-hour time", "desc": "Use 24-hour time instead of AM/PM, also on the login screen", "prop": "clock24h" },
         { "kind": "toggle", "label": "Show seconds", "desc": "Display seconds on the clock", "prop": "clockSeconds" },
         { "kind": "toggle", "label": "Show date", "desc": "Display the date next to the time", "prop": "clockShowDate" }
     ]

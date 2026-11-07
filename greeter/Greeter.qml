@@ -16,6 +16,9 @@ Rectangle {
     readonly property string stateDir: "file:///var/tmp/minflair-greeter/"
 
     Loader { id: palLoader; source: root.stateDir + "colors.qml" }
+    Loader { id: clockLoader; source: root.stateDir + "clock.qml" }
+    readonly property bool hour24: clockLoader.status === Loader.Ready && clockLoader.item !== null ? clockLoader.item.hour24 : true
+    readonly property string timeFormat: hour24 ? "HH:mm" : "h:mm AP"
     QtObject {
         id: pal
         readonly property bool ok: palLoader.status === Loader.Ready && palLoader.item !== null
@@ -110,7 +113,7 @@ Rectangle {
             font.family: pal.font
             font.pixelSize: 120 * root.u
             font.weight: Font.DemiBold
-            text: Qt.formatTime(new Date(), "HH:mm")
+            text: Qt.formatTime(new Date(), root.timeFormat)
         }
         Text {
             id: date
@@ -124,7 +127,7 @@ Rectangle {
         Timer {
             interval: 1000; running: true; repeat: true
             onTriggered: {
-                clock.text = Qt.formatTime(new Date(), "HH:mm");
+                clock.text = Qt.formatTime(new Date(), root.timeFormat);
                 date.text = Qt.formatDate(new Date(), "dddd, MMMM d");
             }
         }

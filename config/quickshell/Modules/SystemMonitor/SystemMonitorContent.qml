@@ -89,10 +89,27 @@ Item {
         radius: 21
         color: root.soft
 
+        Rectangle {
+            id: tabIndicator
+
+            readonly property real cell: (tabBar.width - 8) / 3
+
+            x: 4 + Math.max(0, root.pages.indexOf(root.page)) * cell
+            y: 4
+            width: cell
+            height: tabBar.height - 8
+            radius: height / 2
+            color: Theme.accent
+
+            Behavior on x {
+                NumberAnimation { duration: 260; easing.type: Easing.OutBack; easing.overshoot: 0.8 }
+            }
+        }
+
         Row {
             anchors.fill: parent
             anchors.margins: 4
-            spacing: 4
+            spacing: 0
 
             Repeater {
                 model: [
@@ -104,14 +121,10 @@ Item {
                 delegate: Rectangle {
                     required property var modelData
 
-                    width: (tabBar.width - 8 - 8) / 3
+                    width: (tabBar.width - 8) / 3
                     height: parent.height
                     radius: height / 2
-                    color: root.page === modelData.id ? Theme.accent : "transparent"
-
-                    Behavior on color {
-                        ColorAnimation { duration: Constants.animFast }
-                    }
+                    color: "transparent"
 
                     Text {
                         anchors.centerIn: parent
@@ -119,6 +132,10 @@ Item {
                         font.pixelSize: 13
                         font.bold: true
                         color: root.page === modelData.id ? Theme.opaqueBg : Theme.muted
+
+                        Behavior on color {
+                            ColorAnimation { duration: 180 }
+                        }
                     }
 
                     MouseArea {
