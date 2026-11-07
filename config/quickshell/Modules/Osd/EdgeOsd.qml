@@ -15,6 +15,7 @@ PanelWindow {
     readonly property bool hovered: panelHover.hovered || stripHover.hovered || volSlider.pressed || briSlider.pressed || micSlider.pressed
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
+    readonly property string volumeIcon: (volumeMuted || volume === 0) ? "volume-off" : (volume < 34 ? "volume-1" : (volume < 67 ? "volume-2" : "volume"))
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
     readonly property real railInset: (SettingsService.sideFamily && SettingsService.sideBarPosition === "right") ? SideState.inset("right") : 14
 
@@ -139,7 +140,7 @@ PanelWindow {
 
                 width: 34
                 height: 176
-                icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
+                icon: root.volumeIcon
                 muted: root.volumeMuted
                 fillColor: Theme.accent
                 value: root.volume
@@ -156,7 +157,7 @@ PanelWindow {
 
                 width: 34
                 height: 176
-                icon: BrightnessService.percent <= 20 ? "moon" : "sun"
+                icon: BrightnessService.icon
                 fillColor: Theme.accent
                 value: BrightnessService.percent
                 onMoved: (v) => {

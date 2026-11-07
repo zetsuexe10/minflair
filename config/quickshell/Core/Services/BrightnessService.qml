@@ -6,6 +6,7 @@ Item {
     id: root
 
     property int percent: 0
+    readonly property string icon: "brightness-" + (Math.round(Math.max(0, Math.min(100, percent)) / 100 * 6) + 1)
     property bool available: false
     property int watchers: 0
     property int _pending: -1

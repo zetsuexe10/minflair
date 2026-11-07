@@ -13,6 +13,7 @@ Item {
     property bool active: true
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
+    readonly property string volumeIcon: (volumeMuted || volume === 0) ? "volume-off" : (volume < 34 ? "volume-1" : (volume < 67 ? "volume-2" : "volume"))
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
     readonly property real pageHeight: page === "main" ? 212 : 400
     property string passwordFor: ""
@@ -120,7 +121,7 @@ Item {
             PanelSlider {
                 Layout.preferredWidth: 48
                 Layout.fillHeight: true
-                icon: BrightnessService.percent <= 20 ? "moon" : "sun"
+                icon: BrightnessService.icon
                 fillColor: Theme.accent
                 value: BrightnessService.percent
                 onMoved: (v) => BrightnessService.set(Math.max(1, v))
@@ -130,7 +131,7 @@ Item {
             PanelSlider {
                 Layout.preferredWidth: 48
                 Layout.fillHeight: true
-                icon: root.volumeMuted || root.volume === 0 ? "volume-off" : "volume"
+                icon: root.volumeIcon
                 muted: root.volumeMuted
                 fillColor: Theme.accent
                 value: root.volume

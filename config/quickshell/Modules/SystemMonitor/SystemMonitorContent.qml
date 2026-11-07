@@ -407,9 +407,43 @@ Item {
                     floorMax: 20
                 }
 
+                Rectangle {
+                    id: goButton
+
+                    anchors.centerIn: parent
+                    width: 92
+                    height: 92
+                    radius: 46
+                    visible: speedTest.state === "idle" && speedTest.lastDown < 0
+                    color: goArea.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
+                    scale: goArea.pressed ? 0.95 : 1
+
+                    Behavior on scale {
+                        NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "GO"
+                        font.pixelSize: 26
+                        font.bold: true
+                        color: Theme.opaqueBg
+                    }
+
+                    MouseArea {
+                        id: goArea
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: speedTest.start()
+                    }
+                }
+
                 Column {
                     anchors.centerIn: parent
                     spacing: 0
+                    visible: !goButton.visible
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -506,6 +540,7 @@ Item {
                 anchors.bottom: parent.bottom
                 height: 44
                 radius: 22
+                visible: !goButton.visible
                 color: speedTest.running ? root.soft : Theme.accent
 
                 Behavior on color {
