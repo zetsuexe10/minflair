@@ -449,10 +449,17 @@ require("keybinds")
 
 Check for config errors with `hyprctl configerrors`, and run `qs` from a terminal to see shell errors.
 
+### 🫧 Workspace animation
+
+Settings > Workspaces > Workspace animation picks the style on every bar. **Caelestia** glides a capsule behind the
+focused workspace with a stretchy trail (the leading edge moves first, the trailing edge follows 1.5x slower) and morphs
+the focused dot into a new shape each time. **Classic** is the plain slide. Wi-Fi icons on the bars step through four
+levels from the real signal strength and update every few seconds.
+
 ### 📊 System monitor and speed test
 
 `Super+I` opens a three-tab monitor: live download/upload with graphs plus average, peak and session totals and CPU/memory;
-the apps you used recently with how long each was in focus (remembered between sessions); and a speed test.
+the apps you used recently with how long each was in focus (remembered between sessions); and a speed test with a step indicator (ping, download, upload) and a history of your last tests.
 `Super+T` jumps straight to the speed test, which uses the same fast.com servers as the `fast` CLI and reports ping,
 download and upload. It needs only `python3`.
 

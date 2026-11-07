@@ -393,6 +393,9 @@ Item {
         Item {
             id: speedPage
 
+            readonly property bool hasHistory: speedTest.history.length > 0
+            readonly property bool showResult: speedTest.state === "done" || (speedTest.state === "idle" && hasHistory) || (speedTest.state === "error" && hasHistory)
+
             anchors.fill: parent
             opacity: root.page === "speed" ? 1 : 0
             visible: opacity > 0
@@ -401,39 +404,380 @@ Item {
                 NumberAnimation { duration: Constants.animFast }
             }
 
-            Rectangle {
-                id: gauge
+            Item {
+                id: runView
 
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                height: 136
-                radius: 24
-                color: root.soft
-                border.width: 1
-                border.color: root.softBorder
-                clip: true
+                anchors.fill: parent
+                opacity: speedPage.showResult ? 0 : 1
+                visible: opacity > 0
 
-                Sparkline {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 54
-                    values: speedTest.liveHistory
-                    lineColor: speedTest.state === "upload" ? Theme.accentComplementary : Theme.accent
-                    floorMax: 20
+                Behavior on opacity {
+                    NumberAnimation { duration: 200 }
                 }
 
                 Rectangle {
-                    id: goButton
+                    id: gauge
 
-                    anchors.centerIn: parent
-                    width: 92
-                    height: 92
-                    radius: 46
-                    visible: speedTest.state === "idle" && speedTest.lastDown < 0
-                    color: goArea.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
-                    scale: goArea.pressed ? 0.95 : 1
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: 150
+                    radius: 24
+                    color: root.soft
+                    border.width: 1
+                    border.color: root.softBorder
+                    clip: true
+
+                    Sparkline {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: 56
+                        visible: speedTest.running
+                        values: speedTest.liveHistory
+                        lineColor: speedTest.state === "upload" ? Theme.accentComplementary : Theme.accent
+                        floorMax: 20
+                    }
+
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 14
+                        spacing: 8
+                        visible: speedTest.running
+
+                        Repeater {
+                            model: [
+                                { "id": "latency", "label": "Ping" },
+                                { "id": "download", "label": "Download" },
+                                { "id": "upload", "label": "Upload" }
+                            ]
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                readonly property bool on: speedTest.state === modelData.id || (modelData.id === "latency" && speedTest.state === "starting")
+
+                                width: stepLabel.implicitWidth + 20
+                                height: 22
+                                radius: 11
+                                color: on ? Theme.accent : "transparent"
+                                border.width: on ? 0 : 1
+                                border.color: root.softBorder
+
+                                Behavior on color {
+                                    ColorAnimation { duration: 200 }
+                                }
+
+                                Text {
+                                    id: stepLabel
+
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    font.pixelSize: 11
+                                    font.bold: true
+                                    color: parent.on ? Theme.opaqueBg : Theme.muted
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        id: goButton
+
+                        anchors.centerIn: parent
+                        width: 92
+                        height: 92
+                        radius: 46
+                        visible: speedTest.state === "idle" || speedTest.state === "error"
+                        color: goArea.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
+                        scale: goArea.pressed ? 0.95 : 1
+
+                        Behavior on scale {
+                            NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: speedTest.state === "error" ? "Retry" : "GO"
+                            font.pixelSize: speedTest.state === "error" ? 18 : 26
+                            font.bold: true
+                            color: Theme.opaqueBg
+                        }
+
+                        MouseArea {
+                            id: goArea
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: speedTest.start()
+                        }
+                    }
+
+                    Column {
+                        anchors.centerIn: parent
+                        anchors.verticalCenterOffset: 6
+                        spacing: 0
+                        visible: speedTest.running
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: speedTest.state === "starting" || speedTest.state === "latency" ? "-" : root.fmtMbps(speedTest.liveMbps)
+                            font.pixelSize: 46
+                            font.bold: true
+                            color: Theme.fg
+                        }
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: speedTest.state === "starting" ? "Finding a server" : (speedTest.state === "latency" ? "Measuring latency" : "Mbps")
+                            font.pixelSize: 12
+                            color: Theme.muted
+                        }
+                    }
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 12
+                        width: parent.width - 32
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        visible: speedTest.state === "error"
+                        text: speedTest.message
+                        font.pixelSize: 11
+                        color: Theme.accentComplementary
+                    }
+
+                    Rectangle {
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        width: parent.width * speedTest.progress
+                        height: 3
+                        color: Theme.accent
+                        visible: speedTest.running
+
+                        Behavior on width {
+                            NumberAnimation { duration: 200 }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: gauge.bottom
+                    anchors.topMargin: 10
+                    height: 52
+                    spacing: 10
+
+                    Repeater {
+                        model: [
+                            { "label": "Ping", "value": speedTest.pingMs >= 0 ? Math.round(speedTest.pingMs) + " ms" : "-" },
+                            { "label": "Download", "value": speedTest.downMbps > 0 ? root.fmtMbps(speedTest.downMbps) + " Mbps" : "-" },
+                            { "label": "Upload", "value": speedTest.upMbps > 0 ? root.fmtMbps(speedTest.upMbps) + " Mbps" : "-" }
+                        ]
+
+                        delegate: Rectangle {
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            radius: 18
+                            color: root.soft
+                            border.width: 1
+                            border.color: root.softBorder
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 2
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.value
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                    color: Theme.fg
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.label
+                                    font.pixelSize: 10
+                                    color: Theme.muted
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 40
+                    radius: 20
+                    visible: speedTest.running
+                    color: root.soft
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Stop"
+                        font.pixelSize: 14
+                        font.bold: true
+                        color: Theme.fg
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: speedTest.stop()
+                    }
+                }
+            }
+
+            Item {
+                id: resultView
+
+                anchors.fill: parent
+                opacity: speedPage.showResult ? 1 : 0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation { duration: 200 }
+                }
+
+                RowLayout {
+                    id: resultRow
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: 84
+                    spacing: 10
+
+                    Repeater {
+                        model: [
+                            { "label": "Download", "value": speedTest.history.length > 0 ? root.fmtMbps(speedTest.history[0].down) : "-", "unit": "Mbps", "main": true },
+                            { "label": "Upload", "value": speedTest.history.length > 0 && speedTest.history[0].up > 0 ? root.fmtMbps(speedTest.history[0].up) : "-", "unit": "Mbps", "main": false },
+                            { "label": "Ping", "value": speedTest.history.length > 0 ? Math.round(speedTest.history[0].ping).toString() : "-", "unit": "ms", "main": false }
+                        ]
+
+                        delegate: Rectangle {
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            radius: 22
+                            color: modelData.main ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
+                            border.width: 1
+                            border.color: modelData.main ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.45) : root.softBorder
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 1
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.label
+                                    font.pixelSize: 11
+                                    font.bold: true
+                                    color: Theme.muted
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.value
+                                    font.pixelSize: modelData.main ? 26 : 22
+                                    font.bold: true
+                                    color: Theme.fg
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: modelData.unit
+                                    font.pixelSize: 10
+                                    color: Theme.muted
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    id: historyTitle
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: 6
+                    anchors.top: resultRow.bottom
+                    anchors.topMargin: 10
+                    text: "Recent tests"
+                    font.pixelSize: 11
+                    font.bold: true
+                    color: Theme.muted
+                }
+
+                ListView {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: historyTitle.bottom
+                    anchors.topMargin: 6
+                    anchors.bottom: againButton.top
+                    anchors.bottomMargin: 10
+                    clip: true
+                    spacing: 5
+                    model: speedTest.history.slice(1)
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: ListView.view.width
+                        height: 30
+                        radius: 15
+                        color: root.soft
+
+                        Text {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: Qt.formatDateTime(new Date(modelData.t), "ddd h:mm AP")
+                            font.pixelSize: 11
+                            color: Theme.muted
+                        }
+
+                        Text {
+                            anchors.right: parent.right
+                            anchors.rightMargin: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.fmtMbps(modelData.down) + " down  ·  " + (modelData.up > 0 ? root.fmtMbps(modelData.up) : "-") + " up  ·  " + Math.round(modelData.ping) + " ms"
+                            font.pixelSize: 11
+                            font.bold: true
+                            color: Theme.fg
+                        }
+                    }
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: 8
+                    visible: speedTest.history.length <= 1
+                    text: "Your earlier tests will show up here"
+                    font.pixelSize: 11
+                    color: Theme.muted
+                }
+
+                Rectangle {
+                    id: againButton
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 40
+                    radius: 20
+                    color: Theme.accent
+                    scale: againArea.pressed ? 0.98 : 1
 
                     Behavior on scale {
                         NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
@@ -441,141 +785,19 @@ Item {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "GO"
-                        font.pixelSize: 26
+                        text: "Test again"
+                        font.pixelSize: 14
                         font.bold: true
                         color: Theme.opaqueBg
                     }
 
                     MouseArea {
-                        id: goArea
+                        id: againArea
 
                         anchors.fill: parent
-                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: speedTest.start()
                     }
-                }
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 0
-                    visible: !goButton.visible
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: speedTest.running ? root.fmtMbps(speedTest.liveMbps) : (speedTest.state === "done" ? root.fmtMbps(speedTest.downMbps) : (speedTest.lastDown >= 0 ? root.fmtMbps(speedTest.lastDown) : "0"))
-                        font.pixelSize: 46
-                        font.bold: true
-                        color: Theme.fg
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: {
-                            if (speedTest.state === "starting")
-                                return "Finding a server";
-                            if (speedTest.state === "latency")
-                                return "Measuring latency";
-                            if (speedTest.state === "download")
-                                return "Mbps · downloading";
-                            if (speedTest.state === "upload")
-                                return "Mbps · uploading";
-                            if (speedTest.state === "error")
-                                return speedTest.message;
-                            return speedTest.lastAt !== "" ? "Mbps · last test " + speedTest.lastAt : "Mbps";
-                        }
-                        width: gauge.width - 32
-                        horizontalAlignment: Text.AlignHCenter
-                        elide: Text.ElideRight
-                        font.pixelSize: 12
-                        color: speedTest.state === "error" ? Theme.accentComplementary : Theme.muted
-                    }
-                }
-
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    width: parent.width * speedTest.progress
-                    height: 3
-                    color: Theme.accent
-                    visible: speedTest.running
-                }
-            }
-
-            RowLayout {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: gauge.bottom
-                anchors.topMargin: 10
-                height: 58
-                spacing: 10
-
-                Repeater {
-                    model: [
-                        { "label": "Ping", "value": speedTest.pingMs >= 0 ? Math.round(speedTest.pingMs) + " ms" : (speedTest.lastPing >= 0 ? Math.round(speedTest.lastPing) + " ms" : "-") },
-                        { "label": "Download", "value": speedTest.state === "done" || speedTest.running ? root.fmtMbps(speedTest.downMbps) + " Mbps" : (speedTest.lastDown >= 0 ? root.fmtMbps(speedTest.lastDown) + " Mbps" : "-") },
-                        { "label": "Upload", "value": speedTest.state === "done" || speedTest.running ? (speedTest.upMbps > 0 ? root.fmtMbps(speedTest.upMbps) + " Mbps" : "-") : (speedTest.lastUp >= 0 ? root.fmtMbps(speedTest.lastUp) + " Mbps" : "-") }
-                    ]
-
-                    delegate: Rectangle {
-                        required property var modelData
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        radius: 18
-                        color: root.soft
-                        border.width: 1
-                        border.color: root.softBorder
-
-                        Column {
-                            anchors.centerIn: parent
-                            spacing: 2
-
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: modelData.value
-                                font.pixelSize: 14
-                                font.bold: true
-                                color: Theme.fg
-                            }
-
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: modelData.label
-                                font.pixelSize: 10
-                                color: Theme.muted
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: 44
-                radius: 22
-                visible: !goButton.visible
-                color: speedTest.running ? root.soft : Theme.accent
-
-                Behavior on color {
-                    ColorAnimation { duration: Constants.animFast }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: speedTest.running ? "Stop" : (speedTest.state === "done" || speedTest.state === "error" ? "Test again" : "Start test")
-                    font.pixelSize: 14
-                    font.bold: true
-                    color: speedTest.running ? Theme.fg : Theme.opaqueBg
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: speedTest.running ? speedTest.stop() : speedTest.start()
                 }
             }
         }

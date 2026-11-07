@@ -17,6 +17,12 @@ Item {
     property int dotSpacing: compact ? 5 : 6
     readonly property int dotHeight: compact ? 6 : 8
     readonly property int activePillWidth: compact ? 18 : 24
+    readonly property bool caelestia: SettingsService.workspaceAnim !== "classic"
+    readonly property int cell: compact ? 16 : 20
+    readonly property var spatial: [0.38, 1.21, 0.22, 1.0, 1.0, 1.0]
+    readonly property int leadMs: 340
+    readonly property int trailMs: Math.round(leadMs * 1.5)
+    readonly property var shapes: [{ "r": 0.5, "rot": 0, "sx": 1, "sy": 1 }, { "r": 0.3, "rot": 0, "sx": 1, "sy": 1 }, { "r": 0, "rot": 45, "sx": 0.9, "sy": 0.9 }, { "r": 0.5, "rot": 0, "sx": 1.7, "sy": 0.85 }, { "r": 0.25, "rot": 25, "sx": 1, "sy": 1 }, { "r": 0.5, "rot": 90, "sx": 0.75, "sy": 1.5 }, { "r": 0.18, "rot": 45, "sx": 1.1, "sy": 1.1 }]
     readonly property int activeWsId: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
     readonly property int maxOccupiedWsId: {
         let maxId = 1;
@@ -66,6 +72,21 @@ Item {
     Layout.preferredHeight: customHeight
     Layout.preferredWidth: implicitWidth
     Layout.alignment: Qt.AlignVCenter
+    readonly property real tA: (activeWsId - 1) * cell
+    readonly property real tB: tA + cell
+    property real edgeA: tA
+    property real edgeB: tB
+
+    Behavior on edgeA {
+        enabled: root.caelestia
+        NumberAnimation { duration: root.edgeA > root.tA ? root.leadMs : root.trailMs; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial }
+    }
+
+    Behavior on edgeB {
+        enabled: root.caelestia
+        NumberAnimation { duration: root.edgeB > root.tB ? root.trailMs : root.leadMs; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial }
+    }
+
     implicitWidth: Math.round(hLayout.implicitWidth + (root.bgColor === "transparent" ? 0 : (containerPadding * 2)))
     width: implicitWidth
 
@@ -96,11 +117,28 @@ Item {
         }
     }
 
+    Item {
+        x: hLayout.x
+        y: 0
+        width: hLayout.width
+        height: root.height
+        visible: root.caelestia
+
+        Rectangle {
+            x: root.edgeA + 1
+            width: Math.max(0, root.edgeB - root.edgeA - 2)
+            height: root.height - (root.compact ? 6 : 8)
+            anchors.verticalCenter: parent.verticalCenter
+            radius: height / 2
+            color: Theme.accent
+        }
+    }
+
     Row {
         id: hLayout
 
         anchors.centerIn: parent
-        spacing: root.dotSpacing
+        spacing: root.caelestia ? 0 : root.dotSpacing
 
         Repeater {
             model: SettingsService.numberOfWorkspaces
@@ -133,10 +171,47 @@ Item {
                 visible: opacity > 0.001
                 opacity: isVisibleSlot ? 1 : 0
                 height: root.dotHeight
-                width: isActive ? root.activePillWidth : root.dotHeight
+                width: root.caelestia ? root.cell : (isActive ? root.activePillWidth : root.dotHeight)
+                property int shapeIdx: 0
+
+                onIsActiveChanged: {
+                    if (isActive)
+                        shapeIdx = Math.floor(Math.random() * root.shapes.length);
+                }
+
+                Rectangle {
+                    id: morphDot
+
+                    readonly property var shp: wsSlot.isActive ? root.shapes[wsSlot.shapeIdx] : (wsSlot.hasWindows ? { "r": 0.28, "rot": 0, "sx": 1, "sy": 1 } : { "r": 0.5, "rot": 0, "sx": 0.72, "sy": 0.72 })
+                    readonly property real base: root.dotHeight + (wsSlot.isActive ? 2 : 0)
+
+                    visible: root.caelestia
+                    anchors.centerIn: parent
+                    width: base * shp.sx
+                    height: base * shp.sy
+                    radius: Math.min(width, height) * shp.r
+                    rotation: shp.rot
+                    scale: mouseAreaH.pressed ? 0.85 : (wsSlot.isHovered && !wsSlot.isActive ? 1.2 : 1)
+                    color: {
+                        if (wsSlot.isActive)
+                            return Theme.opaqueBg;
+                        if (wsSlot.hasWindows)
+                            return Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, wsSlot.isHovered ? 0.95 : 0.7);
+                        return Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, wsSlot.isHovered ? 0.5 : 0.24);
+                    }
+
+                    Behavior on width { NumberAnimation { duration: 460; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
+                    Behavior on height { NumberAnimation { duration: 460; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
+                    Behavior on radius { NumberAnimation { duration: 460; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
+                    Behavior on rotation { NumberAnimation { duration: 460; easing.type: Easing.BezierSpline; easing.bezierCurve: root.spatial } }
+                    Behavior on color { ColorAnimation { duration: Constants.animFast } }
+                    Behavior on scale { NumberAnimation { duration: Constants.animFast; easing.type: Easing.OutQuad } }
+                }
 
                 Rectangle {
                     id: dotItem
+
+                    visible: !root.caelestia
 
                     anchors.centerIn: parent
                     height: root.dotHeight

@@ -628,7 +628,7 @@ PanelWindow {
 
             SvgIcon {
                 Layout.alignment: Qt.AlignVCenter
-                icon: root.netUp ? "wifi" : "wifi-off"
+                icon: WifiSignalService.connected ? WifiSignalService.stepIcon : (root.netUp ? "wifi" : "wifi-off")
                 iconSize: 15
                 iconColor: root.netUp ? SideState.primary : SideState.muted
                 flat: true

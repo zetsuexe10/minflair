@@ -17,6 +17,8 @@ Item {
     property real lastUp: -1
     property real lastPing: -1
     property string lastAt: ""
+    property var history: []
+    readonly property string historyFile: Quickshell.env("HOME") + "/.cache/minflair/speedtests.json"
     readonly property bool running: state === "latency" || state === "download" || state === "upload" || state === "starting"
     readonly property string script: Quickshell.shellDir + "/Modules/SystemMonitor/scripts/speedtest.py"
 
@@ -75,12 +77,43 @@ Item {
             lastUp = m.up === null || m.up === undefined ? -1 : m.up;
             lastPing = pingMs;
             lastAt = Qt.formatDateTime(new Date(), "h:mm AP");
+            history = [{ "t": Date.now(), "down": downMbps, "up": upMbps, "ping": pingMs }].concat(history).slice(0, 8);
+            saveProc.command = ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && printf '%s' \"$2\" > \"$1\"", "sh", historyFile, JSON.stringify(history)];
+            saveProc.running = true;
             state = "done";
         } else if (m.phase === "error") {
             message = m.message;
             state = "error";
         }
     }
+
+    Process {
+        id: saveProc
+    }
+
+    Process {
+        id: loadProc
+
+        command: ["sh", "-c", "cat \"$1\" 2>/dev/null || true", "sh", root.historyFile]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const d = JSON.parse(text);
+                    if (Array.isArray(d) && d.length > 0) {
+                        root.history = d.slice(0, 8);
+                        if (root.lastDown < 0) {
+                            root.lastDown = d[0].down;
+                            root.lastUp = d[0].up > 0 ? d[0].up : -1;
+                            root.lastPing = d[0].ping;
+                        }
+                    }
+                } catch (err) {
+                }
+            }
+        }
+    }
+
+    Component.onCompleted: loadProc.running = true
 
     Process {
         id: proc

@@ -26,9 +26,10 @@ SidePill {
     readonly property int first: Math.max(1, Math.min(SettingsService.numberOfWorkspaces - shown + 1, activeWsId - Math.floor(shown / 2)))
     readonly property int activeIdx: Math.max(0, Math.min(shown - 1, activeWsId - first))
 
-    readonly property var spatial: [0.38, 1.21, 0.22, 1.0, 1.0, 1.0]
-    readonly property int leadMs: 320
-    readonly property int trailMs: Math.round(leadMs * 1.5)
+    readonly property bool caelestia: SettingsService.workspaceAnim !== "classic"
+    readonly property var spatial: caelestia ? [0.38, 1.21, 0.22, 1.0, 1.0, 1.0] : [0.25, 0.1, 0.25, 1.0, 1.0, 1.0]
+    readonly property int leadMs: caelestia ? 320 : 240
+    readonly property int trailMs: caelestia ? Math.round(leadMs * 1.5) : leadMs
 
     readonly property var wins: {
         const r = [];

@@ -52,7 +52,9 @@ AppWindow {
         }
         return out;
     }
+    readonly property var wsAnimOptions: [{ "text": "Caelestia", "value": "caelestia" }, { "text": "Classic", "value": "classic" }]
     readonly property var workspaceRows: [
+        { "kind": "select", "label": "Workspace animation", "desc": "Caelestia: a capsule glides with a stretchy trail and the dot morphs. Classic: simple slide", "prop": "workspaceAnim", "options": root.wsAnimOptions },
         { "kind": "stepper", "label": "Number of workspaces", "desc": "Total shown on the bar; it follows the active one", "prop": "numberOfWorkspaces", "from": 1, "to": 20, "step": 1 }
     ]
 

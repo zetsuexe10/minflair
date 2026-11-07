@@ -125,7 +125,7 @@ SidePill {
         SideButton {
             id: netBtn
 
-            icon: (root.wifiUp || root.ethUp) ? "wifi" : "wifi-off"
+            icon: root.wifiUp ? WifiSignalService.stepIcon : (root.ethUp ? "wifi" : "wifi-off")
             iconColor: (root.wifiUp || root.ethUp) ? SideState.fg : SideState.muted
             iconSize: Constants.sizeMd
             active: SideState.popout === "network"

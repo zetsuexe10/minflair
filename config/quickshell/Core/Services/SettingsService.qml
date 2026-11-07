@@ -135,6 +135,7 @@ Item {
     property bool islandSinglePill: false
     readonly property int barWidgetHeight: 28
     property int numberOfWorkspaces: 10
+    property string workspaceAnim: "caelestia"
 
     function saveSettings() {
         saveTimer.restart();
@@ -383,6 +384,11 @@ Item {
             saveSettings();
 
     }
+    onWorkspaceAnimChanged: {
+        if (settingsLoaded)
+            saveSettings();
+    }
+
     onNumberOfWorkspacesChanged: {
         if (settingsLoaded)
             saveSettings();
@@ -455,7 +461,8 @@ Item {
                 "islandShowWorkspaces": settingsService.islandShowWorkspaces,
                 "islandShowTray": settingsService.islandShowTray,
                 "islandSinglePill": settingsService.islandSinglePill,
-                "numberOfWorkspaces": settingsService.numberOfWorkspaces
+                "numberOfWorkspaces": settingsService.numberOfWorkspaces,
+                "workspaceAnim": settingsService.workspaceAnim
             };
             // The greeter only reads fontFamily from its preferences file, so credentials
             // are never written to /var/tmp (it is world readable and persists
@@ -670,6 +677,9 @@ chmod 644 /var/tmp/minflair-greeter/settings_prefs.json || true"];
 
                         if (prefs.numberOfWorkspaces !== undefined)
                             settingsService.numberOfWorkspaces = prefs.numberOfWorkspaces;
+
+                        if (prefs.workspaceAnim !== undefined)
+                            settingsService.workspaceAnim = prefs.workspaceAnim;
 
                     } catch (e) {
                         console.error("Error loading settings: " + e);

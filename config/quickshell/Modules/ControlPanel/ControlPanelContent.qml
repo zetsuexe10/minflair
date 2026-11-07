@@ -205,7 +205,7 @@ Item {
 
                         SvgIcon {
                             anchors.centerIn: parent
-                            icon: wifi.radio ? "wifi" : "wifi-off"
+                            icon: !wifi.radio ? "wifi-off" : (wifi.connectedSsid !== "" ? WifiSignalService.stepIcon : "wifi-0")
                             iconSize: 20
                             flat: true
                             iconColor: wifi.radio ? Theme.opaqueBg : Theme.fg

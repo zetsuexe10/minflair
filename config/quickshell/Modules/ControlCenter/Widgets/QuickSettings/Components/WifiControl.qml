@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Core
 import qs.Core.Components
+import qs.Core.Services
 
 QuickSettingsTile {
     id: root
@@ -43,7 +44,7 @@ QuickSettingsTile {
     }
 
     hasMenu: true
-    icon: root.isActive ? "wifi" : "wifi-off"
+    icon: !root.isActive ? "wifi-off" : (WifiSignalService.connected ? WifiSignalService.stepIcon : "wifi")
     label: "Wi-Fi"
     subtitle: root.currentSsid
     onClicked: root.toggle()
