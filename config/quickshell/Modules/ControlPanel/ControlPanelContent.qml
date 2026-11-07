@@ -16,6 +16,8 @@ Item {
     readonly property string volumeIcon: (volumeMuted || volume === 0) ? "volume-off" : (volume < 34 ? "volume-1" : (volume < 67 ? "volume-2" : "volume"))
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
     readonly property real pageHeight: page === "main" ? 190 : 360
+    readonly property var sinks: deviceList(true)
+    readonly property var sources: deviceList(false)
     property string passwordFor: ""
     readonly property color soft: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
     readonly property color softBorder: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.08)
@@ -52,6 +54,21 @@ Item {
         return "wifi";
     }
 
+    function deviceList(wantSink) {
+        const out = [];
+        const nodes = Pipewire.nodes ? Pipewire.nodes.values : [];
+        for (let i = 0; i < nodes.length; i++) {
+            const n = nodes[i];
+            if (n && n.audio && !n.isStream && n.isSink === wantSink)
+                out.push(n);
+        }
+        return out;
+    }
+
+    function deviceLabel(n) {
+        return n.description || n.nickname || n.name || "Unknown";
+    }
+
     function setVolume(v) {
         if (!sink || !sink.audio)
             return;
@@ -68,6 +85,8 @@ Item {
     onPageChanged: {
         if (page === "wifi")
             wifi.scan(true);
+        if (page === "devices")
+            PowerProfileService.refresh();
     }
     Component.onCompleted: syncWatch()
     Component.onDestruction: {
@@ -375,6 +394,10 @@ Item {
 
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
+                                onPressAndHold: {
+                                    if (modelData.id === "sound")
+                                        root.page = "devices";
+                                }
                                 onClicked: {
                                     if (modelData.id === "sound") {
                                         if (root.sink && root.sink.audio)
@@ -760,6 +783,216 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    Item {
+        id: devicesPage
+
+        anchors.fill: parent
+        opacity: root.page === "devices" ? 1 : 0
+        visible: opacity > 0
+        enabled: root.page === "devices"
+
+        Behavior on opacity {
+            NumberAnimation { duration: Constants.animFast }
+        }
+
+        PwObjectTracker {
+            objects: Pipewire.nodes.values
+        }
+
+        RowLayout {
+            id: devHead
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: 44
+            spacing: 10
+
+            Rectangle {
+                Layout.preferredWidth: 40
+                Layout.preferredHeight: 40
+                radius: 20
+                color: root.soft
+
+                SvgIcon {
+                    anchors.centerIn: parent
+                    icon: "chevron-left"
+                    iconSize: 20
+                    flat: true
+                    iconColor: Theme.fg
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.page = "main"
+                }
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: "Sound & power"
+                font.pixelSize: 20
+                font.bold: true
+                color: Theme.fg
+            }
+        }
+
+        Flickable {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: devHead.bottom
+            anchors.bottom: parent.bottom
+            anchors.topMargin: 10
+            contentHeight: devCol.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            Column {
+                id: devCol
+
+                width: parent.width
+                spacing: 6
+
+                Text {
+                    text: "Output"
+                    font.pixelSize: 12
+                    font.bold: true
+                    color: Theme.muted
+                }
+
+                Repeater {
+                    model: root.sinks
+
+                    delegate: DeviceRow {
+                        required property var modelData
+
+                        label: root.deviceLabel(modelData)
+                        selected: Pipewire.defaultAudioSink && Pipewire.defaultAudioSink.id === modelData.id
+                        onPicked: Pipewire.preferredDefaultAudioSink = modelData
+                    }
+                }
+
+                Text {
+                    visible: root.sources.length > 0
+                    topPadding: 6
+                    text: "Input"
+                    font.pixelSize: 12
+                    font.bold: true
+                    color: Theme.muted
+                }
+
+                Repeater {
+                    model: root.sources
+
+                    delegate: DeviceRow {
+                        required property var modelData
+
+                        label: root.deviceLabel(modelData)
+                        selected: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.id === modelData.id
+                        onPicked: Pipewire.preferredDefaultAudioSource = modelData
+                    }
+                }
+
+                Text {
+                    visible: PowerProfileService.available
+                    topPadding: 6
+                    text: "Power profile"
+                    font.pixelSize: 12
+                    font.bold: true
+                    color: Theme.muted
+                }
+
+                Row {
+                    visible: PowerProfileService.available
+                    width: parent.width
+                    spacing: 8
+
+                    Repeater {
+                        model: PowerProfileService.profiles
+
+                        delegate: Rectangle {
+                            required property var modelData
+                            readonly property bool on: PowerProfileService.current === modelData.id
+
+                            width: (devCol.width - 16) / 3
+                            height: 44
+                            radius: 16
+                            color: on ? Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.92) : root.soft
+
+                            Behavior on color {
+                                ColorAnimation { duration: Constants.animFast }
+                            }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                font.pixelSize: 12
+                                font.bold: true
+                                color: parent.on ? Theme.opaqueBg : Theme.fg
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: PowerProfileService.set(modelData.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    component DeviceRow: Rectangle {
+        id: drow
+
+        property string label: ""
+        property bool selected: false
+
+        signal picked()
+
+        width: parent ? parent.width : 300
+        height: 40
+        radius: 14
+        color: selected ? Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.92) : root.soft
+
+        Behavior on color {
+            ColorAnimation { duration: Constants.animFast }
+        }
+
+        Text {
+            anchors.left: parent.left
+            anchors.right: dcheck.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: 14
+            anchors.rightMargin: 8
+            text: drow.label
+            elide: Text.ElideRight
+            font.pixelSize: 13
+            color: drow.selected ? Theme.opaqueBg : Theme.fg
+        }
+
+        SvgIcon {
+            id: dcheck
+
+            anchors.right: parent.right
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            visible: drow.selected
+            icon: "check"
+            iconSize: 16
+            flat: true
+            iconColor: Theme.opaqueBg
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: drow.picked()
         }
     }
 }
