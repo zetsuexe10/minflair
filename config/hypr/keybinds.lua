@@ -133,6 +133,11 @@ hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call bar powermenu"))
 hl.bind("CTRL + ALT + W", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_wallpaper"))
 -- # Toggle Screenshot
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_screenshot"))
+-- # Instant screenshot: whole screen / selected area / active window (nothing is closed)
+hl.bind("Print", hl.dsp.exec_cmd("$HOME/.minflair/quickshell/Modules/ScreenCapture/scripts/screenshot.sh full"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("$HOME/.minflair/quickshell/Modules/ScreenCapture/scripts/screenshot.sh area"))
+hl.bind("CTRL + Print", hl.dsp.exec_cmd("$HOME/.minflair/quickshell/Modules/ScreenCapture/scripts/screenshot.sh window"))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("$HOME/.minflair/quickshell/Modules/ScreenCapture/scripts/screenshot.sh ocr"))
 -- # Toggle Dashboard
 hl.bind("CTRL + ALT + D", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_dashboard"))
 
@@ -143,6 +148,7 @@ hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell
 
 -- # Toggle System monitor (network, recent apps)
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_sysMonitor"))
+hl.bind("CTRL + ALT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_sysMonitor"))
 
 -- # Toggle Speed test
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_speedTest"))

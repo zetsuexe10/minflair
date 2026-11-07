@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.Core
 import qs.Core.Components
 import qs.Core.Services
@@ -37,6 +38,23 @@ Item {
         page = pages[(i + dir + pages.length) % pages.length];
     }
 
+    function iconFor(cls) {
+        if (!cls)
+            return "";
+        let p = Quickshell.iconPath(cls.toLowerCase(), true);
+        if (p !== "")
+            return p;
+        const e = DesktopEntries.heuristicLookup(cls);
+        if (e && e.icon) {
+            p = Quickshell.iconPath(e.icon, true);
+            if (p !== "")
+                return p;
+            if (e.icon.indexOf("/") === 0)
+                return "file://" + e.icon;
+        }
+        return "";
+    }
+
     function hue(id) {
         let h = 0;
         for (let i = 0; i < id.length; i++)
@@ -53,7 +71,7 @@ Item {
     }
 
     implicitWidth: 420
-    implicitHeight: 312
+    implicitHeight: 318
     onActiveChanged: syncWatch()
     Component.onCompleted: syncWatch()
     Component.onDestruction: {
@@ -160,6 +178,9 @@ Item {
         Item {
             id: overviewPage
 
+            readonly property real diskPct: SystemStats.disks.length > 0 ? SystemStats.disks[0].usage : 0
+            readonly property real tempC: parseFloat(SystemStats.cpuTemp) || 0
+
             anchors.fill: parent
             opacity: root.page === "overview" ? 1 : 0
             visible: opacity > 0
@@ -172,10 +193,51 @@ Item {
                 anchors.fill: parent
                 spacing: 10
 
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 108
+                    Layout.maximumHeight: 108
+                    radius: 26
+                    color: root.soft
+                    border.width: 1
+                    border.color: root.softBorder
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 4
+
+                        Repeater {
+                            model: [
+                                { "label": "CPU", "value": SystemStats.cpuUsage, "text": Math.round(SystemStats.cpuUsage) + "%", "hue": 0 },
+                                { "label": "Memory", "value": SystemStats.memUsage, "text": Math.round(SystemStats.memUsage) + "%", "hue": 1 },
+                                { "label": "Disk", "value": overviewPage.diskPct, "text": Math.round(overviewPage.diskPct) + "%", "hue": 2 },
+                                { "label": "Temp", "value": overviewPage.tempC, "text": Math.round(overviewPage.tempC) + "°", "hue": 3 }
+                            ]
+
+                            delegate: Item {
+                                required property var modelData
+
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                Ring {
+                                    anchors.centerIn: parent
+                                    width: Math.min(parent.width, parent.height)
+                                    height: width
+                                    value: modelData.value
+                                    label: modelData.label
+                                    text: modelData.text
+                                    ringColor: modelData.hue === 3 && modelData.value > 80 ? Theme.accentComplementary : (modelData.hue === 0 ? Theme.accent : (modelData.hue === 1 ? Qt.lighter(Theme.accent, 1.25) : (modelData.hue === 2 ? Qt.darker(Theme.accent, 1.15) : Theme.accentComplementary)))
+                                }
+                            }
+                        }
+                    }
+                }
+
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.preferredHeight: 150
                     spacing: 10
 
                     Repeater {
@@ -192,7 +254,7 @@ Item {
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            radius: 22
+                            radius: 26
                             color: root.soft
                             border.width: 1
                             border.color: root.softBorder
@@ -202,7 +264,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
-                                height: 60
+                                height: 52
                                 values: modelData.down ? NetMonitorService.rxHistory : NetMonitorService.txHistory
                                 lineColor: modelData.down ? Theme.accent : Theme.accentComplementary
                                 floorMax: 131072
@@ -212,78 +274,30 @@ Item {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.margins: 14
-                                spacing: 3
+                                spacing: 2
 
                                 Text {
                                     text: modelData.label
-                                    font.pixelSize: 12
+                                    font.pixelSize: 11
                                     font.bold: true
                                     color: Theme.muted
                                 }
 
                                 Text {
                                     text: NetMonitorService.formatRate(rate)
-                                    font.pixelSize: 21
+                                    font.pixelSize: 19
                                     font.bold: true
                                     color: Theme.fg
                                 }
 
                                 Text {
-                                    text: "avg " + NetMonitorService.formatRate(avg)
-                                    font.pixelSize: 11
+                                    text: "avg " + NetMonitorService.formatRate(avg) + " · peak " + NetMonitorService.formatRate(peak)
+                                    font.pixelSize: 10
                                     color: Theme.muted
                                 }
 
                                 Text {
-                                    text: "peak " + NetMonitorService.formatRate(peak)
-                                    font.pixelSize: 11
-                                    color: Theme.muted
-                                }
-                            }
-                        }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: false
-                    Layout.preferredHeight: 62
-                    Layout.maximumHeight: 62
-                    spacing: 10
-
-                    Repeater {
-                        model: [
-                            { "label": "Received", "value": NetMonitorService.formatBytes(NetMonitorService.totalRx) },
-                            { "label": "Sent", "value": NetMonitorService.formatBytes(NetMonitorService.totalTx) },
-                            { "label": "CPU", "value": Math.round(SystemStats.cpuUsage) + "%" },
-                            { "label": "Memory", "value": Math.round(SystemStats.memUsage) + "%" }
-                        ]
-
-                        delegate: Rectangle {
-                            required property var modelData
-
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: 18
-                            color: root.soft
-                            border.width: 1
-                            border.color: root.softBorder
-
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 2
-
-                                Text {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: modelData.value
-                                    font.pixelSize: 14
-                                    font.bold: true
-                                    color: Theme.fg
-                                }
-
-                                Text {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    text: modelData.label
+                                    text: (modelData.down ? "Received " : "Sent ") + NetMonitorService.formatBytes(modelData.down ? NetMonitorService.totalRx : NetMonitorService.totalTx)
                                     font.pixelSize: 10
                                     color: Theme.muted
                                 }
@@ -340,9 +354,23 @@ Item {
                         width: 34
                         height: 34
                         radius: 17
-                        color: root.hue(modelData.id)
+                        color: appIcon.status === Image.Ready ? Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10) : root.hue(modelData.id)
+
+                        Image {
+                            id: appIcon
+
+                            anchors.centerIn: parent
+                            width: 24
+                            height: 24
+                            sourceSize: Qt.size(48, 48)
+                            fillMode: Image.PreserveAspectFit
+                            asynchronous: true
+                            source: root.iconFor(modelData.id)
+                            visible: status === Image.Ready
+                        }
 
                         Text {
+                            visible: appIcon.status !== Image.Ready
                             anchors.centerIn: parent
                             text: AppHistoryService.prettyName(modelData.id).charAt(0)
                             font.pixelSize: 15

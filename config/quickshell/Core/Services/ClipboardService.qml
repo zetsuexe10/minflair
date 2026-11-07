@@ -128,10 +128,11 @@ Item {
         id: loadClipboardProc
 
         command: ["cliphist", "list"]
-        onExited: function(exitCode) {
-            if (exitCode === 0) {
+
+        function handle(raw) {
+            if (true) {
                 clipboardModel.clear();
-                let output = clipboardOutput.text.trim();
+                let output = raw.trim();
                 if (output === "") {
                     root.filterClipboard("");
                     return ;
@@ -174,6 +175,8 @@ Item {
 
         stdout: StdioCollector {
             id: clipboardOutput
+
+            onStreamFinished: loadClipboardProc.handle(clipboardOutput.text)
         }
 
     }
@@ -189,6 +192,14 @@ Item {
     Process {
         id: copyProc
     }
+
+    Process {
+        id: watcherProc
+
+        command: ["sh", "-c", "command -v wl-paste >/dev/null 2>&1 && command -v cliphist >/dev/null 2>&1 || exit 0; pgrep -f 'wl-paste --type text --watch' >/dev/null || setsid wl-paste --type text --watch cliphist store >/dev/null 2>&1 & pgrep -f 'wl-paste --type image --watch' >/dev/null || setsid wl-paste --type image --watch cliphist store >/dev/null 2>&1 &; exit 0"]
+    }
+
+    Component.onCompleted: watcherProc.running = true
 
     Process {
         id: deleteProc

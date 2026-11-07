@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
 import qs.Core
 import qs.Core.Components
@@ -61,15 +60,7 @@ Item {
         sink.audio.volume = Math.max(0, Math.min(1, v / 100));
     }
 
-    readonly property var btAdapter: Bluetooth.defaultAdapter
-    readonly property bool btOn: btAdapter ? btAdapter.enabled : false
-    readonly property string btConnectedName: {
-        const list = (btAdapter && btAdapter.devices) ? btAdapter.devices.values : [];
-        for (let i = 0; i < list.length; i++)
-            if (list[i] && list[i].connected)
-                return list[i].name || "";
-        return "";
-    }
+    readonly property bool nightOn: DisplayProfileService.nightLightActive
 
     implicitWidth: 360
     implicitHeight: pageHeight
@@ -253,17 +244,16 @@ Item {
                 }
 
                 Rectangle {
-                    id: btTile
+                    id: nightTile
 
                     Layout.preferredWidth: 84
                     Layout.fillHeight: true
                     radius: 26
-                    color: root.btOn ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
+                    color: root.nightOn ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
                     border.width: 1
-                    border.color: root.btOn ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.45) : root.softBorder
-                    scale: btArea.pressed ? 0.95 : 1
-                    opacity: root.btAdapter ? 1 : 0.5
-
+                    border.color: root.nightOn ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.45) : root.softBorder
+                    scale: nightArea.pressed ? 0.95 : 1
+            
                     Behavior on color {
                         ColorAnimation { duration: Constants.animFast }
                     }
@@ -279,14 +269,14 @@ Item {
                         width: 36
                         height: 36
                         radius: 18
-                        color: root.btOn ? Theme.accent : Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.16)
+                        color: root.nightOn ? Theme.accent : Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.16)
 
                         SvgIcon {
                             anchors.centerIn: parent
-                            icon: root.btOn ? "bluetooth" : "bluetooth-off"
+                            icon: root.nightOn ? "moon-filled" : "moon"
                             iconSize: 18
                             flat: true
-                            iconColor: root.btOn ? Theme.opaqueBg : Theme.fg
+                            iconColor: root.nightOn ? Theme.opaqueBg : Theme.fg
                         }
                     }
 
@@ -299,7 +289,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: "Bluetooth"
+                            text: "Night Light"
                             elide: Text.ElideRight
                             font.pixelSize: 12
                             font.bold: true
@@ -308,7 +298,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: !root.btAdapter ? "None" : (!root.btOn ? "Off" : (root.btConnectedName !== "" ? root.btConnectedName : "On"))
+                            text: root.nightOn ? "On · " + DisplayProfileService.nightLightTemperature + "K" : "Off"
                             elide: Text.ElideRight
                             font.pixelSize: 11
                             color: Theme.muted
@@ -316,13 +306,12 @@ Item {
                     }
 
                     MouseArea {
-                        id: btArea
+                        id: nightArea
 
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (root.btAdapter)
-                                root.btAdapter.enabled = !root.btAdapter.enabled;
+                            DisplayProfileService.nightLightActive = !DisplayProfileService.nightLightActive;
                         }
                     }
                 }

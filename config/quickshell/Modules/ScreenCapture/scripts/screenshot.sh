@@ -37,6 +37,7 @@ play_sound() {
 copy_and_notify() {
   if [ -f "$FILENAME" ]; then
     wl-copy <"$FILENAME"
+    qs ipc call osd showMessage "Screenshot" "Saved and copied" "screenshot" >/dev/null 2>&1 || true
     play_sound
   fi
 }
