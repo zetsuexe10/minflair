@@ -436,7 +436,7 @@ from scripts with `qs ipc call osd showVolume` or `showBrightness`.
 
 ### 🎛️ Quick panel
 
-Hold the Sound tile in the quick panel to open **Sound & power**: pick the output and input device, and switch the power profile (Saver / Balanced / Performance, needs `power-profiles-daemon`).
+Right-click or hold the Sound tile in the quick panel to open **Sound & power**: pick the output and input device, and switch the power profile (Saver / Balanced / Performance, needs `power-profiles-daemon`).
 
 `Super+Z` opens an iPhone-style control panel: a Wi-Fi tile (toggle the radio, open the network list to scan, connect
 with a password, disconnect or forget), a Bluetooth tile beside Wi-Fi, Sound and Mic toggles; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the

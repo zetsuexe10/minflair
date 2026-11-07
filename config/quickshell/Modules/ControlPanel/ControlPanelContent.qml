@@ -385,6 +385,18 @@ Item {
 
                             scale: toggleArea.pressed ? 0.95 : 1
 
+                            SvgIcon {
+                                visible: modelData.id === "sound"
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                icon: "chevron-right"
+                                iconSize: 14
+                                flat: true
+                                iconColor: modelData.on ? Theme.opaqueBg : Theme.muted
+                                opacity: 0.7
+                            }
+
                             Behavior on scale {
                                 NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
                             }
@@ -394,11 +406,17 @@ Item {
 
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
                                 onPressAndHold: {
                                     if (modelData.id === "sound")
                                         root.page = "devices";
                                 }
-                                onClicked: {
+                                onClicked: (mouse) => {
+                                    if (mouse.button === Qt.RightButton) {
+                                        if (modelData.id === "sound")
+                                            root.page = "devices";
+                                        return;
+                                    }
                                     if (modelData.id === "sound") {
                                         if (root.sink && root.sink.audio)
                                             root.sink.audio.muted = !root.sink.audio.muted;
