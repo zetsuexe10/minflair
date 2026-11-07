@@ -15,7 +15,7 @@ Item {
     readonly property int volume: (sink && sink.audio) ? Math.round(sink.audio.volume * 100) : 0
     readonly property string volumeIcon: (volumeMuted || volume === 0) ? "volume-off" : (volume < 34 ? "volume-1" : (volume < 67 ? "volume-2" : "volume"))
     readonly property bool volumeMuted: (sink && sink.audio) ? sink.audio.muted : false
-    readonly property real pageHeight: page === "main" ? 212 : 400
+    readonly property real pageHeight: page === "main" ? 258 : 400
     property string passwordFor: ""
     readonly property color soft: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.10)
     readonly property color softBorder: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.08)
@@ -151,7 +151,7 @@ Item {
                     id: wifiTile
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 98
+                    Layout.preferredHeight: 108
                     radius: 26
                     color: wifi.radio ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.20) : root.soft
                     border.width: 1
@@ -181,9 +181,9 @@ Item {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.margins: 14
-                        width: 40
-                        height: 40
-                        radius: 20
+                        width: 36
+                        height: 36
+                        radius: 18
                         color: wifi.radio ? Theme.accent : Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.16)
 
                         SvgIcon {
@@ -299,6 +299,65 @@ Item {
                                     } else {
                                         AudioService.setMicMuted(!AudioService.micMuted);
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: false
+                    Layout.preferredHeight: 50
+                    Layout.maximumHeight: 50
+                    spacing: 10
+
+                    Repeater {
+                        model: [
+                            { "id": "dnd", "icon": NotificationService.dndEnabled ? "bell-off" : "bell", "on": NotificationService.dndEnabled },
+                            { "id": "night", "icon": DisplayProfileService.nightLightActive ? "moon-filled" : "moon", "on": DisplayProfileService.nightLightActive },
+                            { "id": "caffeine", "icon": DisplayProfileService.caffeineActive ? "coffee-filled" : "coffee", "on": DisplayProfileService.caffeineActive }
+                        ]
+
+                        delegate: Rectangle {
+                            required property var modelData
+
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            radius: 25
+                            color: modelData.on ? Theme.accent : root.soft
+                            border.width: 1
+                            border.color: root.softBorder
+                            scale: toggleChipArea.pressed ? 0.95 : 1
+
+                            Behavior on color {
+                                ColorAnimation { duration: Constants.animFast }
+                            }
+
+                            Behavior on scale {
+                                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                            }
+
+                            SvgIcon {
+                                anchors.centerIn: parent
+                                icon: modelData.icon
+                                iconSize: 20
+                                flat: true
+                                iconColor: modelData.on ? Theme.opaqueBg : Theme.fg
+                            }
+
+                            MouseArea {
+                                id: toggleChipArea
+
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (modelData.id === "dnd")
+                                        NotificationService.dndEnabled = !NotificationService.dndEnabled;
+                                    else if (modelData.id === "night")
+                                        DisplayProfileService.nightLightActive = !DisplayProfileService.nightLightActive;
+                                    else
+                                        DisplayProfileService.caffeineActive = !DisplayProfileService.caffeineActive;
                                 }
                             }
                         }

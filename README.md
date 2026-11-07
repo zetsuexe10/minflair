@@ -432,7 +432,7 @@ from scripts with `qs ipc call osd showVolume` or `showBrightness`.
 ### 🎛️ Quick panel
 
 `Super+Z` opens an iPhone-style control panel: a Wi-Fi tile (toggle the radio, open the network list to scan, connect
-with a password, disconnect or forget), Sound and Mic toggles; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the
+with a password, disconnect or forget), Sound and Mic toggles, quick switches for Do Not Disturb, Night Light and Caffeine; the brightness and volume sliders sit on the left, Wi-Fi on top right. On the
 Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
 centred popup.
 
