@@ -262,7 +262,7 @@ Autostart skips anything that is not installed.
 | `Super+Shift+C` | colour picker |
 | `Super+Z` | quick panel: Wi-Fi, brightness, volume |
 | `Super+I` | system monitor: live network speed, recent apps |
-| `Super+Shift+I` | speed test (fast.com servers: ping, download, upload) |
+| `Super+T` | speed test (fast.com servers: ping, download, upload) |
 | `Super+Space` | switch keyboard layout |
 | `Super+R` | restart the shell |
 | `Super+Ctrl+T` | toggle touchpad |
@@ -436,11 +436,24 @@ with a password, disconnect or forget), Sound and Mic toggles, quick switches fo
 Dynamic bar it grows out of the island (also under Controls in the tools menu); on the other bars it opens as a
 centred popup.
 
+### ⌨️ Keybinds not working?
+
+The keybinds live in `~/.minflair/hypr/keybinds.lua` and only exist in the **Minflair** session (pick it in your display
+manager, or run `~/.minflair/bin/minflair-session` from a TTY). If you start `qs` inside your own Hyprland session, add this
+to your own `hyprland.lua` to load them:
+
+```lua
+package.path = os.getenv("HOME") .. "/.minflair/hypr/?.lua;" .. package.path
+require("keybinds")
+```
+
+Check for config errors with `hyprctl configerrors`, and run `qs` from a terminal to see shell errors.
+
 ### 📊 System monitor and speed test
 
 `Super+I` opens a three-tab monitor: live download/upload with graphs plus average, peak and session totals and CPU/memory;
 the apps you used recently with how long each was in focus (remembered between sessions); and a speed test.
-`Super+Shift+I` jumps straight to the speed test, which uses the same fast.com servers as the `fast` CLI and reports ping,
+`Super+T` jumps straight to the speed test, which uses the same fast.com servers as the `fast` CLI and reports ping,
 download and upload. It needs only `python3`.
 
 <a id="dashboard"></a>

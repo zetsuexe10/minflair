@@ -145,7 +145,8 @@ hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_sysMonitor"))
 
 -- # Toggle Speed test
-hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_speedTest"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_speedTest"))
+
 -- # Toggle GitHub widget
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("socat - UNIX-CONNECT:/tmp/quickshell_github"))
 -- # Toggle Control Center (Super)

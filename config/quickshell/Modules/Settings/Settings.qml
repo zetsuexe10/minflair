@@ -239,7 +239,7 @@ AppWindow {
                     { "kind": "info", "label": "Super + Shift + I", "desc": "", "text": "GitHub widget" },
                     { "kind": "info", "label": "Super + Z", "desc": "", "text": "Quick panel: Wi-Fi, brightness, volume" },
                     { "kind": "info", "label": "Super + I", "desc": "", "text": "System monitor: network, recent apps, speed test" },
-                    { "kind": "info", "label": "Super + Shift + I", "desc": "", "text": "Speed test" },
+                    { "kind": "info", "label": "Super + T", "desc": "", "text": "Speed test" },
                     { "kind": "info", "label": "Super + X", "desc": "", "text": "Power menu (Dynamic bar)" },
                     { "kind": "info", "label": "Super + V", "desc": "", "text": "Clipboard history (opens in the Dynamic island)" },
                     { "kind": "info", "label": "Ctrl + Alt + W", "desc": "", "text": "Wallpaper selector" }
